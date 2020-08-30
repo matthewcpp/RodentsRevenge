@@ -1,0 +1,6 @@
+[requires]
+sdl2/2.0.12@bincrafters/stable
+
+[generators]
+cmake_find_package
+cmake_paths
