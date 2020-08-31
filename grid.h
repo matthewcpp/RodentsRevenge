@@ -10,7 +10,8 @@ typedef enum {
     RR_CELL_EMPTY,
     RR_CELL_BLOCK,
     RR_CELL_WALL,
-    RR_CELL_MOUSE
+    RR_CELL_MOUSE,
+    RR_CELL_COUNT
 } rrCellType;
 
 typedef struct rrGrid {

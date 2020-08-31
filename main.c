@@ -37,6 +37,7 @@ int main(int argc, char* argv[]){
 
     rr_sdl_controller_init(&controller, game);
     rr_sdl_renderer_init(&renderer, game, window);
+    rr_sdl_renderer_load_spritesheet(&renderer, "C:/development/repos/RodentsRevenge/assets/spritesheet.png");
 
     rr_game_init(game);
 

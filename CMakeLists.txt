@@ -9,5 +9,6 @@ set_compiler_options(RodentsRevenge)
 
 include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
 find_package(SDL2 REQUIRED)
+find_package(sdl2_image REQUIRED)
 
-target_link_libraries(RodentsRevenge SDL2::SDL2)
+target_link_libraries(RodentsRevenge SDL2::SDL2 sdl2_image::sdl2_image)
