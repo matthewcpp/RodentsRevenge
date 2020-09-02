@@ -46,6 +46,7 @@ int rr_sdl_display_load_spritesheet(rrSDLDisplay* renderer, const char* path) {
     rr_sdl_display_sprite_info(renderer->_sprites + RR_CELL_BLOCK, 1, 1);
     rr_sdl_display_sprite_info(renderer->_sprites + RR_CELL_MOUSE, 37, 19);
     rr_sdl_display_sprite_info(renderer->_sprites + RR_CELL_WALL, 37, 37);
+    rr_sdl_display_sprite_info(renderer->_sprites + RR_CELL_CAT, 19, 1);
 
     return 1;
 }

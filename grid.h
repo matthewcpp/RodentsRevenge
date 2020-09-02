@@ -13,8 +13,9 @@ typedef enum {
     RR_CELL_BLOCK,
     RR_CELL_WALL,
     RR_CELL_MOUSE,
+    RR_CELL_CAT,
     RR_CELL_COUNT
-} rrCellType;
+} rrType;
 
 typedef struct rrGrid {
     unsigned char* cells;
@@ -25,8 +26,8 @@ typedef struct rrGrid {
 void rr_grid_init(rrGrid* grid, int width, int height);
 void rr_grid_uninit(rrGrid* grid);
 int rr_grid_position_is_valid(rrGrid* grid, rrPoint* position);
-void rr_grid_set_cell_type(rrGrid* grid, rrPoint* position, rrCellType type);
-rrCellType rr_grid_get_cell_type(rrGrid* grid, rrPoint* postion);
+void rr_grid_set_cell_type(rrGrid* grid, rrPoint* position, rrType type);
+rrType rr_grid_get_cell_type(rrGrid* grid, rrPoint* postion);
 int rr_grid_load_from_file(rrGrid* grid, const char* path);
 
 #endif

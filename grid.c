@@ -16,11 +16,11 @@ int rr_grid_position_is_valid(rrGrid* grid, rrPoint* position) {
     return position->x >= 0 && position->x < grid->width && position->y >= 0 && position->y < grid->height;
 }
 
-void rr_grid_set_cell_type(rrGrid* grid, rrPoint* position, rrCellType type) {
+void rr_grid_set_cell_type(rrGrid* grid, rrPoint* position, rrType type) {
     grid->cells[grid->width * position->y + position->x] = type;
 }
 
-rrCellType rr_grid_get_cell_type(rrGrid* grid, rrPoint* position) {
+rrType rr_grid_get_cell_type(rrGrid* grid, rrPoint* position) {
     return grid->cells[grid->width * position->y + position->x];
 }
 
