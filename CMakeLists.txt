@@ -4,7 +4,7 @@ include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/util_functions.cmake)
 
 project (RodentsRevenge C)
 
-add_executable(RodentsRevenge main.c player.h player.c grid.h grid.c game.h game.c sdl_controller.h sdl_controller.c sdl_display.h sdl_display.c)
+add_executable(RodentsRevenge main.c player.h player.c grid.h grid.c game.h game.c sdl_controller.h sdl_controller.c sdl_display.h sdl_display.c point.h point.c)
 set_compiler_options(RodentsRevenge)
 
 include(${CMAKE_BINARY_DIR}/conan_paths.cmake)

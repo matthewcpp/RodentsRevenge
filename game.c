@@ -13,7 +13,9 @@ int rr_game_new_level(rrGame* game, const char* path){
     if (!rr_grid_load_from_file(&game->grid, path))
         return 0;
 
-    rr_player_set_pos(&game->player, 11, 11);
+    rrPoint pos;
+    rr_point_set(&pos, 11, 11);
+    rr_player_set_pos(&game->player, &pos);
 
     return 1;
 }
