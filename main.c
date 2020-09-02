@@ -14,7 +14,6 @@ int main(int argc, char* argv[]){
     SDL_Window* window = NULL;
     SDL_Event event;
     int keep_going = 1;
-    int i;
     Uint32 last_update;
 
     rrGame* game = NULL;
@@ -45,20 +44,7 @@ int main(int argc, char* argv[]){
 
     rr_game_init(game);
 
-    rr_player_set_pos(&game->player, 3, 3);
-
-    for (i = 0; i < RR_GRID_WIDTH; i++) {
-        rr_grid_set_cell_type(&game->grid, i,0, RR_CELL_WALL);
-        rr_grid_set_cell_type(&game->grid, i,RR_GRID_HEIGHT - 1, RR_CELL_WALL);
-    }
-
-    for (i = 0; i < RR_GRID_HEIGHT; i++) {
-        rr_grid_set_cell_type(&game->grid, 0, i, RR_CELL_WALL);
-        rr_grid_set_cell_type(&game->grid, RR_GRID_WIDTH - 1, i, RR_CELL_WALL);
-    }
-
-    rr_grid_set_cell_type(&game->grid, 5,5, RR_CELL_BLOCK);
-    rr_grid_set_cell_type(&game->grid, 6,5, RR_CELL_BLOCK);
+    rr_game_new_level(game, "C:/development/repos/RodentsRevenge/assets/levels/level01.txt");
 
     last_update =  SDL_GetTicks();
 

@@ -25,5 +25,6 @@ void rr_grid_uninit(rrGrid* grid);
 int rr_grid_position_is_valid(rrGrid* grid, int x, int y);
 void rr_grid_set_cell_type(rrGrid* grid, int x, int y, rrCellType type);
 rrCellType rr_grid_get_cell_type(rrGrid* grid, int x, int y);
+int rr_grid_load_from_file(rrGrid* grid, const char* path);
 
 #endif

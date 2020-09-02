@@ -14,8 +14,6 @@ int rr_player_set_pos(rrPlayer* player, int x, int y) {
         return 0;
     }
 
-    rr_grid_set_cell_type(player->_grid, player->pos_x, player->pos_y, RR_CELL_EMPTY);
-
     player->pos_x = x;
     player->pos_y = y;
 
@@ -101,8 +99,10 @@ int rr_player_move(rrPlayer* player, int delta_x, int delta_y) {
     else if (targetCellType == RR_CELL_BLOCK)
         can_move = rr_player_push(player, target_x, target_y);
 
-    if (can_move)
+    if (can_move){
+        rr_grid_set_cell_type(player->_grid, player->pos_x, player->pos_y, RR_CELL_EMPTY);
         rr_player_set_pos(player, target_x, target_y);
+    }
 
     return can_move;
 }

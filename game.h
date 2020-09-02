@@ -12,4 +12,6 @@ typedef struct rrGame {
 void rr_game_init(rrGame* game);
 void rr_game_uninit(rrGame* game);
 
+int rr_game_new_level(rrGame* game, const char* path);
+
 #endif
