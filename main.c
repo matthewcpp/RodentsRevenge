@@ -2,7 +2,7 @@
 
 #include <SDL.h>
 #include "sdl_controller.h"
-#include "sdl_renderer.h"
+#include "sdl_display.h"
 
 #include "stdlib.h"
 #include "stdio.h"
@@ -19,7 +19,7 @@ int main(int argc, char* argv[]){
 
     rrGame* game = NULL;
     rrSDLController controller;
-    rrSDLRenderer renderer;
+    rrSDLDisplay renderer;
     (void)argc;
     (void)argv;
 
@@ -39,9 +39,9 @@ int main(int argc, char* argv[]){
     }
 
     rr_sdl_controller_init(&controller, game);
-    rr_sdl_renderer_init(window, &renderer, game);
-    rr_sdl_renderer_load_spritesheet(&renderer, "C:/development/repos/RodentsRevenge/assets/spritesheet.png");
-    rr_sdl_renderer_load_font(&renderer, "C:/development/repos/RodentsRevenge/assets/vegur-regular.ttf");
+    rr_sdl_display_init(window, &renderer, game);
+    rr_sdl_display_load_spritesheet(&renderer, "C:/development/repos/RodentsRevenge/assets/spritesheet.png");
+    rr_sdl_display_load_font(&renderer, "C:/development/repos/RodentsRevenge/assets/vegur-regular.ttf");
 
     rr_game_init(game);
 
@@ -75,14 +75,14 @@ int main(int argc, char* argv[]){
         Uint32 now = SDL_GetTicks();
         if (now - last_update >= 32) {
             rr_sdl_controller_update(&controller);
-            rr_sdl_renderer_draw(&renderer);
+            rr_sdl_display_draw(&renderer);
             last_update = now;
         }
         SDL_Delay(1);
     }
 
     rr_game_uninit(game);
-    rr_sdl_renderer_uninit(&renderer);
+    rr_sdl_display_uninit(&renderer);
     SDL_VideoQuit();
 
     return 0;
