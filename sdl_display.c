@@ -80,16 +80,15 @@ void rr_sdl_display_draw_board_background(rrSDLDisplay* renderer, rrPoint* map_p
 }
 
 void rr_sdl_display_draw_map(rrSDLDisplay* renderer, rrPoint* map_pos) {
-    int x, y;
+    rrPoint cell;
 
     SDL_Rect spriteTile;
     spriteTile.w = RR_RENDERER_TILE_SIZE;
     spriteTile.h = RR_RENDERER_TILE_SIZE;
 
-    for (x = 0; x < RR_GRID_WIDTH; x++) {
-        for (y = 0; y < RR_GRID_HEIGHT; y++) {
-            int index = y * RR_GRID_WIDTH + x;
-            unsigned char cell_value = renderer->_game->grid.cells[index];
+    for (cell.x = 0; cell.x < RR_GRID_WIDTH; cell.x++) {
+        for (cell.y = 0; cell.y < RR_GRID_HEIGHT; cell.y++) {
+            unsigned char cell_value = rr_grid_get_cell(&renderer->_game->grid, &cell)->type;
             SpriteIndex sprite_index;
 
             if (cell_value == RR_CELL_EMPTY)
@@ -110,8 +109,8 @@ void rr_sdl_display_draw_map(rrSDLDisplay* renderer, rrPoint* map_pos) {
 
             assert(sprite_index != RR_SPRITE_COUNT);
 
-            spriteTile.x = map_pos->x + x * 16;
-            spriteTile.y = map_pos->y + y * 16;
+            spriteTile.x = map_pos->x + cell.x * 16;
+            spriteTile.y = map_pos->y + cell.y * 16;
 
             SDL_RenderCopy(renderer->_renderer, renderer->_spritesheet, renderer->_sprites + sprite_index, &spriteTile);
         }

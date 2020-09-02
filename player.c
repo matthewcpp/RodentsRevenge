@@ -15,12 +15,12 @@ int rr_player_push_horizontal(rrPlayer* player, rrPoint* target, int dir) {
     /* find the first non block tile along the direction*/
     do {
         end_cell.x += dir;
-        end_cell_type = rr_grid_get_cell_type(player->entity._grid, &end_cell);
+        end_cell_type = rr_grid_get_cell(player->entity._grid, &end_cell)->type;
     }
     while (end_cell_type == RR_CELL_BLOCK);
 
-    /* blocks along this vector are against a wall and cannot be moved. */
-    if (end_cell_type == RR_CELL_WALL)
+    /* blocks along this vector are against an immovable object and cannot be moved. */
+    if (rr_grid_cell_is_blocked(player->entity._grid, &end_cell))
         return 0;
 
     /* push all the blocks over */
@@ -42,12 +42,12 @@ int rr_player_push_vertical(rrPlayer* player, rrPoint* target, int dir) {
     /* find the first non block tile along the direction*/
     do {
         end_cell.y += dir;
-        end_cell_type = rr_grid_get_cell_type(player->entity._grid, &end_cell);
+        end_cell_type = rr_grid_get_cell(player->entity._grid, &end_cell)->type;
     }
     while (end_cell_type == RR_CELL_BLOCK);
 
-    /* blocks along this vector are against a wall and cannot be moved. */
-    if (end_cell_type == RR_CELL_WALL)
+    /* blocks along this vector are against an immovable object and cannot be moved. */
+    if (rr_grid_cell_is_blocked(player->entity._grid, &end_cell))
         return 0;
 
     /* push all the blocks over */
@@ -82,7 +82,7 @@ int rr_player_move(rrPlayer* player, rrPoint* delta) {
     if (!rr_grid_position_is_valid(player->entity._grid, &target))
         return 0;
 
-    targetCellType = rr_grid_get_cell_type(player->entity._grid, &target);
+    targetCellType = rr_grid_get_cell(player->entity._grid, &target)->type;
 
     if (targetCellType == RR_CELL_WALL)
         can_move = 0;
