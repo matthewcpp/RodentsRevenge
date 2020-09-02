@@ -8,7 +8,8 @@ add_executable(RodentsRevenge main.c player.h player.c grid.h grid.c game.h game
 set_compiler_options(RodentsRevenge)
 
 include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
-find_package(SDL2 REQUIRED)
+find_package(sdl2 REQUIRED)
 find_package(sdl2_image REQUIRED)
+find_package(sdl2_ttf REQUIRED)
 
-target_link_libraries(RodentsRevenge SDL2::SDL2 sdl2_image::sdl2_image)
+target_link_libraries(RodentsRevenge sdl2::sdl2 sdl2_image::sdl2_image sdl2_ttf::sdl2_ttf)

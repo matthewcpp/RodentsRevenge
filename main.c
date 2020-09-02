@@ -7,6 +7,9 @@
 #include "stdlib.h"
 #include "stdio.h"
 
+#define RR_SCREEN_WIDTH 640
+#define RR_SCREEN_HEIGHT 480
+
 int main(int argc, char* argv[]){
     SDL_Window* window = NULL;
     SDL_Event event;
@@ -26,8 +29,8 @@ int main(int argc, char* argv[]){
     window = SDL_CreateWindow("RodentsRevenge",
                               SDL_WINDOWPOS_UNDEFINED,
                               SDL_WINDOWPOS_UNDEFINED,
-                              640,
-                              480,
+                              RR_SCREEN_WIDTH,
+                              RR_SCREEN_HEIGHT,
                               SDL_WINDOW_SHOWN);
 
     SDL_InitSubSystem(SDL_INIT_JOYSTICK);
@@ -36,8 +39,9 @@ int main(int argc, char* argv[]){
     }
 
     rr_sdl_controller_init(&controller, game);
-    rr_sdl_renderer_init(&renderer, game, window);
+    rr_sdl_renderer_init(window, &renderer, game);
     rr_sdl_renderer_load_spritesheet(&renderer, "C:/development/repos/RodentsRevenge/assets/spritesheet.png");
+    rr_sdl_renderer_load_font(&renderer, "C:/development/repos/RodentsRevenge/assets/vegur-regular.ttf");
 
     rr_game_init(game);
 
@@ -78,6 +82,7 @@ int main(int argc, char* argv[]){
     }
 
     rr_game_uninit(game);
+    rr_sdl_renderer_uninit(&renderer);
     SDL_VideoQuit();
 
     return 0;
