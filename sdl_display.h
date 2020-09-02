@@ -6,11 +6,19 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 
+typedef enum {
+    RR_SPRITE_BLOCK,
+    RR_SPRITE_WALL,
+    RR_SPRITE_MOUSE,
+    RR_SPRITE_CAT,
+    RR_SPRITE_COUNT
+} SpriteIndex;
+
 typedef struct {
     rrGame* _game;
     SDL_Window* _window;
     SDL_Renderer* _renderer;
-    SDL_Rect _sprites[RR_CELL_COUNT];
+    SDL_Rect _sprites[RR_SPRITE_COUNT];
     SDL_Texture* _spritesheet;
     TTF_Font* _font;
     SDL_Texture* _scoreText;

@@ -10,15 +10,20 @@ typedef enum {
     RR_STATUS_WAITING = 2,
 } rrStatus;
 
+typedef enum {
+    RR_ENTITY_PLAYER,
+    RR_ENTITY_ENEMY
+} rrEntityType;
+
 typedef struct {
     rrPoint position;
     rrStatus status;
-    rrType type;
+    rrEntityType type;
     void* ptr;
     rrGrid* _grid;
 } rrEntity;
 
-void rr_entity_init(rrEntity* entity, rrType type, void* ptr, rrGrid* grid);
+void rr_entity_init(rrEntity* entity, rrEntityType type, void* ptr, rrGrid* grid);
 int rr_entity_set_pos(rrEntity* entity, rrPoint* position);
 
 #endif

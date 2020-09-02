@@ -1,7 +1,7 @@
 #include "player.h"
 
 void rr_player_init(rrPlayer* player, rrGrid* grid) {
-    rr_entity_init(&player->entity, RR_CELL_MOUSE, player, grid);
+    rr_entity_init(&player->entity, RR_ENTITY_PLAYER, player, grid);
     player->score = 0;
     player->lives = 0;
 
@@ -29,6 +29,8 @@ int rr_player_push_horizontal(rrPlayer* player, rrPoint* target, int dir) {
         end_cell.x -= dir;
     }
 
+    rr_grid_set_cell_type(player->entity._grid, &end_cell, RR_CELL_EMPTY);
+
     return 1;
 }
 
@@ -53,6 +55,8 @@ int rr_player_push_vertical(rrPlayer* player, rrPoint* target, int dir) {
         rr_grid_set_cell_type(player->entity._grid, &end_cell, RR_CELL_BLOCK);
         end_cell.y -= dir;
     }
+
+    rr_grid_set_cell_type(player->entity._grid, &end_cell, RR_CELL_EMPTY);
 
     return 1;
 }

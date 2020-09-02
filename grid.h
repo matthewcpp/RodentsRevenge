@@ -12,8 +12,6 @@ typedef enum {
     RR_CELL_EMPTY,
     RR_CELL_BLOCK,
     RR_CELL_WALL,
-    RR_CELL_MOUSE,
-    RR_CELL_CAT,
     RR_CELL_COUNT
 } rrType;
 
