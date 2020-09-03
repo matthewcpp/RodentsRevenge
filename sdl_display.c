@@ -173,6 +173,7 @@ void rr_sdl_display_draw(rrSDLDisplay* renderer) {
     rrPoint map_pos;
 
     SDL_GetWindowSize(renderer->_window, &window_width, &window_height);
+    SDL_GetRendererOutputSize(renderer->_renderer, &window_width, &window_height);
     map_pos.x = (window_width / 2)  - ((RR_GRID_WIDTH * RR_RENDERER_TILE_SIZE) / 2);
     map_pos.y = (window_height / 2)  - ((RR_GRID_HEIGHT * RR_RENDERER_TILE_SIZE) / 2);
 

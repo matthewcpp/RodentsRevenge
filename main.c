@@ -15,6 +15,7 @@ int main(int argc, char* argv[]){
     SDL_Event event;
     int keep_going = 1;
     Uint32 last_update, now;
+    char asset_path[256];
 
     rrGame* game = NULL;
     rrSDLController controller;
@@ -39,12 +40,17 @@ int main(int argc, char* argv[]){
 
     rr_sdl_controller_init(&controller, game);
     rr_sdl_display_init(window, &renderer, game);
-    rr_sdl_display_load_spritesheet(&renderer, "C:/development/repos/RodentsRevenge/assets/spritesheet.png");
-    rr_sdl_display_load_font(&renderer, "C:/development/repos/RodentsRevenge/assets/vegur-regular.ttf");
+
+    snprintf(asset_path, 256, "%s/%s", ASSET_DIRECTORY, "spritesheet.png");
+    rr_sdl_display_load_spritesheet(&renderer, asset_path);
+
+    snprintf(asset_path, 256, "%s/%s", ASSET_DIRECTORY, "vegur-regular.ttf");
+    rr_sdl_display_load_font(&renderer, asset_path);
 
     rr_game_init(game);
 
-    rr_game_new_level(game, "C:/development/repos/RodentsRevenge/assets/levels/level01.txt");
+    snprintf(asset_path, 256, "%s/%s", ASSET_DIRECTORY, "levels/level01.txt");
+    rr_game_new_level(game, asset_path);
 
     last_update = SDL_GetTicks();
 
