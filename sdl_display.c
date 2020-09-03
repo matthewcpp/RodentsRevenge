@@ -62,11 +62,11 @@ int rr_sdl_display_load_font(rrSDLDisplay* renderer, const char* path) {
 }
 
 void rr_sdl_display_init_score_text(rrSDLDisplay* renderer) {
-
+    SDL_Surface* text = NULL;
     SDL_Color color={0,0,0};
     char scoreStrBuffer[32];
     snprintf(scoreStrBuffer, 32, "Score: %d", renderer->_game->player.score);
-    SDL_Surface* text = TTF_RenderUTF8_Solid (renderer->_font, scoreStrBuffer, color);
+    text = TTF_RenderUTF8_Solid (renderer->_font, scoreStrBuffer, color);
     renderer->_scoreText = SDL_CreateTextureFromSurface(renderer->_renderer, text);
     SDL_FreeSurface(text);
 
@@ -74,7 +74,12 @@ void rr_sdl_display_init_score_text(rrSDLDisplay* renderer) {
 }
 
 void rr_sdl_display_draw_board_background(rrSDLDisplay* renderer, rrPoint* map_pos) {
-    SDL_Rect board_rect = {map_pos->x, map_pos->y, RR_GRID_WIDTH * RR_RENDERER_TILE_SIZE, RR_GRID_HEIGHT * RR_RENDERER_TILE_SIZE};
+    SDL_Rect board_rect;
+    board_rect.x = map_pos->x;
+    board_rect.y = map_pos->y;
+    board_rect.w = RR_GRID_WIDTH * RR_RENDERER_TILE_SIZE;
+    board_rect.h = RR_GRID_HEIGHT * RR_RENDERER_TILE_SIZE;
+
     SDL_SetRenderDrawColor(renderer->_renderer, 195, 195, 0, 255);
     SDL_RenderFillRect(renderer->_renderer, &board_rect);
 }

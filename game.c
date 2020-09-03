@@ -19,10 +19,10 @@ void rr_game_uninit(rrGame* game) {
 }
 
 int rr_game_new_level(rrGame* game, const char* path){
+    rrPoint pos;
     if (!rr_grid_load_from_file(&game->grid, path))
         return 0;
 
-    rrPoint pos;
     rr_point_set(&pos, 11, 11);
     rr_entity_set_pos(&game->player.entity, &pos);
     game->player.entity.status = RR_STATUS_ACTIVE;

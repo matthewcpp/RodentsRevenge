@@ -14,7 +14,7 @@ int main(int argc, char* argv[]){
     SDL_Window* window = NULL;
     SDL_Event event;
     int keep_going = 1;
-    Uint32 last_update;
+    Uint32 last_update, now;
 
     rrGame* game = NULL;
     rrSDLController controller;
@@ -46,7 +46,7 @@ int main(int argc, char* argv[]){
 
     rr_game_new_level(game, "C:/development/repos/RodentsRevenge/assets/levels/level01.txt");
 
-    last_update =  SDL_GetTicks();
+    last_update = SDL_GetTicks();
 
 
     while (keep_going) {
@@ -58,7 +58,7 @@ int main(int argc, char* argv[]){
             }
         }
 
-        Uint32 now = SDL_GetTicks();
+        now = SDL_GetTicks();
         if (now - last_update >= 32) {
             rr_sdl_controller_update(&controller);
             rr_sdl_display_draw(&renderer);
