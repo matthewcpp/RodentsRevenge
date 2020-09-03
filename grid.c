@@ -39,7 +39,7 @@ int rr_grid_load_from_file(rrGrid* grid, const char* path) {
     if (!file)
         return 0;
 
-    while (1) {
+    for (;;) {
         int c = fgetc(file);
 
         if (c == EOF)

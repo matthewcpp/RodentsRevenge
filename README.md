@@ -6,7 +6,7 @@ Windows and MacOS:
 ```shell script
 mkdir build && cd build
 conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
-conan install .. --build missing
+conan install .. --build sdl2_ttf --build sdl2_image
 cmake ..
 ```
 Ubuntu Linux:
