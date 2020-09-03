@@ -10,3 +10,13 @@ matrix:
         - mkdir build && cd build
         - cmake .. -DCMAKE_BUILD_TYPE=Release
         - make
+    - os: osx
+      compiler: clang
+      before_install:
+        - pip install conan
+        - conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
+      script:
+        - mkdir build && cd build
+        - conan install .. --build sdl2_ttf --build sdl2_image
+        - cmake .. -DCMAKE_BUILD_TYPE=Release
+        - make
