@@ -1,0 +1,20 @@
+# Reference https://www.appveyor.com/docs/windows-images-software
+
+version: '{build}'
+
+image: Visual Studio 2015
+
+install:
+  - pip install conan
+  - conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
+
+before_build:
+  - mkdir build
+  - cd build
+  - conan install .. --build sdl2_ttf --build sdl2_image
+  - cmake .. -G "Visual Studio 14 2015" -A x64
+
+configuration: Release
+
+build:
+  project: 'build/RodentsRevenge.sln'

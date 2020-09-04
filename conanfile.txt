@@ -1,4 +1,5 @@
 [requires]
+bzip2/1.0.8
 zlib/1.2.11
 libpng/1.6.37
 sdl2/2.0.10@bincrafters/stable

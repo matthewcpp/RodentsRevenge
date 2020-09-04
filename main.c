@@ -1,11 +1,12 @@
+#include "defs.h"
 #include "game.h"
 
 #include <SDL.h>
 #include "sdl_controller.h"
 #include "sdl_display.h"
 
-#include "stdlib.h"
-#include "stdio.h"
+#include <stdlib.h>
+#include <stdio.h>
 
 #define RR_SCREEN_WIDTH 640
 #define RR_SCREEN_HEIGHT 480
@@ -41,15 +42,15 @@ int main(int argc, char* argv[]){
     rr_sdl_controller_init(&controller, game);
     rr_sdl_display_init(window, &renderer, game);
 
-    snprintf(asset_path, 256, "%s/%s", ASSET_DIRECTORY, "spritesheet.png");
+    snprintf_func(asset_path, 256, "%s/%s", ASSET_DIRECTORY, "spritesheet.png");
     rr_sdl_display_load_spritesheet(&renderer, asset_path);
 
-    snprintf(asset_path, 256, "%s/%s", ASSET_DIRECTORY, "vegur-regular.ttf");
+    snprintf_func(asset_path, 256, "%s/%s", ASSET_DIRECTORY, "vegur-regular.ttf");
     rr_sdl_display_load_font(&renderer, asset_path);
 
     rr_game_init(game);
 
-    snprintf(asset_path, 256, "%s/%s", ASSET_DIRECTORY, "levels/level01.txt");
+    snprintf_func(asset_path, 256, "%s/%s", ASSET_DIRECTORY, "levels/level01.txt");
     rr_game_new_level(game, asset_path);
 
     last_update = SDL_GetTicks();
