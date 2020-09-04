@@ -48,6 +48,7 @@ int rr_sdl_display_load_spritesheet(rrSDLDisplay* renderer, const char* path) {
     rr_sdl_display_sprite_info(renderer->_sprites + RR_SPRITE_MOUSE, 37, 19);
     rr_sdl_display_sprite_info(renderer->_sprites + RR_SPRITE_WALL, 37, 37);
     rr_sdl_display_sprite_info(renderer->_sprites + RR_SPRITE_CAT, 19, 1);
+    rr_sdl_display_sprite_info(renderer->_sprites + RR_SPRITE_CAT_WAIT, 37, 1);
 
     return 1;
 }
@@ -138,6 +139,10 @@ void rr_sdl_display_draw_entities(rrSDLDisplay* renderer, rrPoint* map_pos) {
         switch (enemy->entity.status) {
             case RR_STATUS_ACTIVE:
                 sprite_index = RR_SPRITE_CAT;
+                break;
+
+            case RR_STATUS_WAITING:
+                sprite_index = RR_SPRITE_CAT_WAIT;
                 break;
 
             default:

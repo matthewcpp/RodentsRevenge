@@ -5,12 +5,10 @@
 #include "entity.h"
 
 typedef struct {
-    rrPoint position;
     rrEntity entity;
-
     rrEntity* _player;
 } rrEnemy;
 
 void rr_enemy_init(rrEnemy* enemy, rrEntity* player, rrGrid* grid);
-
+void rr_enemy_update(rrEnemy* enemy);
 #endif

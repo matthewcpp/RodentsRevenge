@@ -8,14 +8,26 @@ void rr_game_init(rrGame* game) {
 
     for (i = 0; i < MAX_ENEMIES; i++) {
         rr_enemy_init(&game->_enemies[i], &game->player.entity, &game->grid);
-        game->active_enemies[i] = NULL;
     }
 
-    game->active_enemy_count = 0;
+    game->_update_time = 0;
 }
 
 void rr_game_uninit(rrGame* game) {
     rr_grid_uninit(&game->grid);
+}
+
+void rr_game_update(rrGame* game, int time) {
+    int i;
+    game->_update_time += time;
+
+    if (game->_update_time <= 64)
+        return;
+
+    for (i = 0; i < MAX_ENEMIES; i++)
+        rr_enemy_update(&game->_enemies[i]);
+
+    game->_update_time = 0;
 }
 
 int rr_game_new_level(rrGame* game, const char* path){

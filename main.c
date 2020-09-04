@@ -15,7 +15,7 @@ int main(int argc, char* argv[]){
     SDL_Window* window = NULL;
     SDL_Event event;
     int keep_going = 1;
-    Uint32 last_update, now;
+    Uint32 last_update, now, time_delta;
     char asset_path[256];
 
     rrGame* game = NULL;
@@ -66,8 +66,10 @@ int main(int argc, char* argv[]){
         }
 
         now = SDL_GetTicks();
-        if (now - last_update >= 32) {
+        time_delta = now - last_update;
+        if (time_delta >= 32) {
             rr_sdl_controller_update(&controller);
+            rr_game_update(game, time_delta);
             rr_sdl_display_draw(&renderer);
             last_update = now;
         }
@@ -75,6 +77,7 @@ int main(int argc, char* argv[]){
     }
 
     rr_game_uninit(game);
+    free(game);
     rr_sdl_display_uninit(&renderer);
     SDL_VideoQuit();
 

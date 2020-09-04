@@ -11,12 +11,13 @@ typedef struct rrGame {
     rrGrid grid;
     rrPlayer player;
     rrEnemy _enemies[MAX_ENEMIES];
-    rrEnemy* active_enemies[MAX_ENEMIES];
-    int active_enemy_count;
+    int _update_time;
 } rrGame;
 
 void rr_game_init(rrGame* game);
 void rr_game_uninit(rrGame* game);
+
+void rr_game_update(rrGame* game, int time);
 
 int rr_game_new_level(rrGame* game, const char* path);
 

@@ -11,6 +11,7 @@ typedef enum {
     RR_SPRITE_WALL,
     RR_SPRITE_MOUSE,
     RR_SPRITE_CAT,
+    RR_SPRITE_CAT_WAIT,
     RR_SPRITE_COUNT
 } SpriteIndex;
 
