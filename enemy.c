@@ -36,6 +36,13 @@ void rr_enemy_move(rrEnemy* enemy) {
         int dist_to_player;
         rr_point_add(&target_point, &enemy->entity.position, &deltas[i]);
 
+        if (rr_point_equals(&target_point, &enemy->_player->position)) {
+            shortest_dist = 0;
+            rr_point_copy(&move_pos, &target_point);
+            enemy->_player->status = RR_STATUS_KILLED;
+            break;
+        }
+
         if (rr_grid_cell_is_blocked(enemy->entity._grid, &target_point))
             continue;
 

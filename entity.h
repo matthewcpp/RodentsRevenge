@@ -7,7 +7,8 @@
 typedef enum {
     RR_STATUS_INACTIVE = 0,
     RR_STATUS_ACTIVE = 1,
-    RR_STATUS_WAITING = 2
+    RR_STATUS_WAITING = 2,
+    RR_STATUS_KILLED = 4
 } rrStatus;
 
 typedef enum {

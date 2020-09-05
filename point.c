@@ -26,3 +26,7 @@ int rr_point_dist_squared(rrPoint* a, rrPoint* b) {
 
     return dir.x * dir.x + dir.y * dir.y;
 }
+
+int rr_point_equals(rrPoint* a, rrPoint* b) {
+    return a->x == b->x && a->y == b->y;
+}
