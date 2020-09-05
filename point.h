@@ -10,5 +10,6 @@ void rr_point_set(rrPoint* point, int x, int y);
 void rr_point_copy(rrPoint* dest, rrPoint* src);
 void rr_point_add(rrPoint* out, rrPoint* a, rrPoint* b);
 void rr_point_sub(rrPoint* out, rrPoint* a, rrPoint* b);
+int rr_point_dist_squared(rrPoint* a, rrPoint* b);
 
 #endif

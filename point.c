@@ -19,3 +19,10 @@ void rr_point_sub(rrPoint* out, rrPoint* a, rrPoint* b) {
     out->x = a->x - b->x;
     out->y = a->y - b->y;
 }
+
+int rr_point_dist_squared(rrPoint* a, rrPoint* b) {
+    rrPoint dir;
+    rr_point_sub(&dir, a, b);
+
+    return dir.x * dir.x + dir.y * dir.y;
+}

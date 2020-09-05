@@ -6,9 +6,10 @@
 
 typedef struct {
     rrEntity entity;
+    int _last_move_time;
     rrEntity* _player;
 } rrEnemy;
 
 void rr_enemy_init(rrEnemy* enemy, rrEntity* player, rrGrid* grid);
-void rr_enemy_update(rrEnemy* enemy);
+void rr_enemy_update(rrEnemy* enemy, int time);
 #endif

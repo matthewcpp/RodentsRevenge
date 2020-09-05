@@ -25,7 +25,7 @@ void rr_game_update(rrGame* game, int time) {
         return;
 
     for (i = 0; i < MAX_ENEMIES; i++)
-        rr_enemy_update(&game->_enemies[i]);
+        rr_enemy_update(&game->_enemies[i], time);
 
     game->_update_time = 0;
 }
