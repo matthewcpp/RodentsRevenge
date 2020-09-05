@@ -12,6 +12,7 @@ typedef struct rrGame {
     rrPlayer player;
     rrEnemy _enemies[MAX_ENEMIES];
     int _update_time;
+    char* _current_level;
 } rrGame;
 
 void rr_game_init(rrGame* game);
@@ -19,6 +20,7 @@ void rr_game_uninit(rrGame* game);
 
 void rr_game_update(rrGame* game, int time);
 
-int rr_game_new_level(rrGame* game, const char* path);
+int rr_game_restart(rrGame* game);
+int rr_game_set_active_level(rrGame* game, const char* path);
 
 #endif

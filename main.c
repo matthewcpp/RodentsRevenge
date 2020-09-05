@@ -51,10 +51,11 @@ int main(int argc, char* argv[]){
     rr_game_init(game);
 
     snprintf_func(asset_path, 256, "%s/%s", ASSET_DIRECTORY, "levels/level01.txt");
-    rr_game_new_level(game, asset_path);
+    rr_game_set_active_level(game, asset_path);
+
+    rr_game_restart(game);
 
     last_update = SDL_GetTicks();
-
 
     while (keep_going) {
         while(SDL_PollEvent(&event)) {
