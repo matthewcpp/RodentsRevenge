@@ -13,20 +13,6 @@ static rrPoint deltas[8] = {
         {-1, 0}, {1, 0},
         {-1, 1}, {0, 1}, {1, 1}};
 
-int rr_enemy_can_move(rrEnemy* enemy) {
-    int i;
-    rrPoint testPoint;
-
-    for (i = 0; i < 8; i++) {
-        rr_point_add(&testPoint, &enemy->entity.position, &deltas[i]);
-
-        if (!rr_grid_cell_is_blocked(enemy->entity._grid, &testPoint))
-            return 1;
-    }
-
-    return 0;
-}
-
 void rr_enemy_move(rrEnemy* enemy) {
     int i;
     int shortest_dist = INT_MAX;
@@ -66,6 +52,11 @@ void rr_enemy_update(rrEnemy* enemy, int time) {
 
     if (enemy->entity.status == RR_STATUS_INACTIVE)
         return;
+
+    if (rr_point_equals(&enemy->entity.position, &enemy->_player->position)) {
+        enemy->_player->status = RR_STATUS_KILLED;
+        return;
+    }
 
     enemy->_last_move_time += time;
     if (enemy->_last_move_time >= 1000) {
