@@ -26,6 +26,7 @@ void rr_game_respawn_player(rrGame* game) {
     rr_point_set(&pos, 11, 11);
 
     /* TODO: pick better respawn location if starting tile is blocked */
+    rr_grid_set_cell_type(&game->grid, &pos, RR_CELL_EMPTY);
     rr_entity_set_pos(&game->player.entity, &pos);
     game->player.entity.status = RR_STATUS_ACTIVE;
 }
