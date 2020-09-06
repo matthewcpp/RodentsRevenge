@@ -24,12 +24,15 @@ typedef struct {
     TTF_Font* _font;
     SDL_Texture* _scoreText;
     SDL_Rect _scoreTextRect;
+
+    SDL_Texture* _livesText;
+    SDL_Rect _livesTextRect;
 } rrSDLDisplay;
 
 void rr_sdl_display_init(SDL_Window* window, rrSDLDisplay* renderer, rrGame* game);
 void rr_sdl_display_uninit(rrSDLDisplay* renderer);
 int rr_sdl_display_load_spritesheet(rrSDLDisplay* renderer, const char* path);
 int rr_sdl_display_load_font(rrSDLDisplay* renderer, const char* path);
-void rr_sdl_display_draw(rrSDLDisplay* renderer);
+void rr_sdl_display_draw(rrSDLDisplay* display);
 
 #endif

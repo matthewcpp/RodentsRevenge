@@ -3,7 +3,7 @@
 void rr_player_init(rrPlayer* player, rrGrid* grid) {
     rr_entity_init(&player->entity, RR_ENTITY_PLAYER, player, grid);
     player->score = 0;
-    player->lives = 0;
+    player->lives_remaining = 0;
 
 }
 

@@ -48,9 +48,9 @@ void rr_game_update(rrGame* game, int time) {
         rr_enemy_update(&game->_enemies[i], time);
 
     if (game->player.entity.status == RR_STATUS_KILLED) {
-        game->player.lives -= 1;
+        game->player.lives_remaining -= 1;
 
-        if (game->player.lives >= 1) {
+        if (game->player.lives_remaining >= 0) {
             rr_game_respawn_player(game);
         }
     }
@@ -62,7 +62,7 @@ int rr_game_restart(rrGame* game) {
     if (game->_current_level == NULL)
         return 0;
 
-    game->player.lives = 3;
+    game->player.lives_remaining = 2;
     rr_game_respawn_player(game);
     rr_game_spawn_enemies(game);
 

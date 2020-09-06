@@ -8,7 +8,7 @@
 
 typedef struct rrPlayer {
     int score;
-    int lives;
+    int lives_remaining;
     rrEntity entity;
 
 } rrPlayer;
