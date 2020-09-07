@@ -2,7 +2,6 @@
 #define RR_ENTITY_H
 
 #include "point.h"
-#include "grid.h"
 
 typedef enum {
     RR_STATUS_INACTIVE = 0,
@@ -20,11 +19,8 @@ typedef struct {
     rrPoint position;
     rrStatus status;
     rrEntityType type;
-    void* ptr;
-    rrGrid* _grid;
 } rrEntity;
 
-void rr_entity_init(rrEntity* entity, rrEntityType type, void* ptr, rrGrid* grid);
-int rr_entity_set_pos(rrEntity* entity, rrPoint* position);
+void rr_entity_init(rrEntity* entity, rrEntityType type);
 
 #endif

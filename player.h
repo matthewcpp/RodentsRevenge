@@ -3,13 +3,16 @@
 
 #include "entity.h"
 #include "point.h"
+#include "grid.h"
 
 #include <stdint.h>
 
 typedef struct rrPlayer {
+    rrEntity entity;
+    rrGrid* _grid;
     int score;
     int lives_remaining;
-    rrEntity entity;
+
 
 } rrPlayer;
 

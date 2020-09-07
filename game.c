@@ -27,14 +27,14 @@ void rr_game_respawn_player(rrGame* game) {
 
     /* TODO: pick better respawn location if starting tile is blocked */
     rr_grid_set_cell_type(&game->grid, &pos, RR_CELL_EMPTY);
-    rr_entity_set_pos(&game->player.entity, &pos);
+    rr_point_copy(&game->player.entity.position, &pos);
     game->player.entity.status = RR_STATUS_ACTIVE;
 }
 
 void rr_game_spawn_enemies(rrGame* game) {
     rrPoint pos;
     rr_point_set(&pos, 1, 1);
-    rr_entity_set_pos(&game->_enemies[0].entity, &pos);
+    rr_point_copy(&game->_enemies[0].entity.position, &pos);
     game->_enemies[0].entity.status = RR_STATUS_ACTIVE;
 }
 

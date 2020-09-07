@@ -3,7 +3,8 @@
 #include <limits.h>
 
 void rr_enemy_init(rrEnemy* enemy, rrEntity* player, rrGrid* grid) {
-    rr_entity_init(&enemy->entity, RR_ENTITY_ENEMY, enemy, grid);
+    rr_entity_init(&enemy->entity, RR_ENTITY_ENEMY);
+    enemy->_grid = grid;
     enemy->_player = player;
     enemy->_last_move_time = 0;
 }
@@ -29,7 +30,7 @@ void rr_enemy_move(rrEnemy* enemy) {
             break;
         }
 
-        if (rr_grid_cell_is_blocked(enemy->entity._grid, &target_point))
+        if (rr_grid_cell_is_blocked(enemy->_grid, &target_point))
             continue;
 
         dist_to_player = rr_point_dist_squared(&target_point, &enemy->_player->position);
@@ -40,8 +41,10 @@ void rr_enemy_move(rrEnemy* enemy) {
     }
 
     if (shortest_dist != INT_MAX) {
+        rr_grid_set_cell_blocked(enemy->_grid, &enemy->entity.position, 0);
         enemy->entity.status = RR_STATUS_ACTIVE;
-        rr_entity_set_pos(&enemy->entity, &move_pos);
+        rr_point_copy(&enemy->entity.position, &move_pos);
+        rr_grid_set_cell_blocked(enemy->_grid, &enemy->entity.position, 1);
     }
     else { /* Enemy was not able to move and is pinned*/
         enemy->entity.status = RR_STATUS_WAITING;

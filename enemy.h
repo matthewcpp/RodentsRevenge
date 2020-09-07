@@ -1,11 +1,13 @@
 #ifndef RODENTSREVENGE_ENEMY_H
 #define RODENTSREVENGE_ENEMY_H
 
-#include "point.h"
 #include "entity.h"
+#include "point.h"
+#include "grid.h"
 
 typedef struct {
     rrEntity entity;
+    rrGrid* _grid;
     int _last_move_time;
     rrEntity* _player;
 } rrEnemy;
