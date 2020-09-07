@@ -60,5 +60,9 @@ void rr_enemy_update(rrEnemy* enemy, int time) {
         rr_enemy_move(enemy);
         enemy->_last_move_time = 0;
     }
+}
+
+void rr_enemy_move_out_of_push_path(rrEnemy* enemy, rrPoint* push_dir) {
 
 }
+

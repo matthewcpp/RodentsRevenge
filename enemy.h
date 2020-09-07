@@ -14,4 +14,5 @@ typedef struct {
 
 void rr_enemy_init(rrEnemy* enemy, rrEntity* player, rrGrid* grid);
 void rr_enemy_update(rrEnemy* enemy, int time);
+void rr_enemy_move_out_of_push_path(rrEnemy* enemy, rrPoint* push_dir);
 #endif

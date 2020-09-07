@@ -25,11 +25,12 @@ rrEntity* rr_grid_get_cell(rrGrid* grid, rrPoint* position) {
 
 int rr_grid_load_from_file(rrGrid* grid, const char* path) {
     rrPoint cell;
-    rr_point_set(&cell, 0, 0);
     FILE* file = fopen(path, "r");
 
     if (!file)
         return 0;
+
+    rr_point_set(&cell, 0, 0);
 
     for (;;) {
         int c = fgetc(file);
