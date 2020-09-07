@@ -2,6 +2,8 @@
 
 #include <string.h>
 
+rrPoint starting_pos = {11,11};
+
 void rr_game_init(rrGame* game) {
     int i;
 
@@ -22,11 +24,8 @@ void rr_game_uninit(rrGame* game) {
 
 /* determines the new position for the player */
 void rr_game_respawn_player(rrGame* game) {
-    rrPoint pos;
-    rr_point_set(&pos, 11, 11);
-
     /* TODO: pick better respawn location if starting tile is blocked */
-    rr_grid_update_entity_position(&game->grid, &game->player.entity, &pos);
+    rr_grid_update_entity_position(&game->grid, &game->player.entity, &starting_pos);
     game->player.entity.status = RR_STATUS_ACTIVE;
 }
 
@@ -63,6 +62,7 @@ int rr_game_restart(rrGame* game) {
     if (game->_current_level == NULL)
         return 0;
 
+    rr_grid_clear_position(&game->grid, &starting_pos);
     game->player.lives_remaining = 2;
     rr_game_respawn_player(game);
     rr_game_spawn_enemies(game);
@@ -80,5 +80,5 @@ int rr_game_set_active_level(rrGame* game, const char* path){
     game->_current_level = malloc(len + 1);
     strcpy(game->_current_level, path);
 
-    return rr_grid_load_from_file(&game->grid, path);
+    return rr_grid_load_from_file(&game->grid, game->_current_level);
 }

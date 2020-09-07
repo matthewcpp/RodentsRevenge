@@ -27,7 +27,7 @@ int rr_player_push(rrPlayer* player, rrPoint* target) {
         if (end_cell_entity->type == RR_ENTITY_WALL)
             return 0;
         else if (end_cell_entity->type == RR_ENTITY_ENEMY) {
-            rr_enemy_move_out_of_push_path((rrEnemy*)end_cell_entity, &dir);
+            rr_enemy_move((rrEnemy*)end_cell_entity);
         }
     }
 

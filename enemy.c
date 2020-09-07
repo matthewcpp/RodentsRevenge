@@ -2,6 +2,7 @@
 #include "player.h"
 
 #include <limits.h>
+#include <stdlib.h>
 
 void rr_enemy_init(rrEnemy* enemy, rrEntity* player, rrGrid* grid) {
     rr_entity_init(&enemy->entity, RR_ENTITY_ENEMY);
@@ -61,8 +62,3 @@ void rr_enemy_update(rrEnemy* enemy, int time) {
         enemy->_last_move_time = 0;
     }
 }
-
-void rr_enemy_move_out_of_push_path(rrEnemy* enemy, rrPoint* push_dir) {
-
-}
-

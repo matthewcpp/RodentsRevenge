@@ -81,9 +81,18 @@ int rr_grid_cell_is_blocked(struct rrGrid* grid, rrPoint* position) {
         return 1;
 }
 
+/* TODO: pool static entities */
 void rr_grid_clear_position(rrGrid* grid, rrPoint* position) {
     int index = grid->width * position->y + position->x;
+    rrEntity* entity = NULL;
     assert(rr_grid_position_is_valid(grid, position));
+
+    entity = grid->cells[index];
+    if (!entity)
+        return;
+
+    if (entity->type != RR_ENTITY_ENEMY && entity->type != RR_ENTITY_PLAYER)
+        free(entity);
 
     grid->cells[index] = NULL;
 }
@@ -93,7 +102,7 @@ void rr_grid_update_entity_position(rrGrid* grid, rrEntity* entity, rrPoint* pos
     int dest_index = grid->width * position->y + position->x;
 
     assert(rr_grid_position_is_valid(grid, position));
-    //assert(grid->cells[dest_index] == NULL);
+    assert(grid->cells[dest_index] == NULL);
 
     /* entities are initially created with an invalid position off the board and must be explicitly placed */
     if (!rr_entity_position_is_invalid(entity))
