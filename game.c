@@ -26,8 +26,7 @@ void rr_game_respawn_player(rrGame* game) {
     rr_point_set(&pos, 11, 11);
 
     /* TODO: pick better respawn location if starting tile is blocked */
-    rr_grid_set_cell_type(&game->grid, &pos, RR_CELL_EMPTY);
-    rr_point_copy(&game->player.entity.position, &pos);
+    rr_grid_update_entity_position(&game->grid, &game->player.entity, &pos);
     game->player.entity.status = RR_STATUS_ACTIVE;
 }
 
@@ -45,15 +44,16 @@ void rr_game_update(rrGame* game, int time) {
     if (game->_update_time <= 64)
         return;
 
-    for (i = 0; i < MAX_ENEMIES; i++)
-        rr_enemy_update(&game->_enemies[i], time);
-
     if (game->player.entity.status == RR_STATUS_KILLED) {
         game->player.lives_remaining -= 1;
 
         if (game->player.lives_remaining >= 0) {
             rr_game_respawn_player(game);
         }
+    }
+    else {
+        for (i = 0; i < MAX_ENEMIES; i++)
+            rr_enemy_update(&game->_enemies[i], time);
     }
 
     game->_update_time = 0;

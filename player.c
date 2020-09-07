@@ -9,55 +9,55 @@ void rr_player_init(rrPlayer* player, rrGrid* grid) {
 }
 
 int rr_player_push_horizontal(rrPlayer* player, rrPoint* target, int dir) {
-    rrType end_cell_type;
-    rrPoint end_cell;
-    rr_point_copy(&end_cell, target);
+    rrEntity* end_cell_entity;
+    rrPoint end_cell_pos;
+    rr_point_copy(&end_cell_pos, target);
 
     /* find the first non block tile along the direction*/
     do {
-        end_cell.x += dir;
-        end_cell_type = rr_grid_get_cell(player->_grid, &end_cell)->type;
+        end_cell_pos.x += dir;
+        end_cell_entity = rr_grid_get_cell(player->_grid, &end_cell_pos);
     }
-    while (end_cell_type == RR_CELL_BLOCK);
+    while (end_cell_entity != NULL && end_cell_entity->type == RR_ENTITY_BLOCK);
 
     /* blocks along this vector are against an immovable object and cannot be moved. */
-    if (rr_grid_cell_is_blocked(player->_grid, &end_cell))
+    if (rr_grid_cell_is_blocked(player->_grid, &end_cell_pos))
         return 0;
 
     /* push all the blocks over */
-    while (end_cell.x != target->x) {
-        rr_grid_set_cell_type(player->_grid, &end_cell, RR_CELL_BLOCK);
-        end_cell.x -= dir;
+    while (end_cell_pos.x != target->x) {
+        rrPoint src_cell;
+        rr_point_set(&src_cell, end_cell_pos.x - dir, end_cell_pos.y);
+        rr_grid_update_entity_position(player->_grid, rr_grid_get_cell(player->_grid, &src_cell), &end_cell_pos);
+        end_cell_pos.x -= dir;
     }
-
-    rr_grid_set_cell_type(player->_grid, &end_cell, RR_CELL_EMPTY);
 
     return 1;
 }
 
 int rr_player_push_vertical(rrPlayer* player, rrPoint* target, int dir) {
-    rrType end_cell_type;
-    rrPoint end_cell;
-    rr_point_copy(&end_cell, target);
+    rrEntity* end_cell_entity;
+    rrPoint end_cell_pos;
+    rr_point_copy(&end_cell_pos, target);
 
     /* find the first non block tile along the direction*/
     do {
-        end_cell.y += dir;
-        end_cell_type = rr_grid_get_cell(player->_grid, &end_cell)->type;
+        end_cell_pos.y += dir;
+        end_cell_entity = rr_grid_get_cell(player->_grid, &end_cell_pos);
     }
-    while (end_cell_type == RR_CELL_BLOCK);
+    while (end_cell_entity != NULL && end_cell_entity->type == RR_ENTITY_BLOCK);
 
     /* blocks along this vector are against an immovable object and cannot be moved. */
-    if (rr_grid_cell_is_blocked(player->_grid, &end_cell))
+    if (rr_grid_cell_is_blocked(player->_grid, &end_cell_pos))
         return 0;
 
     /* push all the blocks over */
-    while (end_cell.y != target->y) {
-        rr_grid_set_cell_type(player->_grid, &end_cell, RR_CELL_BLOCK);
-        end_cell.y -= dir;
+    while (end_cell_pos.y != target->y) {
+        rrPoint src_cell;
+        rr_point_set(&src_cell, end_cell_pos.x, end_cell_pos.y - dir);
+        rr_grid_update_entity_position(player->_grid, rr_grid_get_cell(player->_grid, &src_cell), &end_cell_pos);
+        end_cell_pos.y -= dir;
     }
-
-    rr_grid_set_cell_type(player->_grid, &end_cell, RR_CELL_EMPTY);
 
     return 1;
 }
@@ -65,37 +65,48 @@ int rr_player_push_vertical(rrPlayer* player, rrPoint* target, int dir) {
 int rr_player_push(rrPlayer* player, rrPoint* target) {
     rrPoint delta;
     rr_point_sub(&delta, target, &player->entity.position);
+    int pushed = 0;
 
     if (delta.x)
-        return rr_player_push_horizontal(player, target, delta.x);
+        pushed = rr_player_push_horizontal(player, target, delta.x);
     else if (delta.y)
-        return rr_player_push_vertical(player, target, delta.y);
-    else return 0;
+        pushed =  rr_player_push_vertical(player, target, delta.y);
+
+    if (pushed) {
+        rr_grid_update_entity_position(player->_grid, &player->entity, target);
+    }
+
+    return pushed;
 }
 
-
-int rr_player_move(rrPlayer* player, rrPoint* delta) {
-    rrType targetCellType;
-    int can_move = 1;
+void rr_player_move(rrPlayer* player, rrPoint* delta) {
+    rrEntity* target_cell;
     rrPoint target;
     rr_point_add(&target, &player->entity.position, delta);
 
     if (!rr_grid_position_is_valid(player->_grid, &target))
-        return 0;
+        return;
 
-    targetCellType = rr_grid_get_cell(player->_grid, &target)->type;
+    target_cell = rr_grid_get_cell(player->_grid, &target);
 
-    if (targetCellType == RR_CELL_WALL)
-        can_move = 0;
-
-    else if (targetCellType == RR_CELL_BLOCK)
-        can_move = rr_player_push(player, &target);
-
-    if (can_move){
-        rr_grid_set_cell_blocked(player->_grid, &player->entity.position, 0);
-        rr_point_copy(&player->entity.position, &target);
-        rr_grid_set_cell_blocked(player->_grid, &player->entity.position, 1);
+    if (target_cell == NULL) {
+        rr_grid_update_entity_position(player->_grid, &player->entity, &target);
+        return;
     }
 
-    return can_move;
+    switch (target_cell->type) {
+        case RR_ENTITY_BLOCK:
+            rr_player_push(player, &target);
+            break;
+
+        case RR_ENTITY_ENEMY:
+            rr_player_kill(player);
+            break;
+    }
+}
+
+void rr_player_kill(rrPlayer* player) {
+    player->entity.status = RR_STATUS_KILLED;
+    rr_grid_clear_position(player->_grid, &player->entity.position);
+    rr_entity_set_invalid_position(&player->entity);
 }

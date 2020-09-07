@@ -1,4 +1,5 @@
 #include "enemy.h"
+#include "player.h"
 
 #include <limits.h>
 
@@ -26,7 +27,7 @@ void rr_enemy_move(rrEnemy* enemy) {
         if (rr_point_equals(&target_point, &enemy->_player->position)) {
             shortest_dist = 0;
             rr_point_copy(&move_pos, &target_point);
-            enemy->_player->status = RR_STATUS_KILLED;
+            rr_player_kill((rrPlayer*)enemy->_player);
             break;
         }
 
@@ -41,10 +42,8 @@ void rr_enemy_move(rrEnemy* enemy) {
     }
 
     if (shortest_dist != INT_MAX) {
-        rr_grid_set_cell_blocked(enemy->_grid, &enemy->entity.position, 0);
         enemy->entity.status = RR_STATUS_ACTIVE;
-        rr_point_copy(&enemy->entity.position, &move_pos);
-        rr_grid_set_cell_blocked(enemy->_grid, &enemy->entity.position, 1);
+        rr_grid_update_entity_position(enemy->_grid, &enemy->entity, &move_pos);
     }
     else { /* Enemy was not able to move and is pinned*/
         enemy->entity.status = RR_STATUS_WAITING;
@@ -55,11 +54,6 @@ void rr_enemy_update(rrEnemy* enemy, int time) {
 
     if (enemy->entity.status == RR_STATUS_INACTIVE)
         return;
-
-    if (rr_point_equals(&enemy->entity.position, &enemy->_player->position)) {
-        enemy->_player->status = RR_STATUS_KILLED;
-        return;
-    }
 
     enemy->_last_move_time += time;
     if (enemy->_last_move_time >= 1000) {

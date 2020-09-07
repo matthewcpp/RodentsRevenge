@@ -12,7 +12,9 @@ typedef enum {
 
 typedef enum {
     RR_ENTITY_PLAYER,
-    RR_ENTITY_ENEMY
+    RR_ENTITY_ENEMY,
+    RR_ENTITY_WALL,
+    RR_ENTITY_BLOCK
 } rrEntityType;
 
 typedef struct {
@@ -22,5 +24,7 @@ typedef struct {
 } rrEntity;
 
 void rr_entity_init(rrEntity* entity, rrEntityType type);
+void rr_entity_set_invalid_position(rrEntity* entity);
+int rr_entity_position_is_invalid(rrEntity* entity);
 
 #endif
