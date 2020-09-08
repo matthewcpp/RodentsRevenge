@@ -25,13 +25,18 @@ int rr_input_button_down(rrInput* input, rrInputButton button) {
     return input->_button_info[button].prev_state == 0 && input->_button_info[button].cur_state == 1;
 }
 
+int rr_input_button_held_time(rrInput* input, rrInputButton button) {
+    return input->_button_info[button].hold_time;
+}
+
 void rr_sdl_input_update_button(rrInput* input, rrInputButton button, int value, int time) {
     rrSDLButtonInfo* button_info = &input->_button_info[button];
     button_info->prev_state = button_info->cur_state;
     button_info->cur_state = value;
-    if (button_info->prev_state == button_info->cur_state)
+
+    if (button_info->prev_state && button_info->cur_state)
         button_info->hold_time += time;
-    else if (!button_info->cur_state)
+    else
         button_info->hold_time = 0;
 }
 

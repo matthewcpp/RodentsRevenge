@@ -11,7 +11,13 @@ typedef enum{
 
 typedef struct rrInput rrInput;
 
+/** Returns non zero value if the supplied key was pressed this update frame. */
 int rr_input_button_down(rrInput* input, rrInputButton button);
+
+/** Returns the amount of time the supplied button has been held down.
+ * Note if a button was just pressed this frame, its held time will be zero.
+ */
+int rr_input_button_held_time(rrInput* input, rrInputButton button);
 
 
 #endif
