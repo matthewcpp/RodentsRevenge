@@ -4,19 +4,20 @@
 #include "entity.h"
 #include "point.h"
 #include "grid.h"
+#include "input.h"
 
 #include <stdint.h>
 
 typedef struct rrPlayer {
     rrEntity entity;
     rrGrid* _grid;
+    rrInput* _input;
     int score;
     int lives_remaining;
-
-
 } rrPlayer;
 
-void rr_player_init(rrPlayer* player, rrGrid* grid);
+void rr_player_init(rrPlayer* player, rrGrid* grid, rrInput* input);
+void rr_player_update(rrPlayer* player, int time);
 void rr_player_move(rrPlayer* player, rrPoint* delta);
 void rr_player_kill(rrPlayer* player);
 

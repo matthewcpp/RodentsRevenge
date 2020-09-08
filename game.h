@@ -4,6 +4,7 @@
 #include "grid.h"
 #include "player.h"
 #include "enemy.h"
+#include "input.h"
 
 #define MAX_ENEMIES 8
 
@@ -11,11 +12,12 @@ typedef struct rrGame {
     rrGrid grid;
     rrPlayer player;
     rrEnemy _enemies[MAX_ENEMIES];
+    rrInput* _input;
     int _update_time;
     char* _current_level;
 } rrGame;
 
-void rr_game_init(rrGame* game);
+void rr_game_init(rrGame* game, rrInput* input);
 void rr_game_uninit(rrGame* game);
 
 void rr_game_update(rrGame* game, int time);

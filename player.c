@@ -1,12 +1,33 @@
 #include "player.h"
 #include "enemy.h"
 
-void rr_player_init(rrPlayer* player, rrGrid* grid) {
+#define RR_PLAYER_INPUT_REPEAT_TIME 1000
+
+void rr_player_init(rrPlayer* player, rrGrid* grid, rrInput* input) {
     rr_entity_init(&player->entity, RR_ENTITY_PLAYER);
     player->_grid = grid;
+    player->_input = input;
     player->score = 0;
     player->lives_remaining = 0;
+}
 
+int rr_player_input_button_active(rrInput* input, rrInputButton button) {
+    return rr_input_button_down(input, button) || rr_input_button_held_time(input, button) > RR_PLAYER_INPUT_REPEAT_TIME;
+}
+
+void rr_player_update(rrPlayer* player, int time) {
+    rrPoint delta = {0, 0};
+    if (rr_player_input_button_active(player->_input, RR_INPUT_BUTTON_LEFT))
+        delta.x = -1;
+    else if (rr_player_input_button_active(player->_input, RR_INPUT_BUTTON_RIGHT))
+        delta.x = 1;
+    else if (rr_player_input_button_active(player->_input, RR_INPUT_BUTTON_UP))
+        delta.y = -1;
+    else if (rr_player_input_button_active(player->_input, RR_INPUT_BUTTON_DOWN))
+        delta.y = 1;
+
+    if (!rr_point_equals(&delta, rr_point_zero()))
+        rr_player_move(player, &delta);
 }
 
 int rr_player_push(rrPlayer* player, rrPoint* target) {

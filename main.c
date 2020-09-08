@@ -1,9 +1,9 @@
 #include "defs.h"
 #include "game.h"
+#include "sdl_input.h"
+#include "sdl_display.h"
 
 #include <SDL.h>
-#include "sdl_controller.h"
-#include "sdl_display.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -19,7 +19,7 @@ int main(int argc, char* argv[]){
     char asset_path[256];
 
     rrGame* game = NULL;
-    rrSDLController controller;
+    rrInput* sdl_input = NULL;
     rrSDLDisplay renderer;
     (void)argc;
     (void)argv;
@@ -35,14 +35,14 @@ int main(int argc, char* argv[]){
                               SDL_WINDOW_SHOWN);
 
     SDL_InitSubSystem(SDL_INIT_JOYSTICK);
-    if (SDL_NumJoysticks() < 1) {
-        puts("No joysticks detected");
+    sdl_input = rr_sdl_input_create(0);
+    if (!rr_sdl_input_joystick_active(sdl_input)) {
+        puts("No joysticks detected.  Switching to keyboard input.");
     }
 
-    rr_sdl_controller_init(&controller, game);
     rr_sdl_display_init(window, &renderer, game);
 
-    rr_game_init(game);
+    rr_game_init(game, sdl_input);
 
     snprintf_func(asset_path, 256, "%s/%s", ASSET_DIRECTORY, "spritesheet.png");
     rr_sdl_display_load_spritesheet(&renderer, asset_path);
@@ -69,7 +69,7 @@ int main(int argc, char* argv[]){
         now = SDL_GetTicks();
         time_delta = now - last_update;
         if (time_delta >= 32) {
-            rr_sdl_controller_update(&controller);
+            rr_sdl_input_update(sdl_input, time_delta);
             rr_game_update(game, time_delta);
             rr_sdl_display_draw(&renderer);
             last_update = now;
@@ -79,6 +79,7 @@ int main(int argc, char* argv[]){
 
     rr_game_uninit(game);
     free(game);
+    rr_sdl_input_destroy(sdl_input);
     rr_sdl_display_uninit(&renderer);
     SDL_VideoQuit();
 
