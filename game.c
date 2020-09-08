@@ -4,11 +4,12 @@
 
 rrPoint starting_pos = {11,11};
 
-void rr_game_init(rrGame* game) {
+void rr_game_init(rrGame* game, rrInput* input) {
     int i;
 
+    game->_input = input;
     rr_grid_init(&game->grid, RR_GRID_WIDTH, RR_GRID_HEIGHT);
-    rr_player_init(&game->player, &game->grid);
+    rr_player_init(&game->player, &game->grid, input);
 
     for (i = 0; i < MAX_ENEMIES; i++) {
         rr_enemy_init(&game->_enemies[i], &game->player.entity, &game->grid);
@@ -16,6 +17,8 @@ void rr_game_init(rrGame* game) {
 
     game->_update_time = 0;
     game->_current_level = NULL;
+
+
 }
 
 void rr_game_uninit(rrGame* game) {
@@ -40,8 +43,7 @@ void rr_game_update(rrGame* game, int time) {
     int i;
     game->_update_time += time;
 
-    if (game->_update_time <= 64)
-        return;
+    rr_player_update(&game->player, time);
 
     if (game->player.entity.status == RR_STATUS_KILLED) {
         game->player.lives_remaining -= 1;

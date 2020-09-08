@@ -30,3 +30,9 @@ int rr_point_dist_squared(rrPoint* a, rrPoint* b) {
 int rr_point_equals(rrPoint* a, rrPoint* b) {
     return a->x == b->x && a->y == b->y;
 }
+
+rrPoint _rr_point_zero = {0, 0};
+
+rrPoint* rr_point_zero() {
+    return &_rr_point_zero;
+}
