@@ -14,3 +14,10 @@ void rr_entity_set_invalid_position(rrEntity* entity) {
 int rr_entity_position_is_invalid(rrEntity* entity) {
     return entity->position.x == -1 && entity->position.y == -1;
 }
+
+int rr_entity_is_static(rrEntity* entity) {
+    if (entity->type == RR_ENTITY_PLAYER || entity->type == RR_ENTITY_ENEMY)
+        return 0;
+
+    return 1;
+}

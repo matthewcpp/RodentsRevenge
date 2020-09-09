@@ -16,7 +16,6 @@ void rr_game_init(rrGame* game, rrInput* input) {
         rr_enemy_init(&game->_enemies[i], &game->player.entity, &game->grid);
     }
 
-    game->_update_time = 0;
     game->_current_level = NULL;
     game->current_round = 0;
     game->spawn_count = 1;
@@ -26,10 +25,16 @@ void rr_game_uninit(rrGame* game) {
     rr_grid_uninit(&game->grid);
 }
 
-/* determines the new position for the player */
+/* TODO: investigate player respawn behavior further.  Perhaps based on distance to enemy? */
 void rr_game_respawn_player(rrGame* game) {
-    /* TODO: pick better respawn location if starting tile is blocked */
-    rr_grid_update_entity_position(&game->grid, &game->player.entity, &starting_pos);
+    rrEntity* entity = rr_grid_get_cell(&game->grid, &starting_pos);
+    rrPoint spawn_pos;
+    rr_point_copy(&spawn_pos, &starting_pos);
+
+    if (entity && !rr_entity_is_static(entity))
+        rr_get_spawn_pos(&game->grid, &spawn_pos);
+
+    rr_grid_update_entity_position(&game->grid, &game->player.entity, &spawn_pos);
     game->player.entity.status = RR_STATUS_ACTIVE;
 }
 
@@ -81,10 +86,6 @@ void rr_game_round_clear(rrGame* game) {
 }
 
 void rr_game_update(rrGame* game, int time) {
-    int i;
-    unsigned int round_clear = 1;
-    game->_update_time += time;
-
     rr_player_update(&game->player);
 
     if (game->player.entity.status == RR_STATUS_KILLED) {
@@ -95,17 +96,17 @@ void rr_game_update(rrGame* game, int time) {
         }
     }
     else {
+        int i;
+        unsigned int round_clear = 1;
+
         for (i = 0; i < MAX_ENEMIES; i++){
             rr_enemy_update(&game->_enemies[i], time);
             round_clear &= game->_enemies[i].entity.status != RR_STATUS_ACTIVE;
         }
 
+        if (round_clear)
+            rr_game_round_clear(game);
     }
-
-    if (round_clear)
-        rr_game_round_clear(game);
-
-    game->_update_time = 0;
 }
 
 int rr_game_restart(rrGame* game) {
