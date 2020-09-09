@@ -1,6 +1,7 @@
 #include "sdl_input.h"
 
-#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 rrInput* rr_sdl_input_create(int joystick_index) {
     rrInput* input = malloc(sizeof(rrInput));

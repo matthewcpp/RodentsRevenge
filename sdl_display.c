@@ -63,6 +63,7 @@ int rr_sdl_display_load_spritesheet(rrSDLDisplay* display, const char* path) {
     rr_sdl_display_sprite_info(display->_sprites + RR_SPRITE_WALL, 37, 37);
     rr_sdl_display_sprite_info(display->_sprites + RR_SPRITE_CAT, 19, 1);
     rr_sdl_display_sprite_info(display->_sprites + RR_SPRITE_CAT_WAIT, 37, 1);
+    rr_sdl_display_sprite_info(display->_sprites + RR_SPRITE_CHEESE, 1, 19);
 
     return 1;
 }
@@ -195,6 +196,10 @@ void rr_sdl_display_draw_entities(rrSDLDisplay* display) {
 
                 case RR_ENTITY_BLOCK:
                     rr_sdl_display_draw_basic_block(display, RR_SPRITE_BLOCK, &cell);
+                    break;
+
+                case RR_ENTITY_CHEESE:
+                    rr_sdl_display_draw_basic_block(display, RR_SPRITE_CHEESE, &cell);
                     break;
 
                 case RR_ENTITY_ENEMY:

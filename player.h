@@ -17,7 +17,7 @@ typedef struct rrPlayer {
 } rrPlayer;
 
 void rr_player_init(rrPlayer* player, rrGrid* grid, rrInput* input);
-void rr_player_update(rrPlayer* player, int time);
+void rr_player_update(rrPlayer* player);
 void rr_player_move(rrPlayer* player, rrPoint* delta);
 void rr_player_kill(rrPlayer* player);
 

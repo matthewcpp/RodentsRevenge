@@ -17,8 +17,7 @@ void rr_game_init(rrGame* game, rrInput* input) {
 
     game->_update_time = 0;
     game->_current_level = NULL;
-
-
+    game->current_round = 0;
 }
 
 void rr_game_uninit(rrGame* game) {
@@ -39,11 +38,25 @@ void rr_game_spawn_enemies(rrGame* game) {
     game->_enemies[0].entity.status = RR_STATUS_ACTIVE;
 }
 
+void rr_game_round_clear(rrGame* game) {
+    int i;
+
+    for (i = 0; i < MAX_ENEMIES; i++){
+        if (game->_enemies[i].entity.status != RR_STATUS_WAITING)
+            continue;
+
+        game->_enemies[i].entity.status = RR_STATUS_INACTIVE;
+        rr_grid_clear_position(&game->grid, &game->_enemies[i].entity.position);
+        rr_grid_create_basic_entity(&game->grid, &game->_enemies[i].entity.position, RR_ENTITY_CHEESE);
+    }
+}
+
 void rr_game_update(rrGame* game, int time) {
     int i;
+    unsigned int round_clear = 1;
     game->_update_time += time;
 
-    rr_player_update(&game->player, time);
+    rr_player_update(&game->player);
 
     if (game->player.entity.status == RR_STATUS_KILLED) {
         game->player.lives_remaining -= 1;
@@ -53,9 +66,15 @@ void rr_game_update(rrGame* game, int time) {
         }
     }
     else {
-        for (i = 0; i < MAX_ENEMIES; i++)
+        for (i = 0; i < MAX_ENEMIES; i++){
             rr_enemy_update(&game->_enemies[i], time);
+            round_clear &= game->_enemies[i].entity.status != RR_STATUS_ACTIVE;
+        }
+
     }
+
+    if (round_clear)
+        rr_game_round_clear(game);
 
     game->_update_time = 0;
 }
