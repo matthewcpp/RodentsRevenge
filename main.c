@@ -7,6 +7,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 
 #define RR_SCREEN_WIDTH 640
 #define RR_SCREEN_HEIGHT 480
@@ -23,6 +24,8 @@ int main(int argc, char* argv[]){
     rrSDLDisplay renderer;
     (void)argc;
     (void)argv;
+
+    srand ((unsigned int)time(NULL));
 
     game = malloc(sizeof(rrGame));
 

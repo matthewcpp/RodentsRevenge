@@ -16,6 +16,7 @@ typedef struct rrGame {
     int _update_time;
     char* _current_level;
     int current_round;
+    int spawn_count;
 } rrGame;
 
 void rr_game_init(rrGame* game, rrInput* input);

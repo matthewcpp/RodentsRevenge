@@ -1,4 +1,5 @@
 #include "game.h"
+#include "spawn.h"
 
 #include <string.h>
 
@@ -18,6 +19,7 @@ void rr_game_init(rrGame* game, rrInput* input) {
     game->_update_time = 0;
     game->_current_level = NULL;
     game->current_round = 0;
+    game->spawn_count = 1;
 }
 
 void rr_game_uninit(rrGame* game) {
@@ -31,11 +33,32 @@ void rr_game_respawn_player(rrGame* game) {
     game->player.entity.status = RR_STATUS_ACTIVE;
 }
 
+int rr_game_get_next_inactive_enemy_index(rrGame* game) {
+    int i;
+
+    for (i = 0; i < MAX_ENEMIES; i++) {
+        if (game->_enemies[i].entity.status == RR_STATUS_INACTIVE)
+            return i;
+    }
+
+    return MAX_ENEMIES;
+}
+
 void rr_game_spawn_enemies(rrGame* game) {
-    rrPoint pos;
-    rr_point_set(&pos, 1, 1);
-    rr_point_copy(&game->_enemies[0].entity.position, &pos);
-    game->_enemies[0].entity.status = RR_STATUS_ACTIVE;
+    int i;
+    for (i = 0; i < game->spawn_count; i++) {
+        int enemy_index = rr_game_get_next_inactive_enemy_index(game);
+        rrPoint pos;
+
+        if (enemy_index == MAX_ENEMIES)
+            break;
+
+        rr_get_spawn_pos(&game->grid, &pos);
+        rr_grid_update_entity_position(&game->grid, &game->_enemies[enemy_index].entity, &pos);
+        game->_enemies[0].entity.status = RR_STATUS_ACTIVE;
+    }
+
+    game->spawn_count = (game->spawn_count == 1) ? 2 : 1;
 }
 
 void rr_game_round_clear(rrGame* game) {
