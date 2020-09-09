@@ -55,22 +55,28 @@ void rr_game_spawn_enemies(rrGame* game) {
 
         rr_get_spawn_pos(&game->grid, &pos);
         rr_grid_update_entity_position(&game->grid, &game->_enemies[enemy_index].entity, &pos);
-        game->_enemies[0].entity.status = RR_STATUS_ACTIVE;
+        game->_enemies[enemy_index].entity.status = RR_STATUS_ACTIVE;
     }
 
     game->spawn_count = (game->spawn_count == 1) ? 2 : 1;
 }
 
 void rr_game_round_clear(rrGame* game) {
-    int i;
+    if (game->current_round <= 3) {
+        int i;
 
-    for (i = 0; i < MAX_ENEMIES; i++){
-        if (game->_enemies[i].entity.status != RR_STATUS_WAITING)
-            continue;
+        for (i = 0; i < MAX_ENEMIES; i++){
+            if (game->_enemies[i].entity.status != RR_STATUS_WAITING)
+                continue;
 
-        game->_enemies[i].entity.status = RR_STATUS_INACTIVE;
-        rr_grid_clear_position(&game->grid, &game->_enemies[i].entity.position);
-        rr_grid_create_basic_entity(&game->grid, &game->_enemies[i].entity.position, RR_ENTITY_CHEESE);
+            rr_grid_clear_position(&game->grid, &game->_enemies[i].entity.position);
+            rr_grid_create_basic_entity(&game->grid, &game->_enemies[i].entity.position, RR_ENTITY_CHEESE);
+            game->_enemies[i].entity.status = RR_STATUS_INACTIVE;
+            rr_point_set(&game->_enemies[i].entity.position, -1, -1);
+        }
+
+        rr_game_spawn_enemies(game);
+        game->current_round += 1;
     }
 }
 
@@ -108,6 +114,7 @@ int rr_game_restart(rrGame* game) {
 
     rr_grid_clear_position(&game->grid, &starting_pos);
     game->player.lives_remaining = 2;
+    game->current_round = 1;
     rr_game_respawn_player(game);
     rr_game_spawn_enemies(game);
 
