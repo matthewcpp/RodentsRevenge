@@ -15,7 +15,7 @@ int rr_player_input_button_active(rrInput* input, rrInputButton button) {
     return rr_input_button_down(input, button) || rr_input_button_held_time(input, button) > RR_PLAYER_INPUT_REPEAT_TIME;
 }
 
-void rr_player_update(rrPlayer* player, int time) {
+void rr_player_update(rrPlayer* player) {
     rrPoint delta = {0, 0};
     if (rr_player_input_button_active(player->_input, RR_INPUT_BUTTON_LEFT))
         delta.x = -1;

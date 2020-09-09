@@ -1,4 +1,5 @@
 #include "game.h"
+#include "spawn.h"
 
 #include <string.h>
 
@@ -15,35 +16,77 @@ void rr_game_init(rrGame* game, rrInput* input) {
         rr_enemy_init(&game->_enemies[i], &game->player.entity, &game->grid);
     }
 
-    game->_update_time = 0;
     game->_current_level = NULL;
-
-
+    game->current_round = 0;
+    game->spawn_count = 1;
 }
 
 void rr_game_uninit(rrGame* game) {
     rr_grid_uninit(&game->grid);
 }
 
-/* determines the new position for the player */
+/* TODO: investigate player respawn behavior further.  Perhaps based on distance to enemy? */
 void rr_game_respawn_player(rrGame* game) {
-    /* TODO: pick better respawn location if starting tile is blocked */
-    rr_grid_update_entity_position(&game->grid, &game->player.entity, &starting_pos);
+    rrEntity* entity = rr_grid_get_cell(&game->grid, &starting_pos);
+    rrPoint spawn_pos;
+    rr_point_copy(&spawn_pos, &starting_pos);
+
+    if (entity && !rr_entity_is_static(entity))
+        rr_get_spawn_pos(&game->grid, &spawn_pos);
+
+    rr_grid_update_entity_position(&game->grid, &game->player.entity, &spawn_pos);
     game->player.entity.status = RR_STATUS_ACTIVE;
 }
 
+int rr_game_get_next_inactive_enemy_index(rrGame* game) {
+    int i;
+
+    for (i = 0; i < MAX_ENEMIES; i++) {
+        if (game->_enemies[i].entity.status == RR_STATUS_INACTIVE)
+            return i;
+    }
+
+    return MAX_ENEMIES;
+}
+
 void rr_game_spawn_enemies(rrGame* game) {
-    rrPoint pos;
-    rr_point_set(&pos, 1, 1);
-    rr_point_copy(&game->_enemies[0].entity.position, &pos);
-    game->_enemies[0].entity.status = RR_STATUS_ACTIVE;
+    int i;
+    for (i = 0; i < game->spawn_count; i++) {
+        int enemy_index = rr_game_get_next_inactive_enemy_index(game);
+        rrPoint pos;
+
+        if (enemy_index == MAX_ENEMIES)
+            break;
+
+        rr_get_spawn_pos(&game->grid, &pos);
+        rr_grid_update_entity_position(&game->grid, &game->_enemies[enemy_index].entity, &pos);
+        game->_enemies[enemy_index].entity.status = RR_STATUS_ACTIVE;
+    }
+
+    game->spawn_count = (game->spawn_count == 1) ? 2 : 1;
+}
+
+void rr_game_round_clear(rrGame* game) {
+    if (game->current_round <= 3) {
+        int i;
+
+        for (i = 0; i < MAX_ENEMIES; i++){
+            if (game->_enemies[i].entity.status != RR_STATUS_WAITING)
+                continue;
+
+            rr_grid_clear_position(&game->grid, &game->_enemies[i].entity.position);
+            rr_grid_create_basic_entity(&game->grid, &game->_enemies[i].entity.position, RR_ENTITY_CHEESE);
+            game->_enemies[i].entity.status = RR_STATUS_INACTIVE;
+            rr_point_set(&game->_enemies[i].entity.position, -1, -1);
+        }
+
+        rr_game_spawn_enemies(game);
+        game->current_round += 1;
+    }
 }
 
 void rr_game_update(rrGame* game, int time) {
-    int i;
-    game->_update_time += time;
-
-    rr_player_update(&game->player, time);
+    rr_player_update(&game->player);
 
     if (game->player.entity.status == RR_STATUS_KILLED) {
         game->player.lives_remaining -= 1;
@@ -53,11 +96,17 @@ void rr_game_update(rrGame* game, int time) {
         }
     }
     else {
-        for (i = 0; i < MAX_ENEMIES; i++)
-            rr_enemy_update(&game->_enemies[i], time);
-    }
+        int i;
+        unsigned int round_clear = 1;
 
-    game->_update_time = 0;
+        for (i = 0; i < MAX_ENEMIES; i++){
+            rr_enemy_update(&game->_enemies[i], time);
+            round_clear &= game->_enemies[i].entity.status != RR_STATUS_ACTIVE;
+        }
+
+        if (round_clear)
+            rr_game_round_clear(game);
+    }
 }
 
 int rr_game_restart(rrGame* game) {
@@ -66,6 +115,7 @@ int rr_game_restart(rrGame* game) {
 
     rr_grid_clear_position(&game->grid, &starting_pos);
     game->player.lives_remaining = 2;
+    game->current_round = 1;
     rr_game_respawn_player(game);
     rr_game_spawn_enemies(game);
 

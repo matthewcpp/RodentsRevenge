@@ -97,6 +97,22 @@ void rr_grid_clear_position(rrGrid* grid, rrPoint* position) {
     grid->cells[index] = NULL;
 }
 
+/* TODO: pool static entities */
+rrEntity* rr_grid_create_basic_entity(rrGrid* grid, rrPoint* position, rrEntityType type) {
+    int index = grid->width * position->y + position->x;
+    rrEntity* entity = NULL;
+
+    assert(type != RR_ENTITY_PLAYER && type != RR_ENTITY_ENEMY);
+    assert(rr_grid_position_is_valid(grid, position));
+    if (grid->cells[index] == NULL) {
+        entity = malloc(sizeof(rrEntity));
+        rr_entity_init(entity, type);
+        rr_grid_update_entity_position(grid, entity, position);
+    }
+
+    return entity;
+}
+
 void rr_grid_update_entity_position(rrGrid* grid, rrEntity* entity, rrPoint* position) {
     int src_index = grid->width * entity->position.y + entity->position.x;
     int dest_index = grid->width * position->y + position->x;
