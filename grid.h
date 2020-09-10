@@ -13,6 +13,7 @@ typedef struct rrGrid {
     rrEntity** cells;
     int width;
     int height;
+    int _loaded;
 } rrGrid;
 
 void rr_grid_init(rrGrid* grid, int width, int height);

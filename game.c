@@ -87,14 +87,28 @@ void rr_game_round_clear(rrGame* game) {
     }
 }
 
+void rr_game_over(rrGame* game) {
+    int i;
+    for (i = 0; i < MAX_ENEMIES; i++) {
+        rr_entity_deactivate(&game->_enemies[i].entity);
+    }
+
+    rr_entity_deactivate(&game->player.entity);
+
+    rr_grid_load_from_file(&game->grid, game->_current_level);
+    game->state = RR_GAME_STATE_UNSTARTED;
+}
+
 void rr_game_update_state_playing(rrGame* game, int time) {
     rr_player_update(&game->player);
 
     if (game->player.entity.status == RR_STATUS_KILLED) {
         game->player.lives_remaining -= 1;
 
-        if (game->player.lives_remaining >= 0) {
+        if (game->player.lives_remaining >= 0)
             rr_game_respawn_player(game);
+        else {
+            rr_game_over(game);
         }
     }
     else {

@@ -7,6 +7,7 @@ void rr_grid_init(rrGrid* grid, int width, int height) {
     grid->width = width;
     grid->height = height;
     grid->cells = calloc(width * height, sizeof(rrEntity*));
+    grid->_loaded = 0;
 }
 
 void rr_grid_uninit(rrGrid* grid) {
@@ -23,12 +24,32 @@ rrEntity* rr_grid_get_entity_at_position(rrGrid* grid, rrPoint* position) {
     return grid->cells[grid->width * position->y + position->x];
 }
 
+/* TODO: pool static entities */
+void rr_grid_clear(rrGrid* grid) {
+    int i, count = grid->width * grid->height;
+
+    if (!grid->_loaded)
+        return;
+
+    for (i = 0; i < count; i++) {
+        if (grid->cells[i] == NULL)
+            continue;
+
+        if (grid->cells[i]->type != RR_ENTITY_PLAYER && grid->cells[i]->type != RR_ENTITY_ENEMY)
+            free(grid->cells[i]);
+
+        grid->cells[i] = NULL;
+    }
+}
+
 int rr_grid_load_from_file(rrGrid* grid, const char* path) {
     rrPoint cell;
     FILE* file = fopen(path, "r");
 
     if (!file)
         return 0;
+
+    rr_grid_clear(grid);
 
     rr_point_set(&cell, 0, 0);
 
@@ -73,6 +94,7 @@ int rr_grid_load_from_file(rrGrid* grid, const char* path) {
     }
 
     fclose(file);
+    grid->_loaded = 1;
     return 1;
 }
 
