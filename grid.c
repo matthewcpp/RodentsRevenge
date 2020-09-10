@@ -50,6 +50,11 @@ int rr_grid_load_from_file(rrGrid* grid, const char* path) {
                 rr_entity_init(entity, RR_ENTITY_BLOCK);
                 break;
 
+            case 'C':
+                entity = malloc(sizeof(rrEntity));
+                rr_entity_init(entity, RR_ENTITY_CHEESE);
+                break;
+
             case ' ':
                 break;
 

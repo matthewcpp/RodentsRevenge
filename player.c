@@ -92,6 +92,12 @@ void rr_player_move(rrPlayer* player, rrPoint* delta) {
             rr_player_kill(player);
             break;
 
+        case RR_ENTITY_CHEESE:
+            player->score += 100;
+            rr_grid_clear_position(player->_grid, &target);
+            rr_grid_update_entity_position(player->_grid, &player->entity, &target);
+            break;
+
         default:
             break;
     }
