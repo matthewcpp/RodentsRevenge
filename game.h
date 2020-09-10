@@ -19,18 +19,22 @@ typedef struct rrGame {
     rrPlayer player;
     rrEnemy _enemies[MAX_ENEMIES];
     rrInput* _input;
-    char* _current_level;
+    int current_level;
     int current_round;
+    int rounds_per_level;
     int spawn_count;
     rrGameState state;
+    char* _asset_path;
+    size_t _asset_path_len;
 } rrGame;
 
-void rr_game_init(rrGame* game, rrInput* input);
+void rr_game_init(rrGame* game, rrInput* input, const char* asset_path);
 void rr_game_uninit(rrGame* game);
 
 void rr_game_update(rrGame* game, int time);
 
 int rr_game_restart(rrGame* game);
-int rr_game_set_active_level(rrGame* game, const char* path);
+int rr_game_set_active_level(rrGame* game, int level_num);
+void rr_game_set_rounds_per_level(rrGame* game, int rounds_per_level);
 
 #endif

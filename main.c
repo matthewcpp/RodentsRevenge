@@ -45,16 +45,14 @@ int main(int argc, char* argv[]){
 
     rr_sdl_display_init(window, &renderer, game);
 
-    rr_game_init(game, sdl_input);
+    snprintf_func(asset_path, 256, "%s/", ASSET_DIRECTORY);
+    rr_game_init(game, sdl_input, asset_path);
 
     snprintf_func(asset_path, 256, "%s/%s", ASSET_DIRECTORY, "spritesheet.png");
     rr_sdl_display_load_spritesheet(&renderer, asset_path);
 
     snprintf_func(asset_path, 256, "%s/%s", ASSET_DIRECTORY, "vegur-regular.ttf");
     rr_sdl_display_load_font(&renderer, asset_path);
-
-    snprintf_func(asset_path, 256, "%s/%s", ASSET_DIRECTORY, "levels/level01.txt");
-    rr_game_set_active_level(game, asset_path);
 
     last_update = SDL_GetTicks();
 

@@ -2,10 +2,14 @@
 #include "spawn.h"
 
 #include <string.h>
+#include <stdio.h>
 
 rrPoint starting_pos = {11,11};
 
-void rr_game_init(rrGame* game, rrInput* input) {
+#define RR_LEVEL_COUNT 2
+#define RR_DEFAULT_ROUNDS_PER_LEVEL 6
+
+void rr_game_init(rrGame* game, rrInput* input, const char* asset_path) {
     int i;
 
     game->_input = input;
@@ -16,10 +20,16 @@ void rr_game_init(rrGame* game, rrInput* input) {
         rr_enemy_init(&game->_enemies[i], &game->player.entity, &game->grid);
     }
 
-    game->_current_level = NULL;
-    game->current_round = 0;
+    game->current_round = 1;
+    game->rounds_per_level = RR_DEFAULT_ROUNDS_PER_LEVEL;
     game->spawn_count = 1;
     game->state = RR_GAME_STATE_UNSTARTED;
+
+    game->_asset_path_len = strlen(asset_path);
+    game->_asset_path = malloc(game->_asset_path_len + 1);
+    strcpy(game->_asset_path, asset_path);
+
+    rr_game_set_active_level(game, 1);
 }
 
 void rr_game_uninit(rrGame* game) {
@@ -32,8 +42,12 @@ void rr_game_respawn_player(rrGame* game) {
     rrPoint spawn_pos;
     rr_point_copy(&spawn_pos, &starting_pos);
 
-    if (entity && !rr_entity_is_static(entity))
-        rr_get_spawn_pos(&game->grid, &spawn_pos);
+    if (entity){
+        if (rr_entity_is_static(entity))
+            rr_grid_clear_position(&game->grid, &starting_pos);
+        else
+            rr_get_spawn_pos(&game->grid, &spawn_pos);
+    }
 
     rr_grid_update_entity_position(&game->grid, &game->player.entity, &spawn_pos);
     game->player.entity.status = RR_STATUS_ACTIVE;
@@ -68,7 +82,7 @@ void rr_game_spawn_enemies(rrGame* game) {
 }
 
 void rr_game_round_clear(rrGame* game) {
-    if (game->current_round <= 3) {
+    if (game->current_round <= game->rounds_per_level) {
         int i;
 
         for (i = 0; i < MAX_ENEMIES; i++){
@@ -82,8 +96,7 @@ void rr_game_round_clear(rrGame* game) {
             game->player.score += 1;
         }
 
-        rr_game_spawn_enemies(game);
-        game->current_round += 1;
+
     }
 }
 
@@ -95,8 +108,18 @@ void rr_game_over(rrGame* game) {
 
     rr_entity_deactivate(&game->player.entity);
 
-    rr_grid_load_from_file(&game->grid, game->_current_level);
+    /* TODO: Preserve last board state while game over state active */
+    rr_game_set_active_level(game, game->current_level);
     game->state = RR_GAME_STATE_UNSTARTED;
+}
+
+void rr_game_next_level(rrGame* game){
+    int next_level = game->current_level < RR_LEVEL_COUNT ? game->current_level + 1 : 1;
+    rr_game_set_active_level(game, next_level);
+    rr_game_respawn_player(game);
+    rr_game_spawn_enemies(game);
+
+    game->current_round = 1;
 }
 
 void rr_game_update_state_playing(rrGame* game, int time) {
@@ -125,8 +148,18 @@ void rr_game_update_state_playing(rrGame* game, int time) {
             round_clear &= game->_enemies[i].entity.status != RR_STATUS_ACTIVE;
         }
 
-        if (round_clear)
+        if (round_clear) {
             rr_game_round_clear(game);
+
+            if (game->current_round < game->rounds_per_level) {
+                rr_game_spawn_enemies(game);
+                game->current_round += 1;
+            }
+            else {
+                rr_game_next_level(game);
+            }
+        }
+
     }
 }
 
@@ -157,10 +190,6 @@ void rr_game_update(rrGame* game, int time) {
 }
 
 int rr_game_restart(rrGame* game) {
-    if (game->_current_level == NULL)
-        return 0;
-
-    rr_grid_clear_position(&game->grid, &starting_pos);
     game->player.score = 0;
     game->player.lives_remaining = 2;
     game->current_round = 1;
@@ -171,15 +200,19 @@ int rr_game_restart(rrGame* game) {
     return 1;
 }
 
-int rr_game_set_active_level(rrGame* game, const char* path){
-    size_t len;
-    if (game->_current_level) {
-        free(game->_current_level);
-    }
+int rr_game_set_active_level(rrGame* game, int level_num){
+    int file_loaded;
 
-    len = strlen(path);
-    game->_current_level = malloc(len + 1);
-    strcpy(game->_current_level, path);
+    game->current_level = level_num;
 
-    return rr_grid_load_from_file(&game->grid, game->_current_level);
+    char* path_buffer = malloc(game->_asset_path_len + 32);
+    sprintf(path_buffer, "%slevels/level%02d.txt", game->_asset_path, level_num);
+    file_loaded = rr_grid_load_from_file(&game->grid, path_buffer);
+    free (path_buffer);
+
+    return file_loaded;
+}
+
+void rr_game_set_rounds_per_level(rrGame* game, int rounds_per_level) {
+    game->rounds_per_level = rounds_per_level;
 }
