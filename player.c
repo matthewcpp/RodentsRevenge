@@ -48,7 +48,10 @@ int rr_player_push(rrPlayer* player, rrPoint* target) {
         if (end_cell_entity->type == RR_ENTITY_WALL)
             return 0;
         else if (end_cell_entity->type == RR_ENTITY_ENEMY) {
-            rr_enemy_move((rrEnemy*)end_cell_entity);
+            /* we can only push the block if the enemy was able to move to a safe square, otherwise its pinned. */
+            int enemy_evaded = rr_enemy_move((rrEnemy*)end_cell_entity);
+            if (!enemy_evaded)
+                return 0;
         }
         else if (end_cell_entity->type == RR_ENTITY_CHEESE) {
             rr_grid_clear_position(player->_grid, &end_cell_entity->position);
