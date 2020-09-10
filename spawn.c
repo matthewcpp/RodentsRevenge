@@ -30,7 +30,7 @@ void rr_get_spawn_pos(rrGrid* grid, rrPoint* position) {
 
     for (i = 0; i < RR_SPAWN_POS_COUNT; i++) {
         rrPoint* pos = spawn_positions + spawn_points[i];
-        if (rr_grid_get_cell(grid, pos) == NULL){
+        if (rr_grid_get_entity_at_position(grid, pos) == NULL){
             rr_point_copy(position, pos);
             break;
         }

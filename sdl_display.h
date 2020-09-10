@@ -23,6 +23,8 @@ typedef struct {
     SDL_Rect _sprites[RR_SPRITE_COUNT];
     SDL_Texture* _spritesheet;
     TTF_Font* _font;
+
+    int _previous_score;
     SDL_Texture* _scoreText;
     SDL_Rect _scoreTextRect;
 

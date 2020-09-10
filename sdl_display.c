@@ -17,6 +17,7 @@ void rr_sdl_display_init(SDL_Window* window, rrSDLDisplay* display, rrGame* game
     display->_game = game;
     display->_spritesheet = NULL;
     display->_font = NULL;
+    display->_previous_score = 0;
     display->_scoreText = NULL;
     display->_livesText = NULL;
 
@@ -24,6 +25,8 @@ void rr_sdl_display_init(SDL_Window* window, rrSDLDisplay* display, rrGame* game
 }
 
 void rr_sdl_display_uninit(rrSDLDisplay* display) {
+    SDL_DestroyTexture(display->_scoreText);
+    SDL_DestroyTexture(display->_livesText);
     SDL_DestroyTexture(display->_spritesheet);
     SDL_DestroyRenderer(display->_renderer);
 
@@ -94,6 +97,10 @@ void rr_sdl_display_init_score_text(rrSDLDisplay* display) {
 void rr_sdl_display_init_lives_text(rrSDLDisplay* display) {
     SDL_Color color={0,0,0};
     SDL_Surface* text = TTF_RenderUTF8_Solid (display->_font, "Lives:", color);
+
+    if (display->_livesText)
+        SDL_DestroyTexture(display->_spritesheet);
+
     display->_livesText = SDL_CreateTextureFromSurface(display->_renderer, text);
     SDL_FreeSurface(text);
 
@@ -184,7 +191,7 @@ void rr_sdl_display_draw_entities(rrSDLDisplay* display) {
     rrPoint cell;
     for (cell.x = 0; cell.x < RR_GRID_WIDTH; cell.x++) {
         for (cell.y = 0; cell.y < RR_GRID_HEIGHT; cell.y++) {
-            rrEntity* entity = rr_grid_get_cell(&display->_game->grid, &cell);
+            rrEntity* entity = rr_grid_get_entity_at_position(&display->_game->grid, &cell);
 
             if (!entity)
                 continue;
@@ -222,6 +229,11 @@ void rr_sdl_display_draw(rrSDLDisplay* display) {
 
     rr_sdl_display_draw_board_background(display);
     rr_sdl_display_draw_entities(display);
+
+    if (display->_game->player.score != display->_previous_score){
+        rr_sdl_display_init_score_text(display);
+        display->_previous_score = display->_game->player.score;
+    }
 
     SDL_RenderCopy(display->_renderer, display->_scoreText, NULL, &display->_scoreTextRect);
     rr_sdl_display_draw_lives(display);

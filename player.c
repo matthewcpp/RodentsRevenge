@@ -39,7 +39,7 @@ int rr_player_push(rrPlayer* player, rrPoint* target) {
     /* find the first non block tile along the direction*/
     do {
         rr_point_add(&end_cell_pos, &end_cell_pos, &dir);
-        end_cell_entity = rr_grid_get_cell(player->_grid, &end_cell_pos);
+        end_cell_entity = rr_grid_get_entity_at_position(player->_grid, &end_cell_pos);
     }
     while (end_cell_entity != NULL && end_cell_entity->type == RR_ENTITY_BLOCK);
 
@@ -50,16 +50,16 @@ int rr_player_push(rrPlayer* player, rrPoint* target) {
         else if (end_cell_entity->type == RR_ENTITY_ENEMY) {
             rr_enemy_move((rrEnemy*)end_cell_entity);
         }
+        else if (end_cell_entity->type == RR_ENTITY_CHEESE) {
+            rr_grid_clear_position(player->_grid, &end_cell_entity->position);
+        }
     }
-
-    if (rr_grid_cell_is_blocked(player->_grid, &end_cell_pos))
-        return 0;
 
     /* push all the blocks over */
     while (!rr_point_equals(&end_cell_pos, target)) {
         rrPoint src_cell;
         rr_point_sub(&src_cell, &end_cell_pos, &dir);
-        rr_grid_update_entity_position(player->_grid, rr_grid_get_cell(player->_grid, &src_cell), &end_cell_pos);
+        rr_grid_update_entity_position(player->_grid, rr_grid_get_entity_at_position(player->_grid, &src_cell), &end_cell_pos);
         rr_point_sub(&end_cell_pos, &end_cell_pos, &dir);
     }
 
@@ -76,7 +76,7 @@ void rr_player_move(rrPlayer* player, rrPoint* delta) {
     if (!rr_grid_position_is_valid(player->_grid, &target))
         return;
 
-    target_cell = rr_grid_get_cell(player->_grid, &target);
+    target_cell = rr_grid_get_entity_at_position(player->_grid, &target);
 
     if (target_cell == NULL) {
         rr_grid_update_entity_position(player->_grid, &player->entity, &target);
@@ -90,6 +90,12 @@ void rr_player_move(rrPlayer* player, rrPoint* delta) {
 
         case RR_ENTITY_ENEMY:
             rr_player_kill(player);
+            break;
+
+        case RR_ENTITY_CHEESE:
+            player->score += 100;
+            rr_grid_clear_position(player->_grid, &target);
+            rr_grid_update_entity_position(player->_grid, &player->entity, &target);
             break;
 
         default:

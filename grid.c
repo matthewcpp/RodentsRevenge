@@ -17,7 +17,7 @@ int rr_grid_position_is_valid(rrGrid* grid, rrPoint* position) {
     return position->x >= 0 && position->x < grid->width && position->y >= 0 && position->y < grid->height;
 }
 
-rrEntity* rr_grid_get_cell(rrGrid* grid, rrPoint* position) {
+rrEntity* rr_grid_get_entity_at_position(rrGrid* grid, rrPoint* position) {
     assert(rr_grid_position_is_valid(grid, position));
 
     return grid->cells[grid->width * position->y + position->x];
@@ -50,6 +50,11 @@ int rr_grid_load_from_file(rrGrid* grid, const char* path) {
                 rr_entity_init(entity, RR_ENTITY_BLOCK);
                 break;
 
+            case 'C':
+                entity = malloc(sizeof(rrEntity));
+                rr_entity_init(entity, RR_ENTITY_CHEESE);
+                break;
+
             case ' ':
                 break;
 
@@ -69,16 +74,6 @@ int rr_grid_load_from_file(rrGrid* grid, const char* path) {
 
     fclose(file);
     return 1;
-}
-
-int rr_grid_cell_is_blocked(struct rrGrid* grid, rrPoint* position) {
-    int index = grid->width * position->y + position->x;
-    assert(rr_grid_position_is_valid(grid, position));
-
-    if (grid->cells[index] == NULL)
-        return 0;
-    else
-        return 1;
 }
 
 /* TODO: pool static entities */
