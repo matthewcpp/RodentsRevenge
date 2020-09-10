@@ -50,10 +50,10 @@ int rr_player_push(rrPlayer* player, rrPoint* target) {
         else if (end_cell_entity->type == RR_ENTITY_ENEMY) {
             rr_enemy_move((rrEnemy*)end_cell_entity);
         }
+        else if (end_cell_entity->type == RR_ENTITY_CHEESE) {
+            rr_grid_clear_position(player->_grid, &end_cell_entity->position);
+        }
     }
-
-    if (rr_grid_cell_is_blocked(player->_grid, &end_cell_pos))
-        return 0;
 
     /* push all the blocks over */
     while (!rr_point_equals(&end_cell_pos, target)) {
