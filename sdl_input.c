@@ -57,6 +57,7 @@ void rr_sdl_update_keyboard(rrInput* input, int time) {
     rr_sdl_input_update_button(input, RR_INPUT_BUTTON_DOWN, keyboard_state[SDL_SCANCODE_DOWN], time);
     rr_sdl_input_update_button(input, RR_INPUT_BUTTON_LEFT, keyboard_state[SDL_SCANCODE_LEFT], time);
     rr_sdl_input_update_button(input, RR_INPUT_BUTTON_RIGHT, keyboard_state[SDL_SCANCODE_RIGHT], time);
+    rr_sdl_input_update_button(input, RR_INPUT_BUTTON_START, keyboard_state[SDL_SCANCODE_SPACE], time);
 }
 
 void rr_sdl_input_update(rrInput* input, int time) {

@@ -8,7 +8,7 @@ void rr_player_init(rrPlayer* player, rrGrid* grid, rrInput* input) {
     player->_grid = grid;
     player->_input = input;
     player->score = 0;
-    player->lives_remaining = 0;
+    player->lives_remaining = 2;
 }
 
 int rr_player_input_button_active(rrInput* input, rrInputButton button) {

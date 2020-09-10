@@ -19,6 +19,7 @@ void rr_game_init(rrGame* game, rrInput* input) {
     game->_current_level = NULL;
     game->current_round = 0;
     game->spawn_count = 1;
+    game->state = RR_GAME_STATE_UNSTARTED;
 }
 
 void rr_game_uninit(rrGame* game) {
@@ -86,7 +87,7 @@ void rr_game_round_clear(rrGame* game) {
     }
 }
 
-void rr_game_update(rrGame* game, int time) {
+void rr_game_update_state_playing(rrGame* game, int time) {
     rr_player_update(&game->player);
 
     if (game->player.entity.status == RR_STATUS_KILLED) {
@@ -110,6 +111,22 @@ void rr_game_update(rrGame* game, int time) {
     }
 }
 
+void rr_game_update_state_unstarted(rrGame* game) {
+    if (rr_input_button_down(game->_input, RR_INPUT_BUTTON_START))
+        rr_game_restart(game);
+}
+
+void rr_game_update(rrGame* game, int time) {
+    switch (game->state) {
+        case RR_GAME_STATE_UNSTARTED:
+            rr_game_update_state_unstarted(game);
+            break;
+        case RR_GAME_STATE_PLAYING:
+            rr_game_update_state_playing(game, time);
+            break;
+    }
+}
+
 int rr_game_restart(rrGame* game) {
     if (game->_current_level == NULL)
         return 0;
@@ -118,6 +135,7 @@ int rr_game_restart(rrGame* game) {
     game->player.score = 0;
     game->player.lives_remaining = 2;
     game->current_round = 1;
+    game->state = RR_GAME_STATE_PLAYING;
     rr_game_respawn_player(game);
     rr_game_spawn_enemies(game);
 
