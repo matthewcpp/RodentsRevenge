@@ -100,6 +100,11 @@ void rr_game_over(rrGame* game) {
 }
 
 void rr_game_update_state_playing(rrGame* game, int time) {
+    if (rr_input_button_down(game->_input, RR_INPUT_BUTTON_START)) {
+        game->state = RR_GAME_STATE_PAUSED;
+        return;
+    }
+
     rr_player_update(&game->player);
 
     if (game->player.entity.status == RR_STATUS_KILLED) {
@@ -130,13 +135,23 @@ void rr_game_update_state_unstarted(rrGame* game) {
         rr_game_restart(game);
 }
 
+void rr_game_update_state_paused(rrGame* game) {
+    if (rr_input_button_down(game->_input, RR_INPUT_BUTTON_START))
+        game->state = RR_GAME_STATE_PLAYING;
+}
+
 void rr_game_update(rrGame* game, int time) {
     switch (game->state) {
         case RR_GAME_STATE_UNSTARTED:
             rr_game_update_state_unstarted(game);
             break;
+
         case RR_GAME_STATE_PLAYING:
             rr_game_update_state_playing(game, time);
+            break;
+
+        case RR_GAME_STATE_PAUSED:
+            rr_game_update_state_paused(game);
             break;
     }
 }
