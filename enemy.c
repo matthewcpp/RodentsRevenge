@@ -16,7 +16,7 @@ static rrPoint deltas[8] = {
         {-1, 0}, {1, 0},
         {-1, 1}, {0, 1}, {1, 1}};
 
-void rr_enemy_move(rrEnemy* enemy) {
+int rr_enemy_move(rrEnemy* enemy) {
     int i;
     int shortest_dist = INT_MAX;
     rrPoint move_pos, target_point;
@@ -42,12 +42,15 @@ void rr_enemy_move(rrEnemy* enemy) {
         }
     }
 
-    if (shortest_dist != INT_MAX) {
+    /* Enemy was not able to move and is pinned*/
+    if (shortest_dist == INT_MAX) {
+        enemy->entity.status = RR_STATUS_WAITING;
+        return 0;
+    }
+    else {
         enemy->entity.status = RR_STATUS_ACTIVE;
         rr_grid_update_entity_position(enemy->_grid, &enemy->entity, &move_pos);
-    }
-    else { /* Enemy was not able to move and is pinned*/
-        enemy->entity.status = RR_STATUS_WAITING;
+        return 1;
     }
 }
 

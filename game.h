@@ -8,6 +8,12 @@
 
 #define MAX_ENEMIES 8
 
+typedef enum {
+    RR_GAME_STATE_UNSTARTED,
+    RR_GAME_STATE_PLAYING,
+    RR_GAME_STATE_PAUSED
+} rrGameState;
+
 typedef struct rrGame {
     rrGrid grid;
     rrPlayer player;
@@ -16,6 +22,7 @@ typedef struct rrGame {
     char* _current_level;
     int current_round;
     int spawn_count;
+    rrGameState state;
 } rrGame;
 
 void rr_game_init(rrGame* game, rrInput* input);

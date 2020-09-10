@@ -28,5 +28,6 @@ void rr_entity_init(rrEntity* entity, rrEntityType type);
 void rr_entity_set_invalid_position(rrEntity* entity);
 int rr_entity_position_is_invalid(rrEntity* entity);
 int rr_entity_is_static(rrEntity* entity);
+void rr_entity_deactivate(rrEntity* entity);
 
 #endif
