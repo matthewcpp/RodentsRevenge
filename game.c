@@ -27,7 +27,7 @@ void rr_game_uninit(rrGame* game) {
 
 /* TODO: investigate player respawn behavior further.  Perhaps based on distance to enemy? */
 void rr_game_respawn_player(rrGame* game) {
-    rrEntity* entity = rr_grid_get_cell(&game->grid, &starting_pos);
+    rrEntity* entity = rr_grid_get_entity_at_position(&game->grid, &starting_pos);
     rrPoint spawn_pos;
     rr_point_copy(&spawn_pos, &starting_pos);
 

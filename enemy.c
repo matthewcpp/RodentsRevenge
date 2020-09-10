@@ -32,7 +32,7 @@ void rr_enemy_move(rrEnemy* enemy) {
             break;
         }
 
-        if (rr_grid_cell_is_blocked(enemy->_grid, &target_point))
+        if (rr_grid_get_entity_at_position(enemy->_grid, &target_point) != NULL)
             continue;
 
         dist_to_player = rr_point_dist_squared(&target_point, &enemy->_player->position);
