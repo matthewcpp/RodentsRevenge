@@ -78,6 +78,7 @@ void rr_game_round_clear(rrGame* game) {
             rr_grid_create_basic_entity(&game->grid, &game->_enemies[i].entity.position, RR_ENTITY_CHEESE);
             game->_enemies[i].entity.status = RR_STATUS_INACTIVE;
             rr_point_set(&game->_enemies[i].entity.position, -1, -1);
+            game->player.score += 1;
         }
 
         rr_game_spawn_enemies(game);
@@ -114,6 +115,7 @@ int rr_game_restart(rrGame* game) {
         return 0;
 
     rr_grid_clear_position(&game->grid, &starting_pos);
+    game->player.score = 0;
     game->player.lives_remaining = 2;
     game->current_round = 1;
     rr_game_respawn_player(game);
