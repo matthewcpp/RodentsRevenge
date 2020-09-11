@@ -4,7 +4,7 @@ include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/util_functions.cmake)
 
 project (RodentsRevenge C)
 
-add_executable(RodentsRevenge main.c player.h player.c grid.h grid.c game.h game.c input.h sdl_input.h sdl_input.c sdl_display.h sdl_display.c point.h point.c enemy.h enemy.c entity.h entity.c defs.h spawn.h spawn.c)
+add_executable(RodentsRevenge main.c player.h player.c grid.h grid.c game.h game.c input.h sdl_input.h sdl_input.c sdl_display.h sdl_display.c point.h point.c enemy.h enemy.c entity.h entity.c defs.h spawn.h spawn.c animation.h sdl_animation.c sdl_animation.h)
 set_source_files_properties(main.c PROPERTIES COMPILE_DEFINITIONS ASSET_DIRECTORY="${CMAKE_CURRENT_SOURCE_DIR}/assets")
 set_compiler_options(RodentsRevenge)
 

@@ -1,4 +1,5 @@
 #include "sdl_display.h"
+#include "sdl_animation.h"
 #include "defs.h"
 
 #include <SDL_image.h>
@@ -25,6 +26,8 @@ void rr_sdl_display_init(SDL_Window* window, rrSDLDisplay* display, rrGame* game
 }
 
 void rr_sdl_display_uninit(rrSDLDisplay* display) {
+    rr_sdl_animation_destroy(display->_game->player.death_animation);
+
     SDL_DestroyTexture(display->_scoreText);
     SDL_DestroyTexture(display->_livesText);
     SDL_DestroyTexture(display->_spritesheet);
@@ -52,6 +55,12 @@ void rr_sdl_display_sprite_info(SDL_Rect* rect, int x, int y) {
     rect->h = 16;
 }
 
+void rr_sdl_create_player_death_anim(rrSDLDisplay* display) {
+    rrPoint animation_frames[] = {{18, 36}, {54, 54}, {36, 36}, {0, 18}, {18, 18}};
+    rrPoint frame_size = {16, 16};
+    display->_game->player.death_animation = rr_sdl_animation_create(display->_spritesheet, 5, &animation_frames[0], &frame_size, 100);
+}
+
 int rr_sdl_display_load_spritesheet(rrSDLDisplay* display, const char* path) {
     SDL_Surface* surface = IMG_Load(path);
 
@@ -61,12 +70,15 @@ int rr_sdl_display_load_spritesheet(rrSDLDisplay* display, const char* path) {
     display->_spritesheet = SDL_CreateTextureFromSurface(display->_renderer, surface);
     SDL_FreeSurface(surface);
 
-    rr_sdl_display_sprite_info(display->_sprites + RR_SPRITE_BLOCK, 1, 1);
-    rr_sdl_display_sprite_info(display->_sprites + RR_SPRITE_MOUSE, 37, 19);
-    rr_sdl_display_sprite_info(display->_sprites + RR_SPRITE_WALL, 37, 37);
-    rr_sdl_display_sprite_info(display->_sprites + RR_SPRITE_CAT, 19, 1);
-    rr_sdl_display_sprite_info(display->_sprites + RR_SPRITE_CAT_WAIT, 37, 1);
-    rr_sdl_display_sprite_info(display->_sprites + RR_SPRITE_CHEESE, 1, 19);
+    rr_sdl_display_sprite_info(display->_sprites + RR_SPRITE_BLOCK, 18, 0);
+    rr_sdl_display_sprite_info(display->_sprites + RR_SPRITE_MOUSE, 54, 34);
+    rr_sdl_display_sprite_info(display->_sprites + RR_SPRITE_WALL, 36, 0);
+    rr_sdl_display_sprite_info(display->_sprites + RR_SPRITE_CAT, 85, 52);
+    rr_sdl_display_sprite_info(display->_sprites + RR_SPRITE_CAT_WAIT, 0, 36);
+    rr_sdl_display_sprite_info(display->_sprites + RR_SPRITE_CHEESE, 36, 54);
+    rr_sdl_display_sprite_info(display->_sprites + RR_SPRITE_REMAINING_LIFE, 36, 18);
+
+    rr_sdl_create_player_death_anim(display);
 
     return 1;
 }
@@ -137,11 +149,6 @@ void rr_sdl_display_draw_enemy(rrSDLDisplay* display, rrEnemy* enemy) {
     SDL_Rect sprite_tile;
     SpriteIndex sprite_index;
 
-    if (enemy->entity.status == RR_STATUS_INACTIVE)
-        return;
-
-    rr_sdl_display_set_sprite_rect(display, &sprite_tile, &enemy->entity.position);
-
     switch (enemy->entity.status) {
         case RR_STATUS_ACTIVE:
             sprite_index = RR_SPRITE_CAT;
@@ -152,22 +159,35 @@ void rr_sdl_display_draw_enemy(rrSDLDisplay* display, rrEnemy* enemy) {
             break;
 
         default:
-            sprite_index = RR_SPRITE_COUNT;
+            return;
     }
 
-    assert(sprite_index != RR_SPRITE_COUNT);
-
+    rr_sdl_display_set_sprite_rect(display, &sprite_tile, &enemy->entity.position);
     SDL_RenderCopy(display->_renderer, display->_spritesheet, display->_sprites + sprite_index, &sprite_tile);
 }
 
 void rr_sdl_display_draw_player(rrSDLDisplay* display, rrPlayer* player) {
-    SDL_Rect sprite_tile;
+    SDL_Rect* sprite_src_rect;
+    SDL_Rect texture_dest_rect;
+    SDL_Texture* texture;
 
-    if (player->entity.status != RR_STATUS_ACTIVE)
-        return;
+    switch (player->entity.status) {
+        case RR_STATUS_ACTIVE:
+            texture = display->_spritesheet;
+            sprite_src_rect = display->_sprites + RR_SPRITE_MOUSE;
+            break;
 
-    rr_sdl_display_set_sprite_rect(display, &sprite_tile, &player->entity.position);
-    SDL_RenderCopy(display->_renderer, display->_spritesheet, display->_sprites + RR_SPRITE_MOUSE, &sprite_tile);
+        case RR_STATUS_DYING:
+            texture = player->death_animation->texture;
+            sprite_src_rect = &player->death_animation->current_frame_rect;
+            break;
+
+        default:
+            return;
+    }
+
+    rr_sdl_display_set_sprite_rect(display, &texture_dest_rect, &player->entity.position);
+    SDL_RenderCopy(display->_renderer, texture, sprite_src_rect, &texture_dest_rect);
 }
 
 void rr_sdl_display_draw_lives(rrSDLDisplay* display) {
@@ -182,7 +202,7 @@ void rr_sdl_display_draw_lives(rrSDLDisplay* display) {
     SDL_RenderCopy(display->_renderer, display->_livesText, NULL, &display->_livesTextRect);
 
     for (i = 0; i < display->_game->player.lives_remaining; i++) {
-        SDL_RenderCopy(display->_renderer, display->_spritesheet, display->_sprites + RR_SPRITE_MOUSE, &sprite_rect);
+        SDL_RenderCopy(display->_renderer, display->_spritesheet, display->_sprites + RR_SPRITE_REMAINING_LIFE, &sprite_rect);
         sprite_rect.x += RR_RENDERER_TILE_SIZE + 5;
     }
 }
@@ -215,6 +235,7 @@ void rr_sdl_display_draw_entities(rrSDLDisplay* display) {
 
                 case RR_ENTITY_PLAYER:
                     rr_sdl_display_draw_player(display, (rrPlayer*)entity);
+                    break;
             }
         }
     }

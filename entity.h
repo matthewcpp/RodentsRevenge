@@ -4,10 +4,12 @@
 #include "point.h"
 
 typedef enum {
-    RR_STATUS_INACTIVE = 0,
-    RR_STATUS_ACTIVE = 1,
-    RR_STATUS_WAITING = 2,
-    RR_STATUS_KILLED = 4
+    RR_STATUS_INACTIVE,
+    RR_STATUS_ACTIVE,
+    RR_STATUS_WAITING,
+    RR_STATUS_SUSPENDED,
+    RR_STATUS_DYING,
+    RR_STATUS_KILLED
 } rrStatus;
 
 typedef enum {
