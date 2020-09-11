@@ -26,10 +26,12 @@ int rr_enemy_move(rrEnemy* enemy) {
         rr_point_add(&target_point, &enemy->entity.position, &deltas[i]);
 
         if (rr_point_equals(&target_point, &enemy->_player->position)) {
-            shortest_dist = 0;
-            rr_point_copy(&move_pos, &target_point);
-            rr_player_kill((rrPlayer*)enemy->_player);
-            break;
+            if (enemy->_player->status != RR_STATUS_ACTIVE)
+                return 0;
+
+            rr_enemy_suspend(enemy);
+            rr_player_kill((rrPlayer*)enemy->_player, &enemy->entity);
+            return 1;
         }
 
         if (rr_grid_get_entity_at_position(enemy->_grid, &target_point) != NULL)
@@ -55,8 +57,7 @@ int rr_enemy_move(rrEnemy* enemy) {
 }
 
 void rr_enemy_update(rrEnemy* enemy, int time) {
-
-    if (enemy->entity.status == RR_STATUS_INACTIVE)
+    if (enemy->entity.status != RR_STATUS_ACTIVE)
         return;
 
     enemy->_last_move_time += time;
@@ -64,4 +65,10 @@ void rr_enemy_update(rrEnemy* enemy, int time) {
         rr_enemy_move(enemy);
         enemy->_last_move_time = 0;
     }
+}
+
+void rr_enemy_suspend(rrEnemy* enemy) {
+    rr_grid_clear_position(enemy->_grid, &enemy->entity.position);
+    rr_entity_set_invalid_position(&enemy->entity);
+    enemy->entity.status = RR_STATUS_SUSPENDED;
 }

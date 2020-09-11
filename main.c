@@ -43,10 +43,10 @@ int main(int argc, char* argv[]){
         puts("No joysticks detected.  Switching to keyboard input.");
     }
 
-    rr_sdl_display_init(window, &renderer, game);
-
     snprintf_func(asset_path, 256, "%s/", ASSET_DIRECTORY);
     rr_game_init(game, sdl_input, asset_path);
+
+    rr_sdl_display_init(window, &renderer, game);
 
     snprintf_func(asset_path, 256, "%s/%s", ASSET_DIRECTORY, "spritesheet.png");
     rr_sdl_display_load_spritesheet(&renderer, asset_path);
@@ -76,10 +76,12 @@ int main(int argc, char* argv[]){
         SDL_Delay(1);
     }
 
-    rr_game_uninit(game);
-    free(game);
     rr_sdl_input_destroy(sdl_input);
     rr_sdl_display_uninit(&renderer);
+
+    rr_game_uninit(game);
+    free(game);
+
     SDL_VideoQuit();
 
     return 0;
