@@ -61,12 +61,13 @@ int rr_sdl_display_load_spritesheet(rrSDLDisplay* display, const char* path) {
     display->_spritesheet = SDL_CreateTextureFromSurface(display->_renderer, surface);
     SDL_FreeSurface(surface);
 
-    rr_sdl_display_sprite_info(display->_sprites + RR_SPRITE_BLOCK, 1, 1);
-    rr_sdl_display_sprite_info(display->_sprites + RR_SPRITE_MOUSE, 37, 19);
-    rr_sdl_display_sprite_info(display->_sprites + RR_SPRITE_WALL, 37, 37);
-    rr_sdl_display_sprite_info(display->_sprites + RR_SPRITE_CAT, 19, 1);
-    rr_sdl_display_sprite_info(display->_sprites + RR_SPRITE_CAT_WAIT, 37, 1);
-    rr_sdl_display_sprite_info(display->_sprites + RR_SPRITE_CHEESE, 1, 19);
+    rr_sdl_display_sprite_info(display->_sprites + RR_SPRITE_BLOCK, 18, 0);
+    rr_sdl_display_sprite_info(display->_sprites + RR_SPRITE_MOUSE, 54, 34);
+    rr_sdl_display_sprite_info(display->_sprites + RR_SPRITE_WALL, 36, 0);
+    rr_sdl_display_sprite_info(display->_sprites + RR_SPRITE_CAT, 85, 52);
+    rr_sdl_display_sprite_info(display->_sprites + RR_SPRITE_CAT_WAIT, 0, 36);
+    rr_sdl_display_sprite_info(display->_sprites + RR_SPRITE_CHEESE, 36, 54);
+    rr_sdl_display_sprite_info(display->_sprites + RR_SPRITE_REMAINING_LIFE, 36, 18);
 
     return 1;
 }
