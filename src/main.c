@@ -1,7 +1,7 @@
 #include "defs.h"
 #include "game.h"
-#include "sdl_input.h"
-#include "sdl_display.h"
+#include "sdl/sdl_input.h"
+#include "sdl/sdl_display.h"
 
 #include <SDL.h>
 

@@ -4,9 +4,10 @@ include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/util_functions.cmake)
 
 project (RodentsRevenge C)
 
-add_executable(RodentsRevenge main.c player.h player.c grid.h grid.c game.h game.c input.h sdl_input.h sdl_input.c sdl_display.h sdl_display.c point.h point.c enemy.h enemy.c entity.h entity.c defs.h spawn.h spawn.c animation.h sdl_animation.c sdl_animation.h)
-set_source_files_properties(main.c PROPERTIES COMPILE_DEFINITIONS ASSET_DIRECTORY="${CMAKE_CURRENT_SOURCE_DIR}/assets")
+add_executable(RodentsRevenge src/main.c src/player.h src/player.c src/grid.h src/grid.c src/game.h src/game.c src/input.h src/sdl/sdl_input.h src/sdl/sdl_input.c src/sdl/sdl_display.h src/sdl/sdl_display.c src/point.h src/point.c src/enemy.h src/enemy.c src/entity.h src/entity.c src/defs.h src/spawn.h src/spawn.c src/animation.h src/sdl/sdl_animation.c src/sdl/sdl_animation.h)
+set_source_files_properties(src/main.c PROPERTIES COMPILE_DEFINITIONS ASSET_DIRECTORY="${CMAKE_CURRENT_SOURCE_DIR}/assets")
 set_compiler_options(RodentsRevenge)
+target_include_directories(RodentsRevenge PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 if (UNIX AND NOT APPLE)
 	list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
