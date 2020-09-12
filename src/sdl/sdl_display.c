@@ -8,11 +8,43 @@
 
 #define RR_RENDERER_TILE_SIZE 16
 
+typedef enum {
+    RR_SPRITE_BLOCK,
+    RR_SPRITE_WALL,
+    RR_SPRITE_MOUSE,
+    RR_SPRITE_CAT,
+    RR_SPRITE_CAT_WAIT,
+    RR_SPRITE_CHEESE,
+    RR_SPRITE_REMAINING_LIFE,
+    RR_SPRITE_COUNT
+} SpriteIndex;
+
+struct rrSDLDisplay{
+    rrGame* _game;
+    SDL_Window* _window;
+    SDL_Renderer* _renderer;
+    SDL_Rect _sprites[RR_SPRITE_COUNT];
+    SDL_Texture* _spritesheet;
+    TTF_Font* _font;
+
+    int _previous_score;
+    SDL_Texture* _scoreText;
+    SDL_Rect _scoreTextRect;
+
+    SDL_Texture* _livesText;
+    SDL_Rect _livesTextRect;
+
+    rrPoint _map_pos;
+    rrPoint window_size;
+};
+
 void rr_sdl_display_setup_display_elements(rrSDLDisplay* display);
 void rr_sdl_display_init_score_text(rrSDLDisplay* display);
 void rr_sdl_display_init_lives_text(rrSDLDisplay* display);
 
-void rr_sdl_display_init(SDL_Window* window, rrSDLDisplay* display, rrGame* game) {
+rrSDLDisplay* rr_sdl_display_create(SDL_Window* window, rrGame* game) {
+    rrSDLDisplay* display = malloc(sizeof(rrSDLDisplay));
+
     display->_window = window;
     display->_renderer = SDL_CreateRenderer(window, -1, 0);
     display->_game = game;
@@ -23,9 +55,11 @@ void rr_sdl_display_init(SDL_Window* window, rrSDLDisplay* display, rrGame* game
     display->_livesText = NULL;
 
     TTF_Init();
+
+    return display;
 }
 
-void rr_sdl_display_uninit(rrSDLDisplay* display) {
+void rr_sdl_display_destroy(rrSDLDisplay* display) {
     rr_sdl_animation_destroy(display->_game->player.death_animation);
 
     SDL_DestroyTexture(display->_scoreText);
@@ -37,6 +71,8 @@ void rr_sdl_display_uninit(rrSDLDisplay* display) {
         TTF_CloseFont(display->_font);
 
     TTF_Quit();
+
+    free(display);
 }
 
 void rr_sdl_display_setup_display_elements(rrSDLDisplay* display){
@@ -211,7 +247,7 @@ void rr_sdl_display_draw_entities(rrSDLDisplay* display) {
     rrPoint cell;
     for (cell.x = 0; cell.x < RR_GRID_WIDTH; cell.x++) {
         for (cell.y = 0; cell.y < RR_GRID_HEIGHT; cell.y++) {
-            rrEntity* entity = rr_grid_get_entity_at_position(&display->_game->grid, &cell);
+            rrEntity* entity = rr_grid_get_entity_at_position(display->_game->grid, &cell);
 
             if (!entity)
                 continue;
