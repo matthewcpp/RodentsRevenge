@@ -38,15 +38,15 @@ void rr_player_update_dying(rrPlayer* player, int time) {
     rr_animation_update(player->death_animation, time);
 
     if (rr_animation_complete(player->death_animation)) {
-        player->entity.status = RR_STATUS_KILLED;
-        rr_grid_clear_position(player->_grid, &player->entity.position);
+        rrPoint position;
+        rr_point_copy(&position, &player->entity.position);
 
-        rr_grid_update_entity_position(player->_grid, player->_killer_entity, &player->entity.position);
+        rr_entity_remove_from_grid(&player->entity, player->_grid);
+        player->entity.status = RR_STATUS_KILLED;
+
+        rr_entity_place_in_grid_cell(player->_killer_entity, player->_grid, &position);
         player->_killer_entity->status = RR_STATUS_ACTIVE;
         player->_killer_entity = NULL;
-
-        /* prepare for respawn */
-        rr_entity_set_invalid_position(&player->entity);
     }
 }
 
@@ -89,11 +89,11 @@ int rr_player_push(rrPlayer* player, rrPoint* target) {
     while (!rr_point_equals(&end_cell_pos, target)) {
         rrPoint src_cell;
         rr_point_sub(&src_cell, &end_cell_pos, &dir);
-        rr_grid_update_entity_position(player->_grid, rr_grid_get_entity_at_position(player->_grid, &src_cell), &end_cell_pos);
+        rr_entity_move_to_grid_cell(rr_grid_get_entity_at_position(player->_grid, &src_cell), player->_grid, &end_cell_pos);
         rr_point_sub(&end_cell_pos, &end_cell_pos, &dir);
     }
 
-    rr_grid_update_entity_position(player->_grid, &player->entity, target);
+    rr_entity_move_to_grid_cell(&player->entity, player->_grid, target);
 
     return 1;
 }
@@ -109,7 +109,7 @@ void rr_player_move(rrPlayer* player, rrPoint* delta) {
     target_cell_entity = rr_grid_get_entity_at_position(player->_grid, &target);
 
     if (target_cell_entity == NULL) {
-        rr_grid_update_entity_position(player->_grid, &player->entity, &target);
+        rr_entity_move_to_grid_cell(&player->entity, player->_grid, &target);
         return;
     }
 
@@ -120,14 +120,14 @@ void rr_player_move(rrPlayer* player, rrPoint* delta) {
 
         case RR_ENTITY_ENEMY:
             rr_enemy_suspend((rrEnemy*)target_cell_entity);
-            rr_grid_update_entity_position(player->_grid, &player->entity, &target);
+            rr_entity_move_to_grid_cell(&player->entity, player->_grid, &target);
             rr_player_kill(player, target_cell_entity);
             break;
 
         case RR_ENTITY_CHEESE:
             player->score += 100;
-            rr_grid_clear_position(player->_grid, &target);
-            rr_grid_update_entity_position(player->_grid, &player->entity, &target);
+            rr_grid_destroy_basic_entity(player->_grid, target_cell_entity);
+            rr_entity_move_to_grid_cell(&player->entity, player->_grid, &target);
             break;
 
         default:

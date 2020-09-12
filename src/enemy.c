@@ -51,7 +51,7 @@ int rr_enemy_move(rrEnemy* enemy) {
     }
     else {
         enemy->entity.status = RR_STATUS_ACTIVE;
-        rr_grid_update_entity_position(enemy->_grid, &enemy->entity, &move_pos);
+        rr_entity_move_to_grid_cell(&enemy->entity, enemy->_grid, &move_pos);
         return 1;
     }
 }
@@ -68,7 +68,6 @@ void rr_enemy_update(rrEnemy* enemy, int time) {
 }
 
 void rr_enemy_suspend(rrEnemy* enemy) {
-    rr_grid_clear_position(enemy->_grid, &enemy->entity.position);
-    rr_entity_set_invalid_position(&enemy->entity);
+    rr_entity_remove_from_grid(&enemy->entity, enemy->_grid);
     enemy->entity.status = RR_STATUS_SUSPENDED;
 }

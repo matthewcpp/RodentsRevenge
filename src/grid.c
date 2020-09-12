@@ -24,6 +24,12 @@ rrEntity* rr_grid_get_entity_at_position(rrGrid* grid, rrPoint* position) {
     return grid->cells[grid->width * position->y + position->x];
 }
 
+void rr_grid_set_entity_at_position(rrGrid* grid, rrEntity* entity, rrPoint* position) {
+    assert(rr_grid_position_is_valid(grid, position));
+
+    grid->cells[grid->width * position->y + position->x] = entity;
+}
+
 /* TODO: pool static entities */
 void rr_grid_clear(rrGrid* grid) {
     int i, count = grid->width * grid->height;
@@ -83,8 +89,10 @@ int rr_grid_load_from_file(rrGrid* grid, const char* path) {
                 continue;
         }
 
-        if (entity)
-            rr_grid_update_entity_position(grid, entity, &cell);
+        if (entity){
+            entity->status = RR_STATUS_ACTIVE;
+            rr_entity_place_in_grid_cell(entity, grid, &cell);
+        }
 
         cell.x += 1;
         if (cell.x == RR_GRID_WIDTH) {
@@ -98,18 +106,9 @@ int rr_grid_load_from_file(rrGrid* grid, const char* path) {
     return 1;
 }
 
-/* TODO: pool static entities */
 void rr_grid_clear_position(rrGrid* grid, rrPoint* position) {
     int index = grid->width * position->y + position->x;
-    rrEntity* entity = NULL;
     assert(rr_grid_position_is_valid(grid, position));
-
-    entity = grid->cells[index];
-    if (!entity)
-        return;
-
-    if (entity->type != RR_ENTITY_ENEMY && entity->type != RR_ENTITY_PLAYER)
-        free(entity);
 
     grid->cells[index] = NULL;
 }
@@ -121,26 +120,21 @@ rrEntity* rr_grid_create_basic_entity(rrGrid* grid, rrPoint* position, rrEntityT
 
     assert(type != RR_ENTITY_PLAYER && type != RR_ENTITY_ENEMY);
     assert(rr_grid_position_is_valid(grid, position));
+
     if (grid->cells[index] == NULL) {
         entity = malloc(sizeof(rrEntity));
         rr_entity_init(entity, type);
-        rr_grid_update_entity_position(grid, entity, position);
+        rr_entity_place_in_grid_cell(entity, grid, position);
     }
 
     return entity;
 }
 
-void rr_grid_update_entity_position(rrGrid* grid, rrEntity* entity, rrPoint* position) {
-    int src_index = grid->width * entity->position.y + entity->position.x;
-    int dest_index = grid->width * position->y + position->x;
+/* TODO: pool static entities */
+void rr_grid_destroy_basic_entity(rrGrid* grid, rrEntity* entity) {
+    if (rr_grid_position_is_valid(grid, &entity->position))
+        rr_grid_clear_position(grid, &entity->position);
 
-    assert(rr_grid_position_is_valid(grid, position));
-    assert(grid->cells[dest_index] == NULL);
-
-    /* entities are initially created with an invalid position off the board and must be explicitly placed */
-    if (!rr_entity_position_is_invalid(entity))
-        grid->cells[src_index] = NULL;
-
-    rr_point_copy(&entity->position, position);
-    grid->cells[dest_index] = entity;
+    assert(entity->type != RR_ENTITY_PLAYER && entity->type != RR_ENTITY_ENEMY);
+    free(entity);
 }

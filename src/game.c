@@ -3,6 +3,7 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <assert.h>
 
 rrPoint starting_pos = {11,11};
 
@@ -49,7 +50,7 @@ void rr_game_respawn_player(rrGame* game) {
             rr_get_spawn_pos(&game->grid, &spawn_pos);
     }
 
-    rr_grid_update_entity_position(&game->grid, &game->player.entity, &spawn_pos);
+    rr_entity_place_in_grid_cell(&game->player.entity, &game->grid, &spawn_pos);
     game->player.entity.status = RR_STATUS_ACTIVE;
 }
 
@@ -74,7 +75,7 @@ void rr_game_spawn_enemies(rrGame* game) {
             break;
 
         rr_get_spawn_pos(&game->grid, &pos);
-        rr_grid_update_entity_position(&game->grid, &game->_enemies[enemy_index].entity, &pos);
+        rr_entity_place_in_grid_cell(&game->_enemies[enemy_index].entity, &game->grid, &pos);
         game->_enemies[enemy_index].entity.status = RR_STATUS_ACTIVE;
     }
 
@@ -86,17 +87,20 @@ void rr_game_round_clear(rrGame* game) {
         int i;
 
         for (i = 0; i < MAX_ENEMIES; i++){
-            if (game->_enemies[i].entity.status != RR_STATUS_WAITING)
+            rrEnemy* enemy = &game->_enemies[i];
+            rrPoint position;
+
+            if (enemy->entity.status != RR_STATUS_WAITING)
                 continue;
 
-            rr_grid_clear_position(&game->grid, &game->_enemies[i].entity.position);
-            rr_grid_create_basic_entity(&game->grid, &game->_enemies[i].entity.position, RR_ENTITY_CHEESE);
+            rr_point_copy(&position, &enemy->entity.position);
+            rr_entity_remove_from_grid(&enemy->entity, enemy->_grid);
             game->_enemies[i].entity.status = RR_STATUS_INACTIVE;
-            rr_point_set(&game->_enemies[i].entity.position, -1, -1);
+
+            rr_grid_create_basic_entity(&game->grid, &position, RR_ENTITY_CHEESE);
+
             game->player.score += 1;
         }
-
-
     }
 }
 
@@ -115,6 +119,7 @@ void rr_game_over(rrGame* game) {
 
 void rr_game_next_level(rrGame* game){
     int next_level = game->current_level < RR_LEVEL_COUNT ? game->current_level + 1 : 1;
+    rr_entity_remove_from_grid(&game->player.entity, &game->grid);
     rr_game_set_active_level(game, next_level);
     rr_game_respawn_player(game);
     rr_game_spawn_enemies(game);
