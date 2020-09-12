@@ -14,11 +14,11 @@ void rr_game_init(rrGame* game, rrInput* input, const char* asset_path) {
     int i;
 
     game->_input = input;
-    rr_grid_init(&game->grid, RR_GRID_WIDTH, RR_GRID_HEIGHT);
-    rr_player_init(&game->player, &game->grid, input);
+    game->grid = rr_grid_create(RR_GRID_WIDTH, RR_GRID_HEIGHT);
+    rr_player_init(&game->player, game->grid, input);
 
     for (i = 0; i < MAX_ENEMIES; i++) {
-        rr_enemy_init(&game->_enemies[i], &game->player.entity, &game->grid);
+        rr_enemy_init(&game->_enemies[i], &game->player.entity, game->grid);
     }
 
     game->current_round = 1;
@@ -34,23 +34,23 @@ void rr_game_init(rrGame* game, rrInput* input, const char* asset_path) {
 }
 
 void rr_game_uninit(rrGame* game) {
-    rr_grid_uninit(&game->grid);
+    rr_grid_destroy(game->grid);
 }
 
 /* TODO: investigate player respawn behavior further.  Perhaps based on distance to enemy? */
 void rr_game_respawn_player(rrGame* game) {
-    rrEntity* entity = rr_grid_get_entity_at_position(&game->grid, &starting_pos);
+    rrEntity* entity = rr_grid_get_entity_at_position(game->grid, &starting_pos);
     rrPoint spawn_pos;
     rr_point_copy(&spawn_pos, &starting_pos);
 
     if (entity){
         if (rr_entity_is_static(entity))
-            rr_grid_clear_position(&game->grid, &starting_pos);
+            rr_grid_clear_position(game->grid, &starting_pos);
         else
-            rr_get_spawn_pos(&game->grid, &spawn_pos);
+            rr_get_spawn_pos(game->grid, &spawn_pos);
     }
 
-    rr_entity_place_in_grid_cell(&game->player.entity, &game->grid, &spawn_pos);
+    rr_entity_place_in_grid_cell(&game->player.entity, game->grid, &spawn_pos);
     game->player.entity.status = RR_STATUS_ACTIVE;
 }
 
@@ -74,8 +74,8 @@ void rr_game_spawn_enemies(rrGame* game) {
         if (enemy_index == MAX_ENEMIES)
             break;
 
-        rr_get_spawn_pos(&game->grid, &pos);
-        rr_entity_place_in_grid_cell(&game->_enemies[enemy_index].entity, &game->grid, &pos);
+        rr_get_spawn_pos(game->grid, &pos);
+        rr_entity_place_in_grid_cell(&game->_enemies[enemy_index].entity, game->grid, &pos);
         game->_enemies[enemy_index].entity.status = RR_STATUS_ACTIVE;
     }
 
@@ -97,7 +97,7 @@ void rr_game_round_clear(rrGame* game) {
             rr_entity_remove_from_grid(&enemy->entity, enemy->_grid);
             game->_enemies[i].entity.status = RR_STATUS_INACTIVE;
 
-            rr_grid_create_basic_entity(&game->grid, &position, RR_ENTITY_CHEESE);
+            rr_grid_create_basic_entity(game->grid, &position, RR_ENTITY_CHEESE);
 
             game->player.score += 1;
         }
@@ -119,7 +119,7 @@ void rr_game_over(rrGame* game) {
 
 void rr_game_next_level(rrGame* game){
     int next_level = game->current_level < RR_LEVEL_COUNT ? game->current_level + 1 : 1;
-    rr_entity_remove_from_grid(&game->player.entity, &game->grid);
+    rr_entity_remove_from_grid(&game->player.entity, game->grid);
     rr_game_set_active_level(game, next_level);
     rr_game_respawn_player(game);
     rr_game_spawn_enemies(game);
@@ -215,12 +215,11 @@ int rr_game_restart(rrGame* game) {
 int rr_game_set_active_level(rrGame* game, int level_num){
     int file_loaded;
 
-    game->current_level = level_num;
-
     char* path_buffer = malloc(game->_asset_path_len + 32);
     sprintf(path_buffer, "%slevels/level%02d.txt", game->_asset_path, level_num);
-    file_loaded = rr_grid_load_from_file(&game->grid, path_buffer);
+    file_loaded = rr_grid_load_from_file(game->grid, path_buffer);
     free (path_buffer);
+    game->current_level = level_num;
 
     return file_loaded;
 }

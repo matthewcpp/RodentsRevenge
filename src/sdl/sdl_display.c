@@ -211,7 +211,7 @@ void rr_sdl_display_draw_entities(rrSDLDisplay* display) {
     rrPoint cell;
     for (cell.x = 0; cell.x < RR_GRID_WIDTH; cell.x++) {
         for (cell.y = 0; cell.y < RR_GRID_HEIGHT; cell.y++) {
-            rrEntity* entity = rr_grid_get_entity_at_position(&display->_game->grid, &cell);
+            rrEntity* entity = rr_grid_get_entity_at_position(display->_game->grid, &cell);
 
             if (!entity)
                 continue;

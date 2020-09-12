@@ -15,7 +15,7 @@ typedef enum {
 } rrGameState;
 
 typedef struct rrGame {
-    rrGrid grid;
+    rrGrid* grid;
     rrPlayer player;
     rrEnemy _enemies[MAX_ENEMIES];
     rrInput* _input;

@@ -3,15 +3,27 @@
 #include <stdio.h>
 #include <assert.h>
 
-void rr_grid_init(rrGrid* grid, int width, int height) {
+struct rrGrid{
+    rrEntity** cells;
+    int width;
+    int height;
+    int loaded;
+} ;
+
+rrGrid* rr_grid_create(int width, int height) {
+    rrGrid* grid = malloc(sizeof(struct rrGrid));
+
     grid->width = width;
     grid->height = height;
     grid->cells = calloc(width * height, sizeof(rrEntity*));
-    grid->_loaded = 0;
+    grid->loaded = 0;
+
+    return grid;
 }
 
-void rr_grid_uninit(rrGrid* grid) {
+void rr_grid_destroy(rrGrid* grid) {
     free(grid->cells);
+    free(grid);
 }
 
 int rr_grid_position_is_valid(rrGrid* grid, rrPoint* position) {
@@ -34,7 +46,7 @@ void rr_grid_set_entity_at_position(rrGrid* grid, rrEntity* entity, rrPoint* pos
 void rr_grid_clear(rrGrid* grid) {
     int i, count = grid->width * grid->height;
 
-    if (!grid->_loaded)
+    if (!grid->loaded)
         return;
 
     for (i = 0; i < count; i++) {
@@ -102,7 +114,7 @@ int rr_grid_load_from_file(rrGrid* grid, const char* path) {
     }
 
     fclose(file);
-    grid->_loaded = 1;
+    grid->loaded = 1;
     return 1;
 }
 

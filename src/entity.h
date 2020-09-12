@@ -3,7 +3,7 @@
 
 #include "point.h"
 
-typedef struct rrGrid rrGrid;
+struct rrGrid;
 
 typedef enum {
     RR_STATUS_INACTIVE,
@@ -38,16 +38,17 @@ void rr_entity_deactivate(rrEntity* entity);
  * Moves an entity to a new grid cell which must currently be empty.
  * Convenience method to clear out the old grid location, update entity position, and place it in the target grid location.
  */
-void rr_entity_move_to_grid_cell(rrEntity* entity, rrGrid* grid, rrPoint* position);
+void rr_entity_move_to_grid_cell(rrEntity* entity, struct rrGrid* grid, rrPoint* position);
 
 /**
  * Places an entity which is not currently on the grid in the target grid cell which should be empty.
  * Convenience method to update entity position, and place it in the target grid location.
  */
-void rr_entity_place_in_grid_cell(rrEntity* entity, rrGrid* grid, rrPoint* position);
+void rr_entity_place_in_grid_cell(rrEntity* entity, struct rrGrid* grid, rrPoint* position);
 
 /**
  * Removes an entity from the grid and sets its position to invalid.
  */
-void rr_entity_remove_from_grid(rrEntity* entity, rrGrid* grid);
+void rr_entity_remove_from_grid(rrEntity* entity, struct rrGrid* grid);
+
 #endif
