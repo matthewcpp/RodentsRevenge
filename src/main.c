@@ -21,7 +21,7 @@ int main(int argc, char* argv[]){
 
     rrGame* game = NULL;
     rrInput* sdl_input = NULL;
-    rrSDLDisplay renderer;
+    rrSDLDisplay* display;
     (void)argc;
     (void)argv;
 
@@ -46,13 +46,13 @@ int main(int argc, char* argv[]){
     snprintf_func(asset_path, 256, "%s/", ASSET_DIRECTORY);
     rr_game_init(game, sdl_input, asset_path);
 
-    rr_sdl_display_init(window, &renderer, game);
+    display = rr_sdl_display_create(window, game);
 
     snprintf_func(asset_path, 256, "%s/%s", ASSET_DIRECTORY, "spritesheet.png");
-    rr_sdl_display_load_spritesheet(&renderer, asset_path);
+    rr_sdl_display_load_spritesheet(display, asset_path);
 
     snprintf_func(asset_path, 256, "%s/%s", ASSET_DIRECTORY, "vegur-regular.ttf");
-    rr_sdl_display_load_font(&renderer, asset_path);
+    rr_sdl_display_load_font(display, asset_path);
 
     last_update = SDL_GetTicks();
 
@@ -70,14 +70,14 @@ int main(int argc, char* argv[]){
         if (time_delta >= 32) {
             rr_sdl_input_update(sdl_input, time_delta);
             rr_game_update(game, time_delta);
-            rr_sdl_display_draw(&renderer);
+            rr_sdl_display_draw(display);
             last_update = now;
         }
         SDL_Delay(1);
     }
 
     rr_sdl_input_destroy(sdl_input);
-    rr_sdl_display_uninit(&renderer);
+    rr_sdl_display_destroy(display);
 
     rr_game_uninit(game);
     free(game);
