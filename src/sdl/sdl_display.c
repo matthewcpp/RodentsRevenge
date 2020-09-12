@@ -1,6 +1,6 @@
 #include "sdl_display.h"
 #include "sdl_animation.h"
-#include "defs.h"
+#include "../defs.h"
 
 #include <SDL_image.h>
 

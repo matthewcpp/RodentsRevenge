@@ -1,0 +1,25 @@
+XBE_TITLE = RodentsRevenge
+GEN_XISO = $(XBE_TITLE).iso
+# NXDK_DIR = $(CURDIR)/../..
+# NXDK_DIR = /home/matthew/development/sdk/nxdk
+NXDK_SDL = y
+
+SRCS =  $(CURDIR)/src/enemy.c \
+		$(CURDIR)/src/entity.c \
+		$(CURDIR)/src/game.c \
+		$(CURDIR)/src/grid.c \
+		$(CURDIR)/src/player.c \
+		$(CURDIR)/src/point.c \
+		$(CURDIR)/src/spawn.c \
+		$(CURDIR)/src/sdl/sdl_animation.c \
+		$(CURDIR)/src/sdl/sdl_display.c \
+		$(CURDIR)/src/sdl/sdl_input.c \
+		$(CURDIR)/src/xbox/xbox_main.c
+
+all_local: cp_assets all
+
+include $(NXDK_DIR)/Makefile
+
+cp_assets:
+	@mkdir -p $(OUTPUT_DIR)
+	cp -r assets $(OUTPUT_DIR)

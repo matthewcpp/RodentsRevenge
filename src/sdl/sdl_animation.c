@@ -1,4 +1,4 @@
-#include "animation.h"
+#include "../animation.h"
 #include "sdl_animation.h"
 
 #include <SDL.h>

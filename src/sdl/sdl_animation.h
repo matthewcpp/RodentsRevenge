@@ -1,8 +1,8 @@
 #ifndef RR_SDL_ANIMATION_H
 #define RR_SDL_ANIMATION_H
 
-#include "animation.h"
-#include "point.h"
+#include "../animation.h"
+#include "../point.h"
 
 #include <SDL.h>
 

@@ -1,7 +1,7 @@
 #ifndef rr_sdl_display_H
 #define rr_sdl_display_H
 
-#include "game.h"
+#include "../game.h"
 
 #include <SDL.h>
 #include <SDL_ttf.h>
