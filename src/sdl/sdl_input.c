@@ -3,6 +3,17 @@
 #include <string.h>
 #include <stdlib.h>
 
+typedef struct {
+    int prev_state;
+    int cur_state;
+    int hold_time;
+} rrSDLButtonInfo;
+
+struct rrInput{
+    SDL_Joystick* _joystick;
+    rrSDLButtonInfo _button_info[RR_INPUT_BUTTON_COUNT];
+};
+
 rrInput* rr_sdl_input_create(int joystick_index) {
     rrInput* input = malloc(sizeof(rrInput));
     input->_joystick = SDL_JoystickOpen(joystick_index);

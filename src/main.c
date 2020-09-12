@@ -45,7 +45,6 @@ int main(int argc, char* argv[]){
 
     snprintf_func(asset_path, 256, "%s/", ASSET_DIRECTORY);
     rr_game_init(game, sdl_input, asset_path);
-    rr_game_set_rounds_per_level(game, 2);
 
     rr_sdl_display_init(window, &renderer, game);
 
