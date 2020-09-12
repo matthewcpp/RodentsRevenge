@@ -36,8 +36,8 @@ int main(int argc, char* argv[]){
                               SDL_WINDOW_SHOWN);
 
     SDL_InitSubSystem(SDL_INIT_JOYSTICK);
-    sdl_input = rr_sdl_input_create(0);
-    if (!rr_sdl_input_joystick_active(sdl_input)) {
+    sdl_input = rr_sdl_input_create(0, NULL);
+    if (!rr_sdl_input_controller_active(sdl_input)) {
         puts("No joysticks detected.  Switching to keyboard input.");
     }
 

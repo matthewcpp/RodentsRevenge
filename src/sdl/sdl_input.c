@@ -10,25 +10,30 @@ typedef struct {
 } rrSDLButtonInfo;
 
 struct rrInput{
-    SDL_Joystick* _joystick;
+    SDL_GameController* controller;
     rrSDLButtonInfo _button_info[RR_INPUT_BUTTON_COUNT];
 };
 
-rrInput* rr_sdl_input_create(int joystick_index) {
+rrInput* rr_sdl_input_create(int joystick_index, const char* mapping_file_path) {
     rrInput* input = malloc(sizeof(rrInput));
-    input->_joystick = SDL_JoystickOpen(joystick_index);
+
+    if (mapping_file_path) {
+        SDL_GameControllerAddMappingsFromFile(mapping_file_path);
+    }
+
+    input->controller = SDL_GameControllerOpen(joystick_index);
     memset(input->_button_info, 0, sizeof(rrSDLButtonInfo) * RR_INPUT_BUTTON_COUNT);
 
     return input;
 }
 
-int rr_sdl_input_joystick_active(rrInput* input) {
-    return input->_joystick != NULL;
+int rr_sdl_input_controller_active(rrInput* input) {
+    return input->controller != NULL;
 }
 
 void rr_sdl_input_destroy(rrInput* input) {
-    if (input->_joystick)
-        SDL_JoystickClose(input->_joystick);
+    if (input->controller)
+        SDL_GameControllerClose(input->controller);
 
     free(input);
 }
@@ -53,12 +58,13 @@ void rr_sdl_input_update_button(rrInput* input, rrInputButton button, int value,
 }
 
 void rr_sdl_input_update_joystick(rrInput* input, int time) {
-    Uint8 hat = SDL_JoystickGetHat(input->_joystick, 0);
+    SDL_GameControllerGetButton(input->controller, SDL_CONTROLLER_BUTTON_DPAD_UP );
 
-    rr_sdl_input_update_button(input, RR_INPUT_BUTTON_UP, hat & SDL_HAT_UP, time);
-    rr_sdl_input_update_button(input, RR_INPUT_BUTTON_DOWN, hat & SDL_HAT_DOWN, time);
-    rr_sdl_input_update_button(input, RR_INPUT_BUTTON_LEFT, hat & SDL_HAT_LEFT, time);
-    rr_sdl_input_update_button(input, RR_INPUT_BUTTON_RIGHT, hat & SDL_HAT_RIGHT, time);
+    rr_sdl_input_update_button(input, RR_INPUT_BUTTON_UP, SDL_GameControllerGetButton(input->controller, SDL_CONTROLLER_BUTTON_DPAD_UP ), time);
+    rr_sdl_input_update_button(input, RR_INPUT_BUTTON_DOWN, SDL_GameControllerGetButton(input->controller, SDL_CONTROLLER_BUTTON_DPAD_DOWN ), time);
+    rr_sdl_input_update_button(input, RR_INPUT_BUTTON_LEFT, SDL_GameControllerGetButton(input->controller, SDL_CONTROLLER_BUTTON_DPAD_LEFT ), time);
+    rr_sdl_input_update_button(input, RR_INPUT_BUTTON_RIGHT, SDL_GameControllerGetButton(input->controller, SDL_CONTROLLER_BUTTON_DPAD_RIGHT ), time);
+    rr_sdl_input_update_button(input, RR_INPUT_BUTTON_START, SDL_GameControllerGetButton(input->controller, SDL_CONTROLLER_BUTTON_START ), time);
 }
 
 void rr_sdl_update_keyboard(rrInput* input, int time) {
@@ -72,7 +78,7 @@ void rr_sdl_update_keyboard(rrInput* input, int time) {
 }
 
 void rr_sdl_input_update(rrInput* input, int time) {
-    if (input->_joystick)
+    if (input->controller)
         rr_sdl_input_update_joystick(input, time);
     else
         rr_sdl_update_keyboard(input, time);
