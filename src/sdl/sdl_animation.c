@@ -6,6 +6,16 @@
 #include <stdlib.h>
 #include <string.h>
 
+struct rrAnimation {
+    SDL_Texture* texture;
+    int frame_count;
+    rrPoint* frames;
+    SDL_Rect current_frame_rect;
+
+    int frame_time;
+    int current_time;
+};
+
 rrAnimation* rr_sdl_animation_create(SDL_Texture* texture, int frame_count, rrPoint* frames, rrPoint* frame_size, int frame_time) {
     int frame_data_size = frame_count * sizeof(rrPoint);
     rrAnimation* animation = malloc(sizeof(rrAnimation));
