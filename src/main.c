@@ -27,8 +27,6 @@ int main(int argc, char* argv[]){
 
     srand ((unsigned int)time(NULL));
 
-    game = malloc(sizeof(rrGame));
-
     SDL_VideoInit(NULL);
     window = SDL_CreateWindow("RodentsRevenge",
                               SDL_WINDOWPOS_UNDEFINED,
@@ -44,7 +42,7 @@ int main(int argc, char* argv[]){
     }
 
     snprintf_func(asset_path, 256, "%s/", ASSET_DIRECTORY);
-    rr_game_init(game, sdl_input, asset_path);
+    game = rr_game_create(sdl_input, asset_path);
 
     display = rr_sdl_display_create(window, game);
 
@@ -78,9 +76,7 @@ int main(int argc, char* argv[]){
 
     rr_sdl_input_destroy(sdl_input);
     rr_sdl_display_destroy(display);
-
-    rr_game_uninit(game);
-    free(game);
+    rr_game_destroy(game);
 
     SDL_VideoQuit();
 

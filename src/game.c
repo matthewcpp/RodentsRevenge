@@ -10,8 +10,9 @@ rrPoint starting_pos = {11,11};
 #define RR_LEVEL_COUNT 2
 #define RR_DEFAULT_ROUNDS_PER_LEVEL 6
 
-void rr_game_init(rrGame* game, rrInput* input, const char* asset_path) {
+rrGame* rr_game_create(rrInput* input, const char* asset_path) {
     int i;
+    rrGame* game = malloc(sizeof(rrGame));
 
     game->_input = input;
     game->grid = rr_grid_create(RR_GRID_WIDTH, RR_GRID_HEIGHT);
@@ -31,10 +32,13 @@ void rr_game_init(rrGame* game, rrInput* input, const char* asset_path) {
     strcpy(game->_asset_path, asset_path);
 
     rr_game_set_active_level(game, 1);
+
+    return game;
 }
 
-void rr_game_uninit(rrGame* game) {
+void rr_game_destroy(rrGame* game) {
     rr_grid_destroy(game->grid);
+    free(game);
 }
 
 /* TODO: investigate player respawn behavior further.  Perhaps based on distance to enemy? */

@@ -28,8 +28,8 @@ typedef struct rrGame {
     size_t _asset_path_len;
 } rrGame;
 
-void rr_game_init(rrGame* game, rrInput* input, const char* asset_path);
-void rr_game_uninit(rrGame* game);
+rrGame* rr_game_create(rrInput* input, const char* asset_path);
+void rr_game_destroy(rrGame* game);
 
 void rr_game_update(rrGame* game, int time);
 
