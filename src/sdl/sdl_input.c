@@ -18,9 +18,6 @@ rrInput* rr_sdl_input_create(int joystick_index, const char* mapping_file_path) 
     rrInput* input = NULL;
     SDL_GameController* controller = SDL_GameControllerOpen(joystick_index);
 
-    if (!controller)
-        return NULL;
-
     input = malloc(sizeof(rrInput));
 
     if (mapping_file_path) {

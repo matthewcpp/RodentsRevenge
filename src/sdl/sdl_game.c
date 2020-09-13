@@ -4,10 +4,11 @@
 #include "sdl_display.h"
 
 #include "../game.h"
-#include "../defs.h"
+#include "../util.h"
 
 #include <SDL.h>
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -47,9 +48,6 @@ int rr_sdl_game_init(rrSDLGame* game, int screen_width, int screen_height) {
 
     result = SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER);
 
-    /* TODO: Xbox only */
-    SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
-
     if (result != 0) {
         game->error_str = "Failed to initialize controller subsystem";
         return 0;
@@ -65,13 +63,13 @@ int rr_sdl_game_init(rrSDLGame* game, int screen_width, int screen_height) {
     game->game = rr_game_create(game->input, game->asset_path);
     game->display = rr_sdl_display_create(game->window, game->game);
 
-    snprintf_func(asset_path, 256, "%s%s", game->asset_path, "spritesheet.png");
+    sprintf(asset_path, "%s%s%s", game->asset_path, rr_path_sep(), "spritesheet.png");
     if (!rr_sdl_display_load_spritesheet(game->display, asset_path)) {
         game->error_str = "Failed to load spritesheet";
         return 0;
     }
 
-    snprintf_func(asset_path, 256, "%s%s", game->asset_path, "vegur-regular.ttf");
+    sprintf(asset_path, "%s%s%s", game->asset_path, rr_path_sep(), "vegur-regular.ttf");
     if (!rr_sdl_display_load_font(game->display, asset_path)) {
         game->error_str = "Failed to load font";
         return 0;
@@ -109,15 +107,30 @@ void rr_sdl_game_run(rrSDLGame* game) {
 }
 
 void rr_sdl_game_destroy(rrSDLGame* game) {
-    rr_sdl_input_destroy(game->input);
-    rr_sdl_display_destroy(game->display);
-    rr_game_destroy(game->game);
+    if (game->input)
+        rr_sdl_input_destroy(game->input);
 
-    free(game->asset_path);
+    if (game->display)
+        rr_sdl_display_destroy(game->display);
+
+    if (game->asset_path)
+        free(game->asset_path);
+
+    if (game->game) {
+        rr_game_destroy(game->game);
+    }
+
+    if (game->window) {
+        SDL_DestroyWindow(game->window);
+    }
 
     SDL_VideoQuit();
 }
 
 const char* rr_sdl_game_get_error_str(rrSDLGame* game) {
     return game->error_str;
+}
+
+rrInput* rr_sdl_game_get_input(rrSDLGame* game) {
+    return game->input;
 }
