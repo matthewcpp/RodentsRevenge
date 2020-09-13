@@ -1,7 +1,8 @@
+# Note that NXDK_DIR needs to be passed to the makefile via command line.
+# Example: make -f Makefile.xbox NXDK_DIR=/path/to/nxdk
+
 XBE_TITLE = RodentsRevenge
 GEN_XISO = $(XBE_TITLE).iso
-# NXDK_DIR = $(CURDIR)/../..
-# NXDK_DIR = /home/matthew/development/sdk/nxdk
 NXDK_SDL = y
 
 SRCS =  $(CURDIR)/src/enemy.c \
@@ -11,11 +12,14 @@ SRCS =  $(CURDIR)/src/enemy.c \
 		$(CURDIR)/src/player.c \
 		$(CURDIR)/src/point.c \
 		$(CURDIR)/src/spawn.c \
+		$(CURDIR)/src/util.c \
 		$(CURDIR)/src/sdl/sdl_animation.c \
 		$(CURDIR)/src/sdl/sdl_display.c \
 		$(CURDIR)/src/sdl/sdl_game.c \
 		$(CURDIR)/src/sdl/sdl_input.c \
 		$(CURDIR)/src/xbox/xbox_main.c
+
+CFLAGS := $(CFLAGS) -DRR_PLATFORM_XBOX
 
 all_local: cp_assets all
 
