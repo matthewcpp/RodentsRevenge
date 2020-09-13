@@ -1,4 +1,4 @@
-#include "sdl/sdl_game.h"
+#include "../sdl/sdl_game.h"
 
 #include <stdio.h>
 
