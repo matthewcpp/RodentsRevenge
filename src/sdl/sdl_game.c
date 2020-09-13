@@ -18,35 +18,64 @@ struct rrSDLGame {
     rrSDLDisplay* display;
     SDL_Window* window;
     char* asset_path;
+    const char* error_str;
 };
 
 rrSDLGame* rr_sdl_game_create(const char* asset_path) {
     rrSDLGame* game = calloc(sizeof(rrSDLGame), 1);
 
+    game->error_str = NULL;
     game->asset_path = malloc(strlen(asset_path) + 1);
     strcpy(game->asset_path, asset_path);
 
     return game;
 }
 
-int rr_game_init(rrSDLGame* game, int screen_width, int screen_height) {
+int rr_sdl_game_init(rrSDLGame* game, int screen_width, int screen_height) {
+    int result;
     char asset_path[256];
 
     srand ((unsigned int)time(NULL));
 
     SDL_VideoInit(NULL);
     game->window = SDL_CreateWindow("RodentsRevenge", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, screen_width, screen_height,SDL_WINDOW_SHOWN);
-    SDL_InitSubSystem(SDL_INIT_JOYSTICK);
+
+    if (!game->window) {
+        game->error_str = "Failed to create SDL window";
+        return 0;
+    }
+
+    result = SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER);
+
+    /* TODO: Xbox only */
+    SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
+
+    if (result != 0) {
+        game->error_str = "Failed to initialize controller subsystem";
+        return 0;
+    }
 
     game->input = rr_sdl_input_create(0, NULL);
+
+    if (!game->input) {
+        game->error_str = "Failed to open game controller";
+        return 0;
+    }
+
     game->game = rr_game_create(game->input, game->asset_path);
     game->display = rr_sdl_display_create(game->window, game->game);
 
-    snprintf_func(asset_path, 256, "%s/%s", game->asset_path, "spritesheet.png");
-    rr_sdl_display_load_spritesheet(game->display, asset_path);
+    snprintf_func(asset_path, 256, "%s%s", game->asset_path, "spritesheet.png");
+    if (!rr_sdl_display_load_spritesheet(game->display, asset_path)) {
+        game->error_str = "Failed to load spritesheet";
+        return 0;
+    }
 
-    snprintf_func(asset_path, 256, "%s/%s", game->asset_path, "vegur-regular.ttf");
-    rr_sdl_display_load_font(game->display, asset_path);
+    snprintf_func(asset_path, 256, "%s%s", game->asset_path, "vegur-regular.ttf");
+    if (!rr_sdl_display_load_font(game->display, asset_path)) {
+        game->error_str = "Failed to load font";
+        return 0;
+    }
 
     return 1;
 }
@@ -87,4 +116,8 @@ void rr_sdl_game_destroy(rrSDLGame* game) {
     free(game->asset_path);
 
     SDL_VideoQuit();
+}
+
+const char* rr_sdl_game_get_error_str(rrSDLGame* game) {
+    return game->error_str;
 }
