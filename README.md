@@ -15,3 +15,14 @@ sudo apt-get -y install libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev
 mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
 ```
+
+Xbox
+Clone the [nxdk](https://github.com/XboxDev/nxdk) repo from github and follow the instructions for configuring the SDK.
+Note that on Ubuntu 20.04 you may need to append to your path directory for the `llvm-lib` command to work during the build process:
+```
+PATH=$PATH:/usr/lib/llvm-10/bin
+```
+Generate your xbe
+```shell script
+make -f Makefile.xbox NXDK_DIR=/path/to/nxdk
+```

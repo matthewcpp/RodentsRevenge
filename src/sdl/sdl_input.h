@@ -1,7 +1,7 @@
 #ifndef RR_SDL_INPUT_H
 #define RR_SDL_INPUT_H
 
-#include "input.h"
+#include "../input.h"
 
 #include <SDL.h>
 

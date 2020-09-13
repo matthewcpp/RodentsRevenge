@@ -10,6 +10,18 @@ matrix:
         - mkdir build && cd build
         - cmake .. -DCMAKE_BUILD_TYPE=Release
         - make
+    - os: linux
+      dist: focal
+      env:
+        - BUILD_NAME=xbox
+      compiler: gcc
+      before_install:
+        - sudo apt-get -y install flex bison
+      script:
+        - mkdir build
+        - git clone --recursive https://github.com/XboxDev/nxdk.git build/nxdk
+        - PATH=$PATH:/usr/lib/llvm-10/bin
+        - make -f Makefile.xbox NXDK_DIR=build/nxdk
     - os: osx
       compiler: clang
       before_install:

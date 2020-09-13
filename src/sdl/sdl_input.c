@@ -15,13 +15,16 @@ struct rrInput{
 };
 
 rrInput* rr_sdl_input_create(int joystick_index, const char* mapping_file_path) {
-    rrInput* input = malloc(sizeof(rrInput));
+    rrInput* input = NULL;
+    SDL_GameController* controller = SDL_GameControllerOpen(joystick_index);
+
+    input = malloc(sizeof(rrInput));
 
     if (mapping_file_path) {
         SDL_GameControllerAddMappingsFromFile(mapping_file_path);
     }
 
-    input->controller = SDL_GameControllerOpen(joystick_index);
+    input->controller = controller;
     memset(input->_button_info, 0, sizeof(rrSDLButtonInfo) * RR_INPUT_BUTTON_COUNT);
 
     return input;

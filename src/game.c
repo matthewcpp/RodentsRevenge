@@ -1,9 +1,9 @@
 #include "game.h"
 #include "spawn.h"
+#include "util.h"
 
 #include <string.h>
 #include <stdio.h>
-#include <assert.h>
 
 rrPoint starting_pos = {11,11};
 
@@ -220,7 +220,7 @@ int rr_game_set_active_level(rrGame* game, int level_num){
     int file_loaded;
 
     char* path_buffer = malloc(game->_asset_path_len + 32);
-    sprintf(path_buffer, "%slevels/level%02d.txt", game->_asset_path, level_num);
+    sprintf(path_buffer, "%s%slevels%slevel%02d.txt", game->_asset_path, rr_path_sep(), rr_path_sep(), level_num);
     file_loaded = rr_grid_load_from_file(game->grid, path_buffer);
     free (path_buffer);
     game->current_level = level_num;
