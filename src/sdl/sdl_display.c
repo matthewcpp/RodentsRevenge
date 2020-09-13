@@ -1,10 +1,10 @@
 #include "sdl_display.h"
 #include "sdl_animation.h"
-#include "../defs.h"
 
 #include <SDL_image.h>
 
 #include <assert.h>
+#include <stdio.h>
 
 #define RR_RENDERER_TILE_SIZE 16
 
@@ -132,7 +132,7 @@ void rr_sdl_display_init_score_text(rrSDLDisplay* display) {
     SDL_Surface* text = NULL;
     SDL_Color color={0,0,0};
     char scoreStrBuffer[32];
-    snprintf_func(scoreStrBuffer, 32, "Score: %d", display->_game->player.score);
+    sprintf(scoreStrBuffer, "Score: %d", display->_game->player.score);
     text = TTF_RenderUTF8_Solid (display->_font, scoreStrBuffer, color);
     display->_scoreText = SDL_CreateTextureFromSurface(display->_renderer, text);
     SDL_FreeSurface(text);
