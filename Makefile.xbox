@@ -13,6 +13,7 @@ SRCS =  $(CURDIR)/src/enemy.c \
 		$(CURDIR)/src/spawn.c \
 		$(CURDIR)/src/sdl/sdl_animation.c \
 		$(CURDIR)/src/sdl/sdl_display.c \
+		$(CURDIR)/src/sdl/sdl_game.c \
 		$(CURDIR)/src/sdl/sdl_input.c \
 		$(CURDIR)/src/xbox/xbox_main.c
 
