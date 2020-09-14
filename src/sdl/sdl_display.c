@@ -1,9 +1,12 @@
 #include "sdl_display.h"
 #include "sdl_animation.h"
 
+#include "../vec2.h"
+
 #include <SDL_image.h>
 
 #include <assert.h>
+#include <math.h>
 #include <stdio.h>
 
 #define RR_RENDERER_TILE_SIZE 16
@@ -286,15 +289,65 @@ void rr_sdl_display_draw_entities(rrSDLDisplay* display) {
     }
 }
 
+#define RR_CLOCK_HAND_LENGTH 8.0
+#define RR_CLOCK_TARGET_LENGTH 10.0
+
+void rr_sdl_display_draw_clock_hand(rrSDLDisplay* display, rrPoint* clock_center, int pos) {
+    rrPoint clock_hand;
+    double radians = (12.0 * pos - 90.0) * M_PI / 180.0;
+
+    rr_point_copy(&clock_hand, clock_center);
+
+    clock_hand.x += (int)(cos(radians) * RR_CLOCK_HAND_LENGTH);
+    clock_hand.y += (int)(sin(radians) * RR_CLOCK_HAND_LENGTH);
+
+    SDL_RenderDrawLine(display->_renderer, clock_center->x, clock_center->y, clock_hand.x, clock_hand.y);
+}
+
+void rr_sdl_display_draw_clock_target(rrSDLDisplay* display, rrPoint* clock_center_pt, int target_pos) {
+    rrVec2 center_vec, target_end_pos, center_dir;
+    double radians = (12.0 * target_pos - 90.0) * M_PI / 180.0;
+
+    rr_vec2_from_point(&center_vec, clock_center_pt);
+    rr_vec2_copy(&target_end_pos, &center_vec);
+
+    target_end_pos.x += (float)(cos(radians) * RR_CLOCK_TARGET_LENGTH);
+    target_end_pos.y += (float)(sin(radians) * RR_CLOCK_TARGET_LENGTH);
+
+    rr_vec2_sub(&center_dir, &center_vec, &target_end_pos);
+    rr_vec2_normalize(&center_dir);
+    rr_vec2_scale(&center_dir, &center_dir, RR_CLOCK_TARGET_LENGTH / 2.0f);
+    rr_vec2_add(&center_vec, &target_end_pos, &center_dir);
+
+    SDL_RenderDrawLine(display->_renderer, (int)center_vec.x, (int)center_vec.y, (int)target_end_pos.x, (int)target_end_pos.y);
+}
+
 void rr_sdl_display_draw_clock(rrSDLDisplay* display) {
+    rrPoint clock_center;
     SDL_Rect* sprite_src_rect = display->_sprites + RR_SPRITE_CLOCK;
     SDL_Rect texture_dest_rect;
+    int sec_pos, min_pos, target_pos;
+
     texture_dest_rect.x = (display->window_size.x / 2) - (sprite_src_rect->w / 2);
     texture_dest_rect.y = 10;
     texture_dest_rect.w = sprite_src_rect->w;
     texture_dest_rect.h = sprite_src_rect->h;
 
     SDL_RenderCopy(display->_renderer, display->_spritesheet, sprite_src_rect, &texture_dest_rect);
+
+    rr_clock_get(display->_game->clock, &sec_pos, &min_pos, &target_pos);
+    rr_point_set(&clock_center, texture_dest_rect.x + sprite_src_rect->w / 2, texture_dest_rect.y + sprite_src_rect->h / 2);
+
+    /* draw second hand */
+    SDL_SetRenderDrawColor(display->_renderer, 255, 0, 0, 255);
+    rr_sdl_display_draw_clock_hand(display, &clock_center, sec_pos);
+
+    /* draw minute hand */
+    SDL_SetRenderDrawColor(display->_renderer, 0, 0, 255, 255);
+    rr_sdl_display_draw_clock_hand(display, &clock_center, min_pos);
+
+    /* draw target mark */
+    rr_sdl_display_draw_clock_target(display, &clock_center, target_pos);
 }
 
 void rr_sdl_display_draw(rrSDLDisplay* display) {

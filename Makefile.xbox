@@ -14,6 +14,7 @@ SRCS =  $(CURDIR)/src/clock.c \
 		$(CURDIR)/src/point.c \
 		$(CURDIR)/src/spawn.c \
 		$(CURDIR)/src/util.c \
+		$(CURDIR)/src/vec2.c \
 		$(CURDIR)/src/sdl/sdl_animation.c \
 		$(CURDIR)/src/sdl/sdl_display.c \
 		$(CURDIR)/src/sdl/sdl_game.c \
