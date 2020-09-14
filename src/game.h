@@ -1,6 +1,7 @@
 #ifndef RR_GAME_H
 #define RR_GAME_H
 
+#include "clock.h"
 #include "grid.h"
 #include "player.h"
 #include "enemy.h"
@@ -17,6 +18,7 @@ typedef enum {
 typedef struct rrGame {
     rrGrid* grid;
     rrPlayer player;
+    rrClock* clock;
     rrEnemy _enemies[MAX_ENEMIES];
     rrInput* _input;
     int current_level;

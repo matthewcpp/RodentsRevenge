@@ -1,4 +1,5 @@
 #include "game.h"
+
 #include "spawn.h"
 #include "util.h"
 
@@ -26,6 +27,7 @@ rrGame* rr_game_create(rrInput* input, const char* asset_path) {
     game->rounds_per_level = RR_DEFAULT_ROUNDS_PER_LEVEL;
     game->spawn_count = 1;
     game->state = RR_GAME_STATE_UNSTARTED;
+    game->clock = rr_clock_create();
 
     game->_asset_path_len = strlen(asset_path);
     game->_asset_path = malloc(game->_asset_path_len + 1);
@@ -38,6 +40,7 @@ rrGame* rr_game_create(rrInput* input, const char* asset_path) {
 
 void rr_game_destroy(rrGame* game) {
     rr_grid_destroy(game->grid);
+    rr_clock_destroy(game->clock);
     free(game);
 }
 
@@ -172,6 +175,7 @@ void rr_game_update_state_playing(rrGame* game, int time) {
     }
 
     rr_player_update(&game->player, time);
+    rr_clock_update(game->clock, time);
 
     if (game->player.entity.status == RR_STATUS_KILLED)
         rr_game_update_player_killed(game);

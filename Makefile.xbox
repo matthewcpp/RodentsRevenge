@@ -5,7 +5,8 @@ XBE_TITLE = RodentsRevenge
 GEN_XISO = $(XBE_TITLE).iso
 NXDK_SDL = y
 
-SRCS =  $(CURDIR)/src/enemy.c \
+SRCS =  $(CURDIR)/src/clock.c \
+		$(CURDIR)/src/enemy.c \
 		$(CURDIR)/src/entity.c \
 		$(CURDIR)/src/game.c \
 		$(CURDIR)/src/grid.c \
