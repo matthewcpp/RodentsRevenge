@@ -9,7 +9,6 @@
 rrPoint starting_pos = {11,11};
 
 #define RR_LEVEL_COUNT 2
-#define RR_DEFAULT_ROUNDS_PER_LEVEL 6
 
 rrGame* rr_game_create(rrInput* input, const char* asset_path) {
     int i;
@@ -23,8 +22,7 @@ rrGame* rr_game_create(rrInput* input, const char* asset_path) {
         rr_enemy_init(&game->_enemies[i], &game->player.entity, game->grid);
     }
 
-    game->current_round = 1;
-    game->rounds_per_level = RR_DEFAULT_ROUNDS_PER_LEVEL;
+    game->enemy_index = 0;
     game->spawn_count = 1;
     game->state = RR_GAME_STATE_UNSTARTED;
     rr_clock_init(&game->clock);
@@ -61,25 +59,15 @@ void rr_game_respawn_player(rrGame* game) {
     game->player.entity.status = RR_STATUS_ACTIVE;
 }
 
-int rr_game_get_next_inactive_enemy_index(rrGame* game) {
-    int i;
-
-    for (i = 0; i < MAX_ENEMIES; i++) {
-        if (game->_enemies[i].entity.status == RR_STATUS_INACTIVE)
-            return i;
-    }
-
-    return MAX_ENEMIES;
-}
-
 void rr_game_spawn_enemies(rrGame* game) {
     int i;
-    for (i = 0; i < game->spawn_count; i++) {
-        int enemy_index = rr_game_get_next_inactive_enemy_index(game);
-        rrPoint pos;
 
-        if (enemy_index == MAX_ENEMIES)
-            break;
+    if (game->enemy_index == MAX_ENEMIES)
+        return;
+
+    for (i = 0; i < game->spawn_count; i++) {
+        int enemy_index = game->enemy_index++;
+        rrPoint pos;
 
         rr_get_spawn_pos(game->grid, &pos);
         rr_entity_place_in_grid_cell(&game->_enemies[enemy_index].entity, game->grid, &pos);
@@ -90,7 +78,7 @@ void rr_game_spawn_enemies(rrGame* game) {
 }
 
 void rr_game_round_clear(rrGame* game) {
-    if (game->current_round <= game->rounds_per_level) {
+    if (game->enemy_index < MAX_ENEMIES) {
         int i;
 
         for (i = 0; i < MAX_ENEMIES; i++){
@@ -126,12 +114,12 @@ void rr_game_over(rrGame* game) {
 
 void rr_game_next_level(rrGame* game){
     int next_level = game->current_level < RR_LEVEL_COUNT ? game->current_level + 1 : 1;
+    game->enemy_index = 0;
+    game->spawn_count = 1;
     rr_entity_remove_from_grid(&game->player.entity, game->grid);
     rr_game_set_active_level(game, next_level);
     rr_game_respawn_player(game);
     rr_game_spawn_enemies(game);
-
-    game->current_round = 1;
 }
 
 void rr_game_update_player_active(rrGame* game, int time) {
@@ -143,7 +131,8 @@ void rr_game_update_player_active(rrGame* game, int time) {
         game->player.score += 1;
     }
 
-    for (i = 0; i < MAX_ENEMIES; i++){
+    /* check to see if any previously spawned enemies are still active. */
+    for (i = 0; i < game->enemy_index; i++){
         rrEnemy* enemy = &game->_enemies[i];
         rr_enemy_update(enemy, time);
         if (enemy->entity.status == RR_STATUS_ACTIVE || enemy->entity.status == RR_STATUS_SUSPENDED)
@@ -153,13 +142,10 @@ void rr_game_update_player_active(rrGame* game, int time) {
     if (round_clear) {
         rr_game_round_clear(game);
 
-        if (game->current_round < game->rounds_per_level) {
+        if (game->enemy_index < MAX_ENEMIES)
             rr_game_spawn_enemies(game);
-            game->current_round += 1;
-        }
-        else {
+        else
             rr_game_next_level(game);
-        }
     }
 }
 
@@ -217,7 +203,8 @@ void rr_game_update(rrGame* game, int time) {
 int rr_game_restart(rrGame* game) {
     game->player.score = 0;
     game->player.lives_remaining = 2;
-    game->current_round = 1;
+    game->enemy_index = 0;
+    game->spawn_count = 1;
 
     rr_clock_reset(&game->clock);
     game->clock.target_pos = 5;
@@ -239,8 +226,4 @@ int rr_game_set_active_level(rrGame* game, int level_num){
     game->current_level = level_num;
 
     return file_loaded;
-}
-
-void rr_game_set_rounds_per_level(rrGame* game, int rounds_per_level) {
-    game->rounds_per_level = rounds_per_level;
 }
