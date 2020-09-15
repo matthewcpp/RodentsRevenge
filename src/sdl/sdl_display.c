@@ -289,7 +289,7 @@ void rr_sdl_display_draw_entities(rrSDLDisplay* display) {
     }
 }
 
-#define RR_CLOCK_HAND_LENGTH 8.0
+#define RR_CLOCK_HAND_LENGTH 9.0
 #define RR_CLOCK_TARGET_LENGTH 10.0
 
 void rr_sdl_display_draw_clock_hand(rrSDLDisplay* display, rrPoint* clock_center, int pos) {
@@ -326,7 +326,6 @@ void rr_sdl_display_draw_clock(rrSDLDisplay* display) {
     rrPoint clock_center;
     SDL_Rect* sprite_src_rect = display->_sprites + RR_SPRITE_CLOCK;
     SDL_Rect texture_dest_rect;
-    int sec_pos, min_pos, target_pos;
 
     texture_dest_rect.x = (display->window_size.x / 2) - (sprite_src_rect->w / 2);
     texture_dest_rect.y = 10;
@@ -335,19 +334,18 @@ void rr_sdl_display_draw_clock(rrSDLDisplay* display) {
 
     SDL_RenderCopy(display->_renderer, display->_spritesheet, sprite_src_rect, &texture_dest_rect);
 
-    rr_clock_get(display->_game->clock, &sec_pos, &min_pos, &target_pos);
-    rr_point_set(&clock_center, texture_dest_rect.x + sprite_src_rect->w / 2, texture_dest_rect.y + sprite_src_rect->h / 2);
+    rr_point_set(&clock_center, texture_dest_rect.x + 14, texture_dest_rect.y + 17);
 
     /* draw second hand */
     SDL_SetRenderDrawColor(display->_renderer, 255, 0, 0, 255);
-    rr_sdl_display_draw_clock_hand(display, &clock_center, sec_pos);
+    rr_sdl_display_draw_clock_hand(display, &clock_center, display->_game->clock.seconds_pos);
 
     /* draw minute hand */
     SDL_SetRenderDrawColor(display->_renderer, 0, 0, 255, 255);
-    rr_sdl_display_draw_clock_hand(display, &clock_center, min_pos);
+    rr_sdl_display_draw_clock_hand(display, &clock_center, display->_game->clock.minutes_pos);
 
     /* draw target mark */
-    rr_sdl_display_draw_clock_target(display, &clock_center, target_pos);
+    rr_sdl_display_draw_clock_target(display, &clock_center, display->_game->clock.target_pos);
 }
 
 void rr_sdl_display_draw(rrSDLDisplay* display) {

@@ -27,7 +27,8 @@ rrGame* rr_game_create(rrInput* input, const char* asset_path) {
     game->rounds_per_level = RR_DEFAULT_ROUNDS_PER_LEVEL;
     game->spawn_count = 1;
     game->state = RR_GAME_STATE_UNSTARTED;
-    game->clock = rr_clock_create();
+    rr_clock_init(&game->clock);
+    game->clock.target_pos = 5;
 
     game->_asset_path_len = strlen(asset_path);
     game->_asset_path = malloc(game->_asset_path_len + 1);
@@ -40,7 +41,6 @@ rrGame* rr_game_create(rrInput* input, const char* asset_path) {
 
 void rr_game_destroy(rrGame* game) {
     rr_grid_destroy(game->grid);
-    rr_clock_destroy(game->clock);
     free(game);
 }
 
@@ -138,6 +138,11 @@ void rr_game_update_player_active(rrGame* game, int time) {
     int i;
     unsigned int round_clear = 1;
 
+    if (rr_clock_did_tick_seconds(&game->clock)) {
+        if (game->clock.seconds_pos == 14 || game->clock.seconds_pos == 0)
+        game->player.score += 1;
+    }
+
     for (i = 0; i < MAX_ENEMIES; i++){
         rrEnemy* enemy = &game->_enemies[i];
         rr_enemy_update(enemy, time);
@@ -175,7 +180,7 @@ void rr_game_update_state_playing(rrGame* game, int time) {
     }
 
     rr_player_update(&game->player, time);
-    rr_clock_update(game->clock, time);
+    rr_clock_update(&game->clock, time);
 
     if (game->player.entity.status == RR_STATUS_KILLED)
         rr_game_update_player_killed(game);
@@ -213,6 +218,10 @@ int rr_game_restart(rrGame* game) {
     game->player.score = 0;
     game->player.lives_remaining = 2;
     game->current_round = 1;
+
+    rr_clock_reset(&game->clock);
+    game->clock.target_pos = 5;
+
     game->state = RR_GAME_STATE_PLAYING;
     rr_game_respawn_player(game);
     rr_game_spawn_enemies(game);
