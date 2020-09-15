@@ -7,11 +7,12 @@
 #include "enemy.h"
 #include "input.h"
 
-#define MAX_ENEMIES 9
+#define RR_GAME_MAX_ENEMIES 9
 
 typedef enum {
     RR_GAME_STATE_UNSTARTED,
     RR_GAME_STATE_PLAYING,
+    RR_GAME_STATE_WINDING_CLOCK,
     RR_GAME_STATE_PAUSED
 } rrGameState;
 
@@ -19,11 +20,12 @@ typedef struct rrGame {
     rrGrid* grid;
     rrPlayer player;
     rrClock clock;
-    rrEnemy _enemies[MAX_ENEMIES];
+    rrEnemy _enemies[RR_GAME_MAX_ENEMIES];
     rrInput* _input;
     int current_level;
     int spawn_count;
     int enemy_index;
+    int enemy_count;
     rrGameState state;
     char* _asset_path;
     size_t _asset_path_len;
@@ -36,5 +38,8 @@ void rr_game_update(rrGame* game, int time);
 
 int rr_game_restart(rrGame* game);
 int rr_game_set_active_level(rrGame* game, int level_num);
+
+/** Sets the number of enemies the player must defeat before they can advance to the next level. */
+void rr_game_set_enemy_count(rrGame* game, int enemy_count);
 
 #endif

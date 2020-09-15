@@ -134,3 +134,7 @@ const char* rr_sdl_game_get_error_str(rrSDLGame* game) {
 rrInput* rr_sdl_game_get_input(rrSDLGame* game) {
     return game->input;
 }
+
+rrGame* rr_sdl_game_get_base_game(rrSDLGame* sdl_game) {
+    return sdl_game->game;
+}

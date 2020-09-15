@@ -3,12 +3,14 @@
 #include "spawn.h"
 #include "util.h"
 
+#include <assert.h>
 #include <string.h>
 #include <stdio.h>
 
 rrPoint starting_pos = {11,11};
 
 #define RR_LEVEL_COUNT 2
+#define RR_CLOCK_WIND_SPEED_MOD 100
 
 rrGame* rr_game_create(rrInput* input, const char* asset_path) {
     int i;
@@ -18,11 +20,12 @@ rrGame* rr_game_create(rrInput* input, const char* asset_path) {
     game->grid = rr_grid_create(RR_GRID_WIDTH, RR_GRID_HEIGHT);
     rr_player_init(&game->player, game->grid, input);
 
-    for (i = 0; i < MAX_ENEMIES; i++) {
+    for (i = 0; i < RR_GAME_MAX_ENEMIES; i++) {
         rr_enemy_init(&game->_enemies[i], &game->player.entity, game->grid);
     }
 
     game->enemy_index = 0;
+    game->enemy_count = RR_GAME_MAX_ENEMIES;
     game->spawn_count = 1;
     game->state = RR_GAME_STATE_UNSTARTED;
     rr_clock_init(&game->clock);
@@ -59,13 +62,18 @@ void rr_game_respawn_player(rrGame* game) {
     game->player.entity.status = RR_STATUS_ACTIVE;
 }
 
+void rr_game_set_enemy_count(rrGame* game, int enemy_count) {
+    assert(game->state == RR_GAME_STATE_UNSTARTED);
+
+    game->enemy_count = enemy_count;
+}
+
 void rr_game_spawn_enemies(rrGame* game) {
+    int enemies_remaining = game->enemy_count - game->enemy_index;
+    int spawn_count = enemies_remaining < game->spawn_count ? enemies_remaining : game->spawn_count;
     int i;
 
-    if (game->enemy_index == MAX_ENEMIES)
-        return;
-
-    for (i = 0; i < game->spawn_count; i++) {
+    for (i = 0; i < spawn_count; i++) {
         int enemy_index = game->enemy_index++;
         rrPoint pos;
 
@@ -78,30 +86,29 @@ void rr_game_spawn_enemies(rrGame* game) {
 }
 
 void rr_game_round_clear(rrGame* game) {
-    if (game->enemy_index < MAX_ENEMIES) {
-        int i;
+    int i;
 
-        for (i = 0; i < MAX_ENEMIES; i++){
-            rrEnemy* enemy = &game->_enemies[i];
-            rrPoint position;
+    for (i = 0; i < game->enemy_index; i++){
+        rrEnemy* enemy = &game->_enemies[i];
+        rrPoint position;
 
-            if (enemy->entity.status != RR_STATUS_WAITING)
-                continue;
+        if (enemy->entity.status != RR_STATUS_WAITING)
+            continue;
 
-            rr_point_copy(&position, &enemy->entity.position);
-            rr_entity_remove_from_grid(&enemy->entity, enemy->_grid);
-            game->_enemies[i].entity.status = RR_STATUS_INACTIVE;
+        rr_point_copy(&position, &enemy->entity.position);
+        rr_entity_remove_from_grid(&enemy->entity, enemy->_grid);
+        game->_enemies[i].entity.status = RR_STATUS_INACTIVE;
 
-            rr_grid_create_basic_entity(game->grid, &position, RR_ENTITY_CHEESE);
+        rr_grid_create_basic_entity(game->grid, &position, RR_ENTITY_CHEESE);
 
-            game->player.score += 1;
-        }
+        game->player.score += 1;
     }
+
 }
 
 void rr_game_over(rrGame* game) {
     int i;
-    for (i = 0; i < MAX_ENEMIES; i++) {
+    for (i = 0; i < RR_GAME_MAX_ENEMIES; i++) {
         rr_entity_deactivate(&game->_enemies[i].entity);
     }
 
@@ -120,6 +127,8 @@ void rr_game_next_level(rrGame* game){
     rr_game_set_active_level(game, next_level);
     rr_game_respawn_player(game);
     rr_game_spawn_enemies(game);
+    rr_clock_reset(&game->clock);
+    game->clock.target_pos = 5;
 }
 
 void rr_game_update_player_active(rrGame* game, int time) {
@@ -142,8 +151,8 @@ void rr_game_update_player_active(rrGame* game, int time) {
     if (round_clear) {
         rr_game_round_clear(game);
 
-        if (game->enemy_index < MAX_ENEMIES)
-            rr_game_spawn_enemies(game);
+        if (game->enemy_index < game->enemy_count)
+            game->state = RR_GAME_STATE_WINDING_CLOCK;
         else
             rr_game_next_level(game);
     }
@@ -156,6 +165,19 @@ void rr_game_update_player_killed(rrGame* game) {
         rr_game_respawn_player(game);
     else {
         rr_game_over(game);
+    }
+}
+
+void rr_game_update_state_winding_clock(rrGame* game, int time) {
+    rr_clock_update(&game->clock, time * RR_CLOCK_WIND_SPEED_MOD);
+
+    if (rr_clock_did_tick_target(&game->clock)) {
+        game->clock.update_time = 0;
+
+        rr_clock_advance_target(&game->clock, 5);
+
+        rr_game_spawn_enemies(game);
+        game->state = RR_GAME_STATE_PLAYING;
     }
 }
 
@@ -192,6 +214,10 @@ void rr_game_update(rrGame* game, int time) {
 
         case RR_GAME_STATE_PLAYING:
             rr_game_update_state_playing(game, time);
+            break;
+
+        case RR_GAME_STATE_WINDING_CLOCK:
+            rr_game_update_state_winding_clock(game, time);
             break;
 
         case RR_GAME_STATE_PAUSED:

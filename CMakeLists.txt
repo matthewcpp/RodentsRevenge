@@ -16,6 +16,7 @@ if (UNIX AND NOT APPLE)
 	find_package(SDL2_ttf REQUIRED)
 
 	target_link_libraries(RodentsRevenge SDL2::Main SDL2::Image SDL2::TTF)
+	target_link_libraries(RodentsRevenge m)
 else()
 	include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
 	find_package(sdl2 REQUIRED)
