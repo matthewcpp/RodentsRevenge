@@ -140,6 +140,11 @@ void rr_game_update_player_active(rrGame* game, int time) {
         game->player.score += 1;
     }
 
+    if (rr_clock_did_tick_target(&game->clock) && game->clock.target_pos != 0) {
+        rr_clock_advance_target(&game->clock, 5);
+        rr_game_spawn_enemies(game);
+    }
+
     /* check to see if any previously spawned enemies are still active. */
     for (i = 0; i < game->enemy_index; i++){
         rrEnemy* enemy = &game->_enemies[i];
