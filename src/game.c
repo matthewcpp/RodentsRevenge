@@ -23,7 +23,7 @@ struct rrGame {
     rrGameState state;
 
     cutil_vector* _enemies;
-    rrEnemyPool* _enemy_pool;
+    rrPool* _enemy_pool;
     rrInput* _input;
     rrSpawner* _spawner;
     int current_level;
@@ -40,7 +40,7 @@ rrGame* rr_game_create(rrInput* input, const char* asset_path) {
     rr_player_init(&game->player, game->grid, input);
 
     game->_enemies = cutil_vector_create(cutil_trait_ptr());
-    game->_enemy_pool = rr_enemy_pool_create(&game->player.entity, game->grid);
+    game->_enemy_pool = rr_pool_create(_rr_enemey_create_pooled, rr_pool_default_delete_func, game);
     game->_spawner = rr_spawner_create(game->grid, game->_enemies, game->_enemy_pool);
 
     game->state = RR_GAME_STATE_UNSTARTED;
@@ -57,9 +57,9 @@ rrGame* rr_game_create(rrInput* input, const char* asset_path) {
 }
 
 void rr_game_destroy(rrGame* game) {
-    rr_enemy_pool_return_vec(game->_enemy_pool, game->_enemies);
+    rr_pool_return_vec(game->_enemy_pool, game->_enemies);
     cutil_vector_destroy(game->_enemies);
-    rr_enemy_pool_destroy(game->_enemy_pool);
+    rr_pool_destroy(game->_enemy_pool);
 
     rr_grid_destroy(game->grid);
     rr_spawner_destroy(game->_spawner);
@@ -109,7 +109,7 @@ void rr_game_round_clear(rrGame* game) {
 
         rr_point_copy(&position, &enemy->entity.position);
         rr_entity_remove_from_grid(&enemy->entity, enemy->_grid);
-        rr_enemy_pool_return(game->_enemy_pool, enemy);
+        rr_pool_return(game->_enemy_pool, enemy);
 
         rr_grid_create_basic_entity(game->grid, &position, RR_ENTITY_CHEESE);
 
@@ -129,7 +129,7 @@ void rr_game_over(rrGame* game) {
         rrEnemy* enemy;
         cutil_vector_get(game->_enemies, i, &enemy);
         rr_entity_remove_from_grid(&enemy->entity, game->grid);
-        rr_enemy_pool_return(game->_enemy_pool, enemy);
+        rr_pool_return(game->_enemy_pool, enemy);
     }
     cutil_vector_clear(game->_enemies);
 

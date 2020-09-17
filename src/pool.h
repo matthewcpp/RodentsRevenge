@@ -1,28 +1,39 @@
 #ifndef RR_POOL_H
 #define RR_POOL_H
 
-#include "enemy.h"
-
 #include "cutil/vector.h"
 
-typedef struct rrEnemyPool rrEnemyPool;
-
-rrEnemyPool* rr_enemy_pool_create(rrEntity* player, struct rrGrid* grid);
-
-/** Destroys the pool and deletes every enemy in reserve. */
-void rr_enemy_pool_destroy(rrEnemyPool* pool);
-
-/** Gets an enemy from the pool.  If one is not available in reserve a new one will be created. */
-rrEnemy* rr_enemy_pool_get(rrEnemyPool* pool);
-
-/** Returns an enemy to the pool so it can be re-used later. */
-void rr_enemy_pool_return(rrEnemyPool* pool, rrEnemy* enemy);
+typedef struct rrPool rrPool;
 
 /**
- * Returns all enemies in the vector to the pull.
- * It is the callers responsibility to ensure the vector contains only enemies.
- * Note: This method does not clear the supplied vector.
+ * Function that creates a new item of type T*
+ * This method will be called automatically by the pool when there are no such items in reserve.
  */
-void rr_enemy_pool_return_vec(rrEnemyPool* pool, cutil_vector* enemy_vector);
+typedef void* (*rr_pool_create_func)(void* user_data);
+
+/**
+ * Function that frees all resources for an item in this pool.
+ * This method will be called automatically on all items that are in the pool when it is destroyed.
+ */
+typedef void (*rr_pool_destroy_func)(void* item, void* user_data);
+
+rrPool* rr_pool_create(rr_pool_create_func create_func, rr_pool_destroy_func destroy_func, void* user_data);
+
+/** Destroys the pool and calls the destroy func on every item in reserve. */
+void rr_pool_destroy(rrPool* pool);
+
+/** Gets an iem from the pool, or uses the create function to create a new one. */
+void* rr_pool_get(rrPool* pool);
+
+/** Returns an item to the pool for reuse later. */
+void rr_pool_return(rrPool* pool, void* item);
+
+/** Returns all items in the vector to the pool.
+ * It is the callers responsibility to ensure the vector contains items of the correct type.
+ * Note that the vector passed to this function is not cleared.
+ */
+void rr_pool_return_vec(rrPool* pool, cutil_vector* vec);
+
+void rr_pool_default_delete_func(void* item, void* user_data);
 
 #endif

@@ -1,61 +1,69 @@
 #include "pool.h"
 
-#include "cutil/vector.h"
+#include <stdlib.h>
 
-struct rrEnemyPool {
+struct rrPool {
+    rr_pool_create_func create_func;
+    rr_pool_destroy_func destroy_func;
+    void* user_data;
     cutil_vector* reserve;
-    rrEntity* player;
-    rrGrid* grid;
 };
 
-rrEnemyPool* rr_enemy_pool_create(rrEntity* player, rrGrid* grid) {
-    rrEnemyPool* pool = malloc(sizeof(rrEnemyPool));
+rrPool* rr_pool_create(rr_pool_create_func create_func, rr_pool_destroy_func destroy_func, void* user_data) {
+    rrPool* pool = malloc(sizeof(rrPool));
 
+    pool->create_func = create_func;
+    pool->destroy_func = destroy_func;
+    pool->user_data = user_data;
     pool->reserve = cutil_vector_create(cutil_trait_ptr());
-    pool->grid = grid;
-    pool->player = player;
 
     return pool;
 }
 
-void rr_enemy_pool_destroy(rrEnemyPool* pool) {
-    size_t i;
-    rrEnemy* enemy;
+void rr_pool_destroy(rrPool* pool) {
+    size_t i = 0;
+    size_t size = cutil_vector_size(pool->reserve);
+    void* item;
 
-    for (i = 0; i < cutil_vector_size(pool->reserve); i++) {
-        cutil_vector_get(pool->reserve, i, &enemy);
-        free(enemy);
+    for (i = 0; i < size; i++) {
+        cutil_vector_get(pool->reserve, i , &item);
+        pool->destroy_func(item, pool->user_data);
     }
 
     cutil_vector_destroy(pool->reserve);
     free(pool);
 }
 
-rrEnemy* rr_enemy_pool_get(rrEnemyPool* pool) {
-    rrEnemy* enemy;
-    size_t size = cutil_vector_size(pool->reserve);
-    if (size > 0) {
-        cutil_vector_get(pool->reserve, size - 1, &enemy);
+void* rr_pool_get(rrPool* pool) {
+    void* item;
+
+    if (!cutil_vector_empty(pool->reserve)) {
+        cutil_vector_get(pool->reserve, cutil_vector_size(pool->reserve) - 1, &item);
         cutil_vector_pop_back(pool->reserve);
     }
     else {
-        enemy = malloc(sizeof(rrEnemy));
-        rr_enemy_init(enemy, pool->player, pool->grid);
+        item = pool->create_func(pool->user_data);
     }
 
-    return enemy;
+    return item;
 }
 
-void rr_enemy_pool_return(rrEnemyPool* pool, rrEnemy* enemy) {
-    cutil_vector_push_back(pool->reserve, &enemy);
+void rr_pool_return(rrPool* pool, void* item) {
+    cutil_vector_push_back(pool->reserve, &item);
 }
 
-void rr_enemy_pool_return_vec(rrEnemyPool* pool, cutil_vector* enemy_vector) {
+void rr_pool_return_vec(rrPool* pool, cutil_vector* vec) {
     size_t i;
+    size_t count = cutil_vector_size(vec);
 
-    for (i = 0; i < cutil_vector_size(enemy_vector); i++) {
-        rrEnemy* enemy;
-        cutil_vector_get(enemy_vector, i, &enemy);
-        rr_enemy_pool_return(pool, enemy);
+    for (i = 0; i < count; i++) {
+        void* item;
+        cutil_vector_get(vec, i, &item);
+        cutil_vector_push_back(pool->reserve, &item);
     }
+}
+
+void rr_pool_default_delete_func(void* item, void* user_data) {
+    (void)user_data;
+    free(item);
 }

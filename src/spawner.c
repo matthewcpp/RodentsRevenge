@@ -1,5 +1,7 @@
 #include "spawner.h"
 
+#include "enemy.h"
+
 #include "cutil/strbuf.h"
 #include "cutil/vector.h"
 
@@ -22,14 +24,14 @@ typedef enum {
 struct rrSpawner {
     rrGrid* grid;
     cutil_vector* enemy_list;
-    rrEnemyPool* enemy_pool;
+    rrPool* enemy_pool;
 
     int spawn_count;
     cutil_vector* spawn_cycle;
     rrSpawnerMode mode;
 };
 
-rrSpawner* rr_spawner_create(rrGrid* grid, cutil_vector* enemy_list, rrEnemyPool* enemy_pool) {
+rrSpawner* rr_spawner_create(rrGrid* grid, cutil_vector* enemy_list, rrPool* enemy_pool) {
     rrSpawner* spawner = malloc(sizeof(rrSpawner));
 
     spawner->grid = grid;
@@ -105,7 +107,7 @@ int rr_spawner_spawn_enemies(rrSpawner* spawner) {
     int i;
 
     for (i = 0; i < spawn_count; i++) {
-        rrEnemy* enemy = rr_enemy_pool_get(spawner->enemy_pool);
+        rrEnemy* enemy = rr_pool_get(spawner->enemy_pool);
         rrPoint spawn_pos;
 
         rr_spawner_get_spawn_pos(spawner, &spawn_pos);
