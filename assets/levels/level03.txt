@@ -1,0 +1,24 @@
+#spawn constant 3
+WWWWWWWWWWWWWWWWWWWWWWW
+W               B  B  W
+WB    B BBB    B  W B W
+W     B BW       B BB W
+W  W       B B   BB B W
+W    B        W B     W
+W BBB  B B    WB  B   W
+W   BB   BBBB     B B W
+W   BBB  BB B B BBWB  W
+W B  BB      B   BBB  W
+W  B   BW B  B    BB  W
+W      BB  B B B      W
+W BB BB      B  WB B  W
+W  B   B  B   B B BWW W
+W B    B   BB      B  W
+W B B     B B  B BB B W
+W   B B  B BBB B BB B W
+W  B B   BB BB  BBB   W
+WW B B  BBW  BB  B    W
+W B B      BBB  B W B W
+W W  BBB  BBB B B  BB W
+W                     W
+WWWWWWWWWWWWWWWWWWWWWWW

@@ -5,6 +5,7 @@ version: '{build}'
 image: Visual Studio 2015
 
 install:
+  - git submodule update --init
   - pip install conan
   - conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
 

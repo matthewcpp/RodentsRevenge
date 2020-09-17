@@ -1,0 +1,3 @@
+[submodule "lib/cutil"]
+	path = lib/cutil
+	url = https://github.com/matthewcpp/cutil.git

@@ -24,11 +24,14 @@ matrix:
         - make -f Makefile.xbox NXDK_DIR=build/nxdk
     - os: osx
       compiler: clang
-      before_install:
-        - pip install conan
-        - conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
+      osx_image: xcode12
+      addons:
+        homebrew:
+          packages:
+            - sdl2
+            - sdl2_image
+            - sdl2_ttf
       script:
         - mkdir build && cd build
-        - conan install .. --build sdl2_ttf --build sdl2_image
         - cmake .. -DCMAKE_BUILD_TYPE=Release
         - make

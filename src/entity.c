@@ -45,5 +45,5 @@ void rr_entity_remove_from_grid(rrEntity* entity, rrGrid* grid) {
     assert(!rr_entity_position_is_invalid(entity));
 
     rr_grid_clear_position(grid, &entity->position);
-    rr_entity_set_invalid_position(entity);
+    rr_entity_deactivate(entity);
 }

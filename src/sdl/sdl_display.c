@@ -1,6 +1,7 @@
 #include "sdl_display.h"
 #include "sdl_animation.h"
 
+#include "../enemy.h"
 #include "../vec2.h"
 
 #include <SDL_image.h>
@@ -64,7 +65,7 @@ rrSDLDisplay* rr_sdl_display_create(SDL_Window* window, rrGame* game) {
 }
 
 void rr_sdl_display_destroy(rrSDLDisplay* display) {
-    rr_sdl_animation_destroy(display->_game->player.death_animation);
+    rr_sdl_animation_destroy(rr_game_get_player(display->_game)->death_animation);
 
     SDL_DestroyTexture(display->_scoreText);
     SDL_DestroyTexture(display->_livesText);
@@ -105,7 +106,7 @@ void rr_sdl_display_sprite_info(SDL_Rect* rect, int x, int y, int w, int h) {
 void rr_sdl_create_player_death_anim(rrSDLDisplay* display) {
     rrPoint animation_frames[] = {{18, 36}, {54, 54}, {36, 36}, {0, 18}, {18, 18}};
     rrPoint frame_size = {16, 16};
-    display->_game->player.death_animation = rr_sdl_animation_create(display->_spritesheet, 5, &animation_frames[0], &frame_size, 100);
+    rr_game_get_player(display->_game)->death_animation = rr_sdl_animation_create(display->_spritesheet, 5, &animation_frames[0], &frame_size, 100);
 }
 
 int rr_sdl_display_load_spritesheet(rrSDLDisplay* display, const char* path) {
@@ -144,7 +145,7 @@ void rr_sdl_display_init_score_text(rrSDLDisplay* display) {
     SDL_Surface* text = NULL;
     SDL_Color color={0,0,0};
     char scoreStrBuffer[32];
-    sprintf(scoreStrBuffer, "Score: %d", display->_game->player.score);
+    sprintf(scoreStrBuffer, "Score: %d", rr_game_get_player(display->_game)->score);
     text = TTF_RenderUTF8_Solid (display->_font, scoreStrBuffer, color);
     display->_scoreText = SDL_CreateTextureFromSurface(display->_renderer, text);
     SDL_FreeSurface(text);
@@ -240,6 +241,8 @@ void rr_sdl_display_draw_player(rrSDLDisplay* display, rrPlayer* player) {
 
 void rr_sdl_display_draw_lives(rrSDLDisplay* display) {
     int i;
+    rrPlayer* player = rr_game_get_player(display->_game);
+
     int adjustment = (display->_livesTextRect.h - RR_RENDERER_TILE_SIZE) / 2;
     SDL_Rect sprite_rect;
     sprite_rect.x = display->_livesTextRect.x + display->_livesTextRect.w + 5;
@@ -249,7 +252,7 @@ void rr_sdl_display_draw_lives(rrSDLDisplay* display) {
 
     SDL_RenderCopy(display->_renderer, display->_livesText, NULL, &display->_livesTextRect);
 
-    for (i = 0; i < display->_game->player.lives_remaining; i++) {
+    for (i = 0; i < player->lives_remaining; i++) {
         SDL_RenderCopy(display->_renderer, display->_spritesheet, display->_sprites + RR_SPRITE_REMAINING_LIFE, &sprite_rect);
         sprite_rect.x += RR_RENDERER_TILE_SIZE + 5;
     }
@@ -259,7 +262,7 @@ void rr_sdl_display_draw_entities(rrSDLDisplay* display) {
     rrPoint cell;
     for (cell.x = 0; cell.x < RR_GRID_WIDTH; cell.x++) {
         for (cell.y = 0; cell.y < RR_GRID_HEIGHT; cell.y++) {
-            rrEntity* entity = rr_grid_get_entity_at_position(display->_game->grid, &cell);
+            rrEntity* entity = rr_grid_get_entity_at_position(rr_game_get_grid(display->_game), &cell);
 
             if (!entity)
                 continue;
@@ -323,6 +326,7 @@ void rr_sdl_display_draw_clock_target(rrSDLDisplay* display, rrPoint* clock_cent
 }
 
 void rr_sdl_display_draw_clock(rrSDLDisplay* display) {
+    rrClock* clock = rr_game_get_clock(display->_game);
     rrPoint clock_center;
     SDL_Rect* sprite_src_rect = display->_sprites + RR_SPRITE_CLOCK;
     SDL_Rect texture_dest_rect;
@@ -338,17 +342,19 @@ void rr_sdl_display_draw_clock(rrSDLDisplay* display) {
 
     /* draw second hand */
     SDL_SetRenderDrawColor(display->_renderer, 255, 0, 0, 255);
-    rr_sdl_display_draw_clock_hand(display, &clock_center, display->_game->clock.seconds_pos);
+    rr_sdl_display_draw_clock_hand(display, &clock_center, clock->seconds_pos);
 
     /* draw minute hand */
     SDL_SetRenderDrawColor(display->_renderer, 0, 0, 255, 255);
-    rr_sdl_display_draw_clock_hand(display, &clock_center, display->_game->clock.minutes_pos);
+    rr_sdl_display_draw_clock_hand(display, &clock_center, clock->minutes_pos);
 
     /* draw target mark */
-    rr_sdl_display_draw_clock_target(display, &clock_center, display->_game->clock.target_pos);
+    rr_sdl_display_draw_clock_target(display, &clock_center, clock->target_pos);
 }
 
 void rr_sdl_display_draw(rrSDLDisplay* display) {
+    rrPlayer* player = rr_game_get_player(display->_game);
+
     if (!display->_scoreText)
         rr_sdl_display_setup_display_elements(display);
 
@@ -358,9 +364,9 @@ void rr_sdl_display_draw(rrSDLDisplay* display) {
     rr_sdl_display_draw_board_background(display);
     rr_sdl_display_draw_entities(display);
 
-    if (display->_game->player.score != display->_previous_score){
+    if (player->score != display->_previous_score){
         rr_sdl_display_init_score_text(display);
-        display->_previous_score = display->_game->player.score;
+        display->_previous_score = player->score;
     }
 
     SDL_RenderCopy(display->_renderer, display->_scoreText, NULL, &display->_scoreTextRect);

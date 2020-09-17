@@ -10,21 +10,33 @@ D-Pad / Arrow Keys: Move the mouse
 ```
 
 ### Building
-Windows and MacOS:
+
+Begin by cloning the repo and initializing the submodules:
+```shell script
+git clone --recurse-submodules https://github.com/matthewcpp/RodentsRevenge.git
+```
+##### Windows:
 ```shell script
 mkdir build && cd build
 conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
 conan install .. --build sdl2_ttf --build sdl2_image
 cmake ..
 ```
-Ubuntu Linux:
+##### Ubuntu Linux:
 ```shell script
 sudo apt-get -y install libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev
 mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
 ```
 
-Xbox
+##### MacOS:
+```shell script
+brew install sdl2 sdl2_image sdl2_ttf
+mkdir build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+```
+
+##### Xbox:
 
 Clone the [nxdk](https://github.com/XboxDev/nxdk) repo from github and follow the instructions for configuring the SDK.
 Note that on Ubuntu 20.04 you may need to append to your path directory for the `llvm-lib` command to work during the build process:
