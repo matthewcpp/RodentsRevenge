@@ -146,7 +146,8 @@ void rr_spawner_set_properties(rrSpawner* spawner, cutil_btree* properties) {
     char* key = "spawn";
     char* spawner_props = NULL;
 
-    cutil_btree_get(properties, &key, &spawner_props);
+    if (!cutil_btree_get(properties, &key, &spawner_props))
+        return;
 
     spawner->mode = RR_SPAWNER_MODE_CONSTANT;
     spawner->spawn_count = 1;

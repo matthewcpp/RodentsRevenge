@@ -146,8 +146,6 @@ void rr_game_next_level(rrGame* game){
     rr_game_set_active_level(game, next_level);
     rr_game_respawn_player(game);
     rr_spawner_spawn_enemies(game->_spawner);
-    rr_clock_reset(&game->clock);
-    game->clock.target_pos = 5;
 }
 
 void rr_game_update_player_active(rrGame* game, int time) {
@@ -161,7 +159,7 @@ void rr_game_update_player_active(rrGame* game, int time) {
 
     /* Player has not defeated all enemies in time...more will spawn now! */
     if (rr_clock_did_tick_target(&game->clock) && game->clock.target_pos != 0) {
-        rr_clock_advance_target(&game->clock, 5);
+        rr_clock_advance_target(&game->clock);
         rr_spawner_spawn_enemies(game->_spawner);
     }
 
@@ -201,7 +199,7 @@ void rr_game_update_state_winding_clock(rrGame* game, int time) {
     if (rr_clock_did_tick_target(&game->clock)) {
         game->clock.update_time = 0;
 
-        rr_clock_advance_target(&game->clock, 5);
+        rr_clock_advance_target(&game->clock);
 
         rr_spawner_spawn_enemies(game->_spawner);
         game->state = RR_GAME_STATE_PLAYING;
@@ -258,7 +256,6 @@ int rr_game_restart(rrGame* game) {
     game->player.lives_remaining = 2;
 
     rr_clock_reset(&game->clock);
-    game->clock.target_pos = 5;
 
     game->state = RR_GAME_STATE_PLAYING;
     rr_game_respawn_player(game);
@@ -275,6 +272,7 @@ int rr_game_set_active_level(rrGame* game, int level_num){
     file_loaded = rr_grid_load_from_file(game->grid, path_buffer);
 
     rr_spawner_set_properties(game->_spawner, rr_grid_get_properties(game->grid));
+    rr_clock_set_properties(&game->clock, rr_grid_get_properties(game->grid));
 
     free (path_buffer);
     game->current_level = level_num;
