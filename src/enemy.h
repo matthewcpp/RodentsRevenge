@@ -21,4 +21,7 @@ int rr_enemy_move(rrEnemy* enemy);
  */
 void rr_enemy_suspend(rrEnemy* enemy);
 
+void* _rr_enemey_create_pooled(void* user_data);
+void rr_enemy_reset_pooled(void* item, void* user_data);
+
 #endif

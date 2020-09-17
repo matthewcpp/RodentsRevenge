@@ -19,7 +19,8 @@ typedef enum {
     RR_ENTITY_ENEMY,
     RR_ENTITY_WALL,
     RR_ENTITY_BLOCK,
-    RR_ENTITY_CHEESE
+    RR_ENTITY_CHEESE,
+    RR_ENTITY_UNKNOWN
 } rrEntityType;
 
 typedef struct {

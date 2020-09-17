@@ -81,7 +81,7 @@ int rr_player_push(rrPlayer* player, rrPoint* target) {
                 return 0;
         }
         else if (end_cell_entity->type == RR_ENTITY_CHEESE) {
-            rr_grid_clear_position(player->_grid, &end_cell_entity->position);
+            rr_grid_destroy_basic_entity(player->_grid, end_cell_entity);
         }
     }
 

@@ -8,7 +8,7 @@
 
 typedef struct rrSpawner rrSpawner;
 
-rrSpawner* rr_spawner_create(rrGrid* grid, cutil_vector* enemy_list, rrEnemyPool* enemy_pool);
+rrSpawner* rr_spawner_create(rrGrid* grid, cutil_vector* enemy_list, rrPool* enemy_pool);
 void rr_spawner_destroy(rrSpawner* spawner);
 
 int rr_spawner_spawn_enemies(rrSpawner* spawner);

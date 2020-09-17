@@ -18,7 +18,7 @@ SRCS =  $(CURDIR)/lib/cutil/src/allocator.c \
 		$(CURDIR)/src/player.c \
 		$(CURDIR)/src/point.c \
 		$(CURDIR)/src/pool.c \
-		$(CURDIR)/src/spawn.c \
+		$(CURDIR)/src/spawner.c \
 		$(CURDIR)/src/util.c \
 		$(CURDIR)/src/vec2.c \
 		$(CURDIR)/src/sdl/sdl_animation.c \
