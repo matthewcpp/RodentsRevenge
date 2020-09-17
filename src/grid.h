@@ -4,6 +4,8 @@
 #include "point.h"
 #include "entity.h"
 
+#include "cutil/btree.h"
+
 #include <stdlib.h>
 
 #define RR_GRID_WIDTH 23
@@ -20,5 +22,8 @@ int rr_grid_load_from_file(rrGrid* grid, const char* path);
 void rr_grid_clear_position(rrGrid* grid, rrPoint* position);
 rrEntity* rr_grid_create_basic_entity(rrGrid* grid, rrPoint* position, rrEntityType type);
 void rr_grid_destroy_basic_entity(rrGrid* grid, rrEntity* entity);
+
+/** Gets property values specified in level */
+cutil_btree* rr_grid_get_properties(rrGrid* grid);
 
 #endif

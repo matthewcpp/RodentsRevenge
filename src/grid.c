@@ -1,5 +1,7 @@
 #include "grid.h"
 
+#include "cutil/strbuf.h"
+
 #include <stdio.h>
 #include <assert.h>
 
@@ -8,6 +10,7 @@ struct rrGrid{
     int width;
     int height;
     int loaded;
+    cutil_btree* properties;
 } ;
 
 rrGrid* rr_grid_create(int width, int height) {
@@ -17,11 +20,13 @@ rrGrid* rr_grid_create(int width, int height) {
     grid->height = height;
     grid->cells = calloc(width * height, sizeof(rrEntity*));
     grid->loaded = 0;
+    grid->properties = cutil_btree_create(4, cutil_trait_cstring(), cutil_trait_cstring());
 
     return grid;
 }
 
 void rr_grid_destroy(rrGrid* grid) {
+    cutil_btree_destroy(grid->properties);
     free(grid->cells);
     free(grid);
 }
@@ -60,6 +65,38 @@ void rr_grid_clear(rrGrid* grid) {
     }
 }
 
+/* TODO: Better string security here */
+void rr_grid_parse_property(rrGrid* grid, FILE* file) {
+    cutil_strbuf* property_name = cutil_strbuf_create();
+    cutil_strbuf* property_value = cutil_strbuf_create();
+    char* name_ptr;
+    char* value_ptr;
+
+    int ch = fgetc(file);
+
+    /* read prop name */
+    while (ch != ' ') {
+        cutil_strbuf_append_char(property_name, (char)ch);
+        ch = fgetc(file);
+    }
+
+    /* read prop value */
+    ch = fgetc(file);
+    while (ch != '\n') {
+        if (ch == '\r') continue;
+        cutil_strbuf_append_char(property_value, (char)ch);
+        ch = fgetc(file);
+    }
+
+    name_ptr = (char*)cutil_strbuf_cstring(property_name);
+    value_ptr = (char*)cutil_strbuf_cstring(property_value);
+
+    cutil_btree_insert(grid->properties, &name_ptr, &value_ptr);
+
+    cutil_strbuf_destroy(property_name);
+    cutil_strbuf_destroy(property_value);
+}
+
 int rr_grid_load_from_file(rrGrid* grid, const char* path) {
     rrPoint cell;
     FILE* file = fopen(path, "r");
@@ -79,6 +116,10 @@ int rr_grid_load_from_file(rrGrid* grid, const char* path) {
             break;
 
         switch (c) {
+            case '#':
+                rr_grid_parse_property(grid, file);
+                continue;
+
             case 'W':
                 entity = malloc(sizeof(rrEntity));
                 rr_entity_init(entity, RR_ENTITY_WALL);
@@ -149,4 +190,8 @@ void rr_grid_destroy_basic_entity(rrGrid* grid, rrEntity* entity) {
 
     assert(entity->type != RR_ENTITY_PLAYER && entity->type != RR_ENTITY_ENEMY);
     free(entity);
+}
+
+cutil_btree* rr_grid_get_properties(rrGrid* grid) {
+    return grid->properties;
 }

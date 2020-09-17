@@ -5,13 +5,19 @@ XBE_TITLE = RodentsRevenge
 GEN_XISO = $(XBE_TITLE).iso
 NXDK_SDL = y
 
-SRCS =  $(CURDIR)/src/clock.c \
+SRCS =  $(CURDIR)/lib/cutil/src/allocator.c \
+		$(CURDIR)/lib/cutil/src/btree.c \
+		$(CURDIR)/lib/cutil/src/strbuf.c \
+		$(CURDIR)/lib/cutil/src/trait.c \
+		$(CURDIR)/lib/cutil/src/vector.c \
+		$(CURDIR)/src/clock.c \
 		$(CURDIR)/src/enemy.c \
 		$(CURDIR)/src/entity.c \
 		$(CURDIR)/src/game.c \
 		$(CURDIR)/src/grid.c \
 		$(CURDIR)/src/player.c \
 		$(CURDIR)/src/point.c \
+		$(CURDIR)/src/pool.c \
 		$(CURDIR)/src/spawn.c \
 		$(CURDIR)/src/util.c \
 		$(CURDIR)/src/vec2.c \
@@ -21,7 +27,7 @@ SRCS =  $(CURDIR)/src/clock.c \
 		$(CURDIR)/src/sdl/sdl_input.c \
 		$(CURDIR)/src/xbox/xbox_main.c
 
-CFLAGS := $(CFLAGS) -DRR_PLATFORM_XBOX
+CFLAGS := $(CFLAGS) -I$(CURDIR)/lib/cutil/include -DRR_PLATFORM_XBOX
 
 all_local: cp_assets all
 
