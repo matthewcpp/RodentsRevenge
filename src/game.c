@@ -2,7 +2,7 @@
 
 #include "enemy.h"
 #include "pool.h"
-#include "spawn.h"
+#include "spawner.h"
 #include "util.h"
 
 #include "cutil/vector.h"
