@@ -1,3 +1,6 @@
 [submodule "lib/cutil"]
 	path = lib/cutil
 	url = https://github.com/matthewcpp/cutil.git
+[submodule "lib/sdl2-cmake"]
+	path = lib/sdl2-cmake
+	url = https://github.com/aminosbh/sdl2-cmake-modules.git
