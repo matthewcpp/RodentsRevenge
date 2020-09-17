@@ -78,5 +78,13 @@ void* _rr_enemey_create_pooled(void* user_data) {
     rr_enemy_init(enemy, &rr_game_get_player(game)->entity, rr_game_get_grid(game));
 
     return enemy;
+}
 
+/** ensures that the enemy has been removed from the board before it is returned to the reserve.  Failure to do this can leave the board in an inconsistent state. */
+void rr_enemy_reset_pooled(void* item, void* user_data) {
+    rrEnemy* enemy = (rrEnemy*)item;
+    rrGame* game = (rrGame*)user_data;
+
+    if (!rr_entity_position_is_invalid(&enemy->entity))
+        rr_entity_remove_from_grid(&enemy->entity, rr_game_get_grid(game));
 }

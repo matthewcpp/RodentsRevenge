@@ -1,9 +1,12 @@
 #include "grid.h"
 
+#include "pool.h"
+
 #include "cutil/strbuf.h"
 
-#include <stdio.h>
 #include <assert.h>
+#include <stdio.h>
+#include <string.h>
 
 struct rrGrid{
     rrEntity** cells;
@@ -11,7 +14,21 @@ struct rrGrid{
     int height;
     int loaded;
     cutil_btree* properties;
-} ;
+    rrPool* static_pool;
+};
+
+void* rr_grid_create_pooled_entity(void* user_data) {
+    rrEntity * entity = malloc(sizeof(rrEntity));
+    rr_entity_init(entity, RR_ENTITY_UNKNOWN);
+    (void)user_data;
+    return entity;
+}
+
+void rr_grid_reset_pool_entity(void* item, void* user_data) {
+    (void)user_data;
+    assert(rr_entity_is_static(item));
+    rr_entity_init(item, RR_ENTITY_UNKNOWN);
+}
 
 rrGrid* rr_grid_create(int width, int height) {
     rrGrid* grid = malloc(sizeof(struct rrGrid));
@@ -21,11 +38,32 @@ rrGrid* rr_grid_create(int width, int height) {
     grid->cells = calloc(width * height, sizeof(rrEntity*));
     grid->loaded = 0;
     grid->properties = cutil_btree_create(4, cutil_trait_cstring(), cutil_trait_cstring());
+    grid->static_pool = rr_pool_create(rr_grid_create_pooled_entity, rr_grid_reset_pool_entity, rr_pool_default_delete_func, NULL);
 
     return grid;
 }
 
+void rr_grid_clear(rrGrid* grid) {
+    int i, count = grid->width * grid->height;
+
+    if (!grid->loaded)
+        return;
+
+    for (i = 0; i < count; i++) {
+        rrEntity* entity = grid->cells[i];
+        if (entity == NULL || !rr_entity_is_static(entity))
+            continue;
+
+        rr_pool_return(grid->static_pool, grid->cells[i]);
+    }
+
+    memset(grid->cells, 0, count * sizeof(rrEntity*));
+    grid->loaded = 0;
+}
+
 void rr_grid_destroy(rrGrid* grid) {
+    rr_grid_clear(grid);
+    rr_pool_destroy(grid->static_pool);
     cutil_btree_destroy(grid->properties);
     free(grid->cells);
     free(grid);
@@ -47,25 +85,6 @@ void rr_grid_set_entity_at_position(rrGrid* grid, rrEntity* entity, rrPoint* pos
     grid->cells[grid->width * position->y + position->x] = entity;
 }
 
-/* TODO: pool static entities */
-void rr_grid_clear(rrGrid* grid) {
-    int i, count = grid->width * grid->height;
-
-    if (!grid->loaded)
-        return;
-
-    for (i = 0; i < count; i++) {
-        if (grid->cells[i] == NULL)
-            continue;
-
-        if (grid->cells[i]->type != RR_ENTITY_PLAYER && grid->cells[i]->type != RR_ENTITY_ENEMY)
-            free(grid->cells[i]);
-
-        grid->cells[i] = NULL;
-    }
-}
-
-/* TODO: Better string security here */
 void rr_grid_parse_property(rrGrid* grid, FILE* file) {
     cutil_strbuf* property_name = cutil_strbuf_create();
     cutil_strbuf* property_value = cutil_strbuf_create();
@@ -121,18 +140,18 @@ int rr_grid_load_from_file(rrGrid* grid, const char* path) {
                 continue;
 
             case 'W':
-                entity = malloc(sizeof(rrEntity));
-                rr_entity_init(entity, RR_ENTITY_WALL);
+                entity = rr_pool_get(grid->static_pool);
+                entity->type = RR_ENTITY_WALL;
                 break;
 
             case 'B':
-                entity = malloc(sizeof(rrEntity));
-                rr_entity_init(entity, RR_ENTITY_BLOCK);
+                entity = rr_pool_get(grid->static_pool);
+                entity->type = RR_ENTITY_BLOCK;
                 break;
 
             case 'C':
-                entity = malloc(sizeof(rrEntity));
-                rr_entity_init(entity, RR_ENTITY_CHEESE);
+                entity = rr_pool_get(grid->static_pool);
+                entity->type = RR_ENTITY_CHEESE;
                 break;
 
             case ' ':
@@ -166,7 +185,6 @@ void rr_grid_clear_position(rrGrid* grid, rrPoint* position) {
     grid->cells[index] = NULL;
 }
 
-/* TODO: pool static entities */
 rrEntity* rr_grid_create_basic_entity(rrGrid* grid, rrPoint* position, rrEntityType type) {
     int index = grid->width * position->y + position->x;
     rrEntity* entity = NULL;
@@ -175,21 +193,20 @@ rrEntity* rr_grid_create_basic_entity(rrGrid* grid, rrPoint* position, rrEntityT
     assert(rr_grid_position_is_valid(grid, position));
 
     if (grid->cells[index] == NULL) {
-        entity = malloc(sizeof(rrEntity));
-        rr_entity_init(entity, type);
+        entity = rr_pool_get(grid->static_pool);
+        entity->type = type;
         rr_entity_place_in_grid_cell(entity, grid, position);
     }
 
     return entity;
 }
 
-/* TODO: pool static entities */
 void rr_grid_destroy_basic_entity(rrGrid* grid, rrEntity* entity) {
+    assert(rr_entity_is_static(entity));
     if (rr_grid_position_is_valid(grid, &entity->position))
         rr_grid_clear_position(grid, &entity->position);
 
-    assert(entity->type != RR_ENTITY_PLAYER && entity->type != RR_ENTITY_ENEMY);
-    free(entity);
+    rr_pool_return(grid->static_pool, entity);
 }
 
 cutil_btree* rr_grid_get_properties(rrGrid* grid) {

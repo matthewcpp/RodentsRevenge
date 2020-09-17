@@ -40,7 +40,7 @@ rrGame* rr_game_create(rrInput* input, const char* asset_path) {
     rr_player_init(&game->player, game->grid, input);
 
     game->_enemies = cutil_vector_create(cutil_trait_ptr());
-    game->_enemy_pool = rr_pool_create(_rr_enemey_create_pooled, rr_pool_default_delete_func, game);
+    game->_enemy_pool = rr_pool_create(_rr_enemey_create_pooled, rr_enemy_reset_pooled, rr_pool_default_delete_func, game);
     game->_spawner = rr_spawner_create(game->grid, game->_enemies, game->_enemy_pool);
 
     game->state = RR_GAME_STATE_UNSTARTED;
@@ -88,7 +88,7 @@ void rr_game_respawn_player(rrGame* game) {
 
     if (entity){
         if (rr_entity_is_static(entity))
-            rr_grid_clear_position(game->grid, &starting_pos);
+            rr_grid_destroy_basic_entity(game->grid, entity);
         else
             rr_spawner_get_spawn_pos(game->_spawner, &spawn_pos);
     }

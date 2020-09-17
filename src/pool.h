@@ -12,12 +12,18 @@ typedef struct rrPool rrPool;
 typedef void* (*rr_pool_create_func)(void* user_data);
 
 /**
+ * Function that resets an item to a default state.
+ * This method will be called automatically on all items that are returned to the pool.
+ */
+typedef void (*rr_pool_reset_func)(void* item, void* user_data);
+
+/**
  * Function that frees all resources for an item in this pool.
  * This method will be called automatically on all items that are in the pool when it is destroyed.
  */
 typedef void (*rr_pool_destroy_func)(void* item, void* user_data);
 
-rrPool* rr_pool_create(rr_pool_create_func create_func, rr_pool_destroy_func destroy_func, void* user_data);
+rrPool* rr_pool_create(rr_pool_create_func create_func, rr_pool_reset_func reset_func, rr_pool_destroy_func destroy_func, void* user_data);
 
 /** Destroys the pool and calls the destroy func on every item in reserve. */
 void rr_pool_destroy(rrPool* pool);
@@ -34,6 +40,10 @@ void rr_pool_return(rrPool* pool, void* item);
  */
 void rr_pool_return_vec(rrPool* pool, cutil_vector* vec);
 
+/** This default destroy function simply calls free on the item passed to it. */
 void rr_pool_default_delete_func(void* item, void* user_data);
+
+/** The default reset function is a no-op. */
+void rr_pool_default_reset_func(void* item, void* user_data);
 
 #endif
