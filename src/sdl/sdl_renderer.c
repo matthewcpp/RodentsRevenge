@@ -85,6 +85,10 @@ void rr_renderer_set_sprite_tint_color(rrRenderer* renderer, rrSprite* sprite, r
     SDL_SetTextureColorMod(sprite->handle, color->r, color->g, color->b);
 }
 
+void rr_renderer_draw_line(rrRenderer* renderer, rrPoint* a, rrPoint* b) {
+    SDL_RenderDrawLine(renderer->renderer, a->x, a->y, b->x, b->y);
+}
+
 void rr_color_black(rrColor* color) {
     color->r = 0;
     color->g = 0;
@@ -96,5 +100,19 @@ void rr_color_white(rrColor* color) {
     color->r = 255;
     color->g = 255;
     color->b = 255;
+    color->a = 255;
+}
+
+void rr_color_blue(rrColor* color) {
+    color->r = 0;
+    color->g = 0;
+    color->b = 255;
+    color->a = 255;
+}
+
+void rr_color_red(rrColor* color) {
+    color->r = 255;
+    color->g = 0;
+    color->b = 0;
     color->a = 255;
 }

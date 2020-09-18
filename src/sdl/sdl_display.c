@@ -308,66 +308,7 @@ void rr_sdl_display_draw_entities(rrSDLDisplay* display) {
     }
 }
 
-#define RR_CLOCK_HAND_LENGTH 9.0
-#define RR_CLOCK_TARGET_LENGTH 10.0
 
-void rr_sdl_display_draw_clock_hand(rrSDLDisplay* display, rrPoint* clock_center, int pos) {
-    rrPoint clock_hand;
-    double radians = (12.0 * pos - 90.0) * M_PI / 180.0;
-
-    rr_point_copy(&clock_hand, clock_center);
-
-    clock_hand.x += (int)(cos(radians) * RR_CLOCK_HAND_LENGTH);
-    clock_hand.y += (int)(sin(radians) * RR_CLOCK_HAND_LENGTH);
-
-    SDL_RenderDrawLine(display->sdl_renderer, clock_center->x, clock_center->y, clock_hand.x, clock_hand.y);
-}
-
-void rr_sdl_display_draw_clock_target(rrSDLDisplay* display, rrPoint* clock_center_pt, int target_pos) {
-    rrVec2 center_vec, target_end_pos, center_dir;
-    double radians = (12.0 * target_pos - 90.0) * M_PI / 180.0;
-
-    rr_vec2_from_point(&center_vec, clock_center_pt);
-    rr_vec2_copy(&target_end_pos, &center_vec);
-
-    target_end_pos.x += (float)(cos(radians) * RR_CLOCK_TARGET_LENGTH);
-    target_end_pos.y += (float)(sin(radians) * RR_CLOCK_TARGET_LENGTH);
-
-    rr_vec2_sub(&center_dir, &center_vec, &target_end_pos);
-    rr_vec2_normalize(&center_dir);
-    rr_vec2_scale(&center_dir, &center_dir, RR_CLOCK_TARGET_LENGTH / 2.0f);
-    rr_vec2_add(&center_vec, &target_end_pos, &center_dir);
-
-    SDL_RenderDrawLine(display->sdl_renderer, (int)center_vec.x, (int)center_vec.y, (int)target_end_pos.x, (int)target_end_pos.y);
-}
-
-void rr_sdl_display_draw_clock(rrSDLDisplay* display) {
-    rrClock* clock = rr_game_get_clock(display->_game);
-    rrPoint clock_center;
-    SDL_Rect* sprite_src_rect = display->_sprites + RR_SPRITE_CLOCK;
-    SDL_Rect texture_dest_rect;
-
-    texture_dest_rect.x = (display->window_size.x / 2) - (sprite_src_rect->w / 2);
-    texture_dest_rect.y = 10;
-    texture_dest_rect.w = sprite_src_rect->w;
-    texture_dest_rect.h = sprite_src_rect->h;
-
-    SDL_RenderCopy(display->sdl_renderer, display->_spritesheet, sprite_src_rect, &texture_dest_rect);
-
-    rr_point_set(&clock_center, texture_dest_rect.x + 14, texture_dest_rect.y + 17);
-
-    /* draw second hand */
-    SDL_SetRenderDrawColor(display->sdl_renderer, 255, 0, 0, 255);
-    rr_sdl_display_draw_clock_hand(display, &clock_center, clock->seconds_pos);
-
-    /* draw minute hand */
-    SDL_SetRenderDrawColor(display->sdl_renderer, 0, 0, 255, 255);
-    rr_sdl_display_draw_clock_hand(display, &clock_center, clock->minutes_pos);
-
-    /* draw target mark */
-    SDL_SetRenderDrawColor(display->sdl_renderer, 0, 0, 255, 255);
-    rr_sdl_display_draw_clock_target(display, &clock_center, clock->target_pos);
-}
 
 void rr_sdl_display_draw(rrSDLDisplay* display) {
     if (!display->_livesText)
@@ -376,7 +317,6 @@ void rr_sdl_display_draw(rrSDLDisplay* display) {
     SDL_SetRenderDrawColor(display->sdl_renderer, 195, 195, 195, 255);
     SDL_RenderClear(display->sdl_renderer);
 
-
     /* TODO: Figure out why this order is necessary */
     rr_sdl_display_draw_board_background(display);
     rr_sdl_display_draw_entities(display);
@@ -384,8 +324,6 @@ void rr_sdl_display_draw(rrSDLDisplay* display) {
 
     rr_ui_update(display->ui);
     rr_ui_draw(display->ui);
-
-    rr_sdl_display_draw_clock(display);
 
     SDL_RenderPresent(display->sdl_renderer);
 }

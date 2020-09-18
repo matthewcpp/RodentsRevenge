@@ -6,6 +6,7 @@
 
 #include "menu.h"
 #include "score.h"
+#include "clock.h"
 
 typedef struct {
     rrGame* game;
@@ -14,6 +15,7 @@ typedef struct {
 
     rrUiMenu menu;
     rrUiScore score;
+    rrUiClock clock;
 } rrUi;
 
 rrUi* rr_ui_create(rrGame* game, rrRenderer* renderer, rrInput* input);

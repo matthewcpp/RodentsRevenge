@@ -14,6 +14,8 @@ typedef struct {
 
 void rr_color_black(rrColor* color);
 void rr_color_white(rrColor* color);
+void rr_color_blue(rrColor* color);
+void rr_color_red(rrColor* color);
 
 typedef struct
 {
@@ -31,6 +33,7 @@ void rr_renderer_get_screen_size(rrRenderer*, rrPoint* size);
 void rr_renderer_color(struct rrRenderer* renderer, rrColor* color);
 void rr_renderer_fill_rect(rrRenderer* renderer, rrRect* rect);
 void rr_renderer_draw_sprite(rrRenderer* renderer, rrSprite* sprite, rrPoint* position);
+void rr_renderer_draw_line(rrRenderer* renderer, rrPoint* a, rrPoint* b);
 
 rrSprite* rr_renderer_create_text(rrRenderer* renderer, int font, const char* text);
 void rr_renderer_destroy_sprite(struct rrRenderer* renderer, rrSprite* sprite);

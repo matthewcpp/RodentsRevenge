@@ -21,12 +21,13 @@ set(game_src
 
 set(drawing_src
 	src/draw/renderer.h
-		)
+	src/draw/spritesheet.h src/draw/spritesheet.c)
 
 set(ui_src
+	src/ui/clock.h src/ui/clock.c
 	src/ui/ui.h src/ui/ui.c
 	src/ui/menu.h src/ui/menu.c
-		src/ui/score.h src/ui/score.c)
+	src/ui/score.h src/ui/score.c)
 
 set(sdl_src
 	src/sdl/sdl_input.h src/sdl/sdl_input.c

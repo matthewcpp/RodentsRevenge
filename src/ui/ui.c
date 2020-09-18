@@ -19,6 +19,8 @@ rrUi* rr_ui_create(rrGame* game, rrRenderer* renderer, rrInput* input) {
     ui_element_offset.x = -10;
 
     rr_ui_score_init(&ui->score, &ui_element_offset, game, renderer);
+    ui_element_offset.x = 0;
+    rr_ui_clock_init(&ui->clock, renderer, game, NULL, &ui_element_offset);
 
     return ui;
 }
