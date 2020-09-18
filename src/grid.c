@@ -154,6 +154,11 @@ int rr_grid_load_from_file(rrGrid* grid, const char* path) {
                 entity->type = RR_ENTITY_CHEESE;
                 break;
 
+            case 'H':
+                entity = rr_pool_get(grid->static_pool);
+                entity->type = RR_ENTITY_HOLE;
+                break;
+
             case ' ':
                 break;
 

@@ -10,6 +10,7 @@ typedef enum {
     RR_STATUS_ACTIVE,
     RR_STATUS_WAITING,
     RR_STATUS_SUSPENDED,
+    RR_STATUS_STUCK,
     RR_STATUS_DYING,
     RR_STATUS_KILLED
 } rrStatus;
@@ -20,6 +21,7 @@ typedef enum {
     RR_ENTITY_WALL,
     RR_ENTITY_BLOCK,
     RR_ENTITY_CHEESE,
+    RR_ENTITY_HOLE,
     RR_ENTITY_UNKNOWN
 } rrEntityType;
 

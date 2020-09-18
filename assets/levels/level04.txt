@@ -1,0 +1,25 @@
+#clock 2
+#spawn 1
+WWWWWWWWWWWWWWWWWWWWWWW
+W            H        W
+W  B B B B B H B B B  W
+WHB B B B B B B B B B W
+W  B B B B B B B B B  W
+W B B B B B B B B B B W
+W  B B B B BHB B B B  W
+W B B B B B B B B B B W
+W  B B B B B B B B B  W
+W B B B B B B B B B B W
+W  B B B B B B B B B  W
+W B B B B B B B B B B W
+W  B B B B B B BHB B  W
+W B B B B B B B B B B W
+W  B B B B B B B B B  W
+W B B B BHB B B B B B W
+W  B B B B B B B B B  W
+W B B B B B B B B B B W
+W  B B B B B B B B B  W
+W B B B B B B B B B B W
+W  B B B B B B B B B  W
+W                     W
+WWWWWWWWWWWWWWWWWWWWWWW

@@ -1,4 +1,5 @@
-#spawn constant 3
+#clock 5
+#spawn 3
 WWWWWWWWWWWWWWWWWWWWWWW
 W               B  B  W
 WB    B BBB    B  W B W

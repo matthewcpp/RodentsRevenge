@@ -21,6 +21,8 @@ typedef enum {
     RR_SPRITE_CHEESE,
     RR_SPRITE_REMAINING_LIFE,
     RR_SPRITE_CLOCK,
+    RR_SPRITE_HOLE,
+    RR_SPRITE_STUCK_PLAYER,
     RR_SPRITE_COUNT
 } SpriteIndex;
 
@@ -125,6 +127,8 @@ int rr_sdl_display_load_spritesheet(rrSDLDisplay* display, const char* path) {
     rr_sdl_display_grid_sprite_info(display->_sprites + RR_SPRITE_CAT_WAIT, 0, 36);
     rr_sdl_display_grid_sprite_info(display->_sprites + RR_SPRITE_CHEESE, 36, 54);
     rr_sdl_display_grid_sprite_info(display->_sprites + RR_SPRITE_REMAINING_LIFE, 36, 18);
+    rr_sdl_display_grid_sprite_info(display->_sprites + RR_SPRITE_HOLE, 0, 0);
+    rr_sdl_display_grid_sprite_info(display->_sprites + RR_SPRITE_STUCK_PLAYER, 0, 54);
     rr_sdl_display_sprite_info(display->_sprites + RR_SPRITE_CLOCK, 54, 0, 29, 32);
 
     rr_sdl_create_player_death_anim(display);
@@ -231,6 +235,11 @@ void rr_sdl_display_draw_player(rrSDLDisplay* display, rrPlayer* player) {
             sprite_src_rect = &player->death_animation->current_frame_rect;
             break;
 
+        case RR_STATUS_STUCK:
+            texture = display->_spritesheet;
+            sprite_src_rect = display->_sprites + RR_SPRITE_STUCK_PLAYER;
+            break;
+
         default:
             return;
     }
@@ -278,6 +287,10 @@ void rr_sdl_display_draw_entities(rrSDLDisplay* display) {
 
                 case RR_ENTITY_CHEESE:
                     rr_sdl_display_draw_basic_block(display, RR_SPRITE_CHEESE, &cell);
+                    break;
+
+                case RR_ENTITY_HOLE:
+                    rr_sdl_display_draw_basic_block(display, RR_SPRITE_HOLE, &cell);
                     break;
 
                 case RR_ENTITY_ENEMY:

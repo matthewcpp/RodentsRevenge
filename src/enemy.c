@@ -26,12 +26,15 @@ int rr_enemy_move(rrEnemy* enemy) {
         rr_point_add(&target_point, &enemy->entity.position, &deltas[i]);
 
         if (rr_point_equals(&target_point, &enemy->_player->position)) {
-            if (enemy->_player->status != RR_STATUS_ACTIVE)
+            if (enemy->_player->status == RR_STATUS_ACTIVE || enemy->_player->status == RR_STATUS_STUCK) {
+                rr_enemy_suspend(enemy);
+                rr_player_kill((rrPlayer*)enemy->_player, &enemy->entity);
+                return 1;
+            }
+            else{
                 return 0;
+            }
 
-            rr_enemy_suspend(enemy);
-            rr_player_kill((rrPlayer*)enemy->_player, &enemy->entity);
-            return 1;
         }
 
         if (rr_grid_get_entity_at_position(enemy->_grid, &target_point) != NULL)
