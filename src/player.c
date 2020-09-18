@@ -85,7 +85,7 @@ int rr_player_push(rrPlayer* player, rrPoint* target) {
 
     if (end_cell_entity) {
         /* blocks along this vector are against an immovable object and cannot be moved. */
-        if (end_cell_entity->type == RR_ENTITY_WALL)
+        if (end_cell_entity->type == RR_ENTITY_WALL || end_cell_entity->type == RR_ENTITY_TRAP)
             return 0;
         else if (end_cell_entity->type == RR_ENTITY_ENEMY) {
             /* we can only push the block if the enemy was able to move to a safe square, otherwise its pinned. */
