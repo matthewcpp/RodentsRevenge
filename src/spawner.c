@@ -16,19 +16,13 @@ rrPoint spawn_positions[RR_SPAWN_POS_COUNT] = {
         {11, 1}, {21, 11}, {11, 21}, {1, 11}
 };
 
-typedef enum {
-    RR_SPAWNER_MODE_CYCLE,
-    RR_SPAWNER_MODE_CONSTANT
-} rrSpawnerMode;
-
 struct rrSpawner {
     rrGrid* grid;
     cutil_vector* enemy_list;
     rrPool* enemy_pool;
 
-    int spawn_count;
+    int spawn_index;
     cutil_vector* spawn_cycle;
-    rrSpawnerMode mode;
 };
 
 rrSpawner* rr_spawner_create(rrGrid* grid, cutil_vector* enemy_list, rrPool* enemy_pool) {
@@ -37,9 +31,8 @@ rrSpawner* rr_spawner_create(rrGrid* grid, cutil_vector* enemy_list, rrPool* ene
     spawner->grid = grid;
     spawner->enemy_list = enemy_list;
     spawner->enemy_pool = enemy_pool;
-    spawner->spawn_count = 1;
+    spawner->spawn_index = 0;
     spawner->spawn_cycle = cutil_vector_create(cutil_trait_int());
-    spawner->mode = RR_SPAWNER_MODE_CONSTANT;
 
     return spawner;
 }
@@ -77,34 +70,11 @@ void rr_spawner_get_spawn_pos(rrSpawner* spawner, rrPoint* position) {
     }
 }
 
-void rr_spawner_post_spawn(rrSpawner* spawner) {
-    if (spawner->mode == RR_SPAWNER_MODE_CYCLE){
-        spawner->spawn_count += 1;
-
-        if (spawner->spawn_count >= cutil_vector_size(spawner->spawn_cycle))
-            spawner->spawn_count = 0;
-    }
-}
-
-int rr_spawner_get_spawn_count(rrSpawner* spawner) {
-    switch(spawner->mode) {
-        case RR_SPAWNER_MODE_CONSTANT:
-            return spawner->spawn_count;
-
-        case RR_SPAWNER_MODE_CYCLE: {
-            int count;
-            cutil_vector_get(spawner->spawn_cycle, spawner->spawn_count, &count);
-            return count;
-        }
-
-        default:
-            return 0;
-    }
-}
-
 int rr_spawner_spawn_enemies(rrSpawner* spawner) {
-    int spawn_count = rr_spawner_get_spawn_count(spawner);
+    int spawn_count;
     int i;
+
+    cutil_vector_get(spawner->spawn_cycle, spawner->spawn_index, &spawn_count);
 
     for (i = 0; i < spawn_count; i++) {
         rrEnemy* enemy = rr_pool_get(spawner->enemy_pool);
@@ -117,12 +87,14 @@ int rr_spawner_spawn_enemies(rrSpawner* spawner) {
         cutil_vector_push_back(spawner->enemy_list, &enemy);
     }
 
-    rr_spawner_post_spawn(spawner);
+    spawner->spawn_index += 1;
+    if (spawner->spawn_index >= cutil_vector_size(spawner->spawn_cycle))
+        spawner->spawn_index = 0;
 
     return spawn_count;
 }
 
-void rr_spawner_parse_cycle_props(rrSpawner* spawner, const char* props) {
+void rr_spawner_parse_spawn_values(rrSpawner* spawner, const char* props) {
     char* end_ptr;
     int val = (int)strtol(props, &end_ptr, 10);
 
@@ -133,14 +105,9 @@ void rr_spawner_parse_cycle_props(rrSpawner* spawner, const char* props) {
     }
 
     assert(cutil_vector_size(spawner->spawn_cycle) > 0);
-    spawner->spawn_count = 0;
-    spawner->mode = RR_SPAWNER_MODE_CYCLE;
+    spawner->spawn_index = 0;
 }
 
-void rr_spawner_parse_constant_props(rrSpawner* spawner, const char* props){
-    spawner->mode = RR_SPAWNER_MODE_CONSTANT;
-    spawner->spawn_count = strtol(props, NULL, 10);
-}
 
 void rr_spawner_set_properties(rrSpawner* spawner, cutil_btree* properties) {
     char* key = "spawn";
@@ -149,17 +116,15 @@ void rr_spawner_set_properties(rrSpawner* spawner, cutil_btree* properties) {
     if (!cutil_btree_get(properties, &key, &spawner_props))
         return;
 
-    spawner->mode = RR_SPAWNER_MODE_CONSTANT;
-    spawner->spawn_count = 1;
+    spawner->spawn_index = 0;
     cutil_vector_clear(spawner->spawn_cycle);
 
-    if (spawner_props == NULL)
+    /* no properties set use default. */
+    if (spawner_props == NULL){
+        int val = 1;
+        cutil_vector_push_back(spawner->spawn_cycle, &val);
         return;
+    }
 
-    if (strstr(spawner_props, "constant") == spawner_props) {
-        rr_spawner_parse_constant_props(spawner, spawner_props + 8);
-    }
-    else if (strstr(spawner_props, "cycle") == spawner_props) {
-        rr_spawner_parse_cycle_props(spawner, spawner_props + 6);
-    }
+    rr_spawner_parse_spawn_values(spawner, spawner_props);
 }

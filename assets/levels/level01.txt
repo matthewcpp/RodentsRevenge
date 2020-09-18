@@ -1,5 +1,5 @@
 #clock 5
-#spawn cycle 1 2
+#spawn 1 2
 WWWWWWWWWWWWWWWWWWWWWWW
 W                     W
 W                     W
