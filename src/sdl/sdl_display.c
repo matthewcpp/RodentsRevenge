@@ -1,8 +1,10 @@
 #include "sdl_display.h"
 #include "sdl_animation.h"
+#include "sdl_renderer.h"
 
 #include "../enemy.h"
 #include "../vec2.h"
+#include "../ui/ui.h"
 
 #include <SDL_image.h>
 
@@ -44,13 +46,17 @@ struct rrSDLDisplay{
 
     rrPoint _map_pos;
     rrPoint window_size;
+
+    rrRenderer* renderer;
+    rrUi* ui;
+    rrInput* input;
 };
 
 void rr_sdl_display_setup_display_elements(rrSDLDisplay* display);
 void rr_sdl_display_init_score_text(rrSDLDisplay* display);
 void rr_sdl_display_init_lives_text(rrSDLDisplay* display);
 
-rrSDLDisplay* rr_sdl_display_create(SDL_Window* window, rrGame* game) {
+rrSDLDisplay* rr_sdl_display_create(SDL_Window* window, rrGame* game, rrInput* input) {
     rrSDLDisplay* display = malloc(sizeof(rrSDLDisplay));
 
     display->_window = window;
@@ -61,6 +67,10 @@ rrSDLDisplay* rr_sdl_display_create(SDL_Window* window, rrGame* game) {
     display->_previous_score = 0;
     display->_scoreText = NULL;
     display->_livesText = NULL;
+    display->input = input;
+
+    display->renderer = rr_sdl_renderer_create(display->_renderer);
+    display->ui = NULL;
 
     TTF_Init();
 
@@ -87,6 +97,9 @@ void rr_sdl_display_setup_display_elements(rrSDLDisplay* display){
     SDL_GetRendererOutputSize(display->_renderer, &display->window_size.x, &display->window_size.y);
     display->_map_pos.x = (display->window_size.x / 2)  - ((RR_GRID_WIDTH * RR_RENDERER_TILE_SIZE) / 2);
     display->_map_pos.y = (display->window_size.y / 2)  - ((RR_GRID_HEIGHT * RR_RENDERER_TILE_SIZE) / 2);
+
+    rr_sdl_renderer_set_screen_size(display->renderer, &display->window_size);
+    display->ui = rr_ui_create(display->_game, display->renderer, display->input);
 
     rr_sdl_display_init_score_text(display);
     rr_sdl_display_init_lives_text(display);
@@ -143,13 +156,14 @@ int rr_sdl_display_load_font(rrSDLDisplay* display, const char* path) {
         TTF_CloseFont(display->_font);
 
     display->_font = TTF_OpenFont(path, 18);
+    rr_sdl_renderer_set_font(display->renderer, display->_font);
 
     return display->_font != NULL;
 }
 
 void rr_sdl_display_init_score_text(rrSDLDisplay* display) {
     SDL_Surface* text = NULL;
-    SDL_Color color={0,0,0};
+    SDL_Color color={0,0,0, 255};
     char scoreStrBuffer[32];
     sprintf(scoreStrBuffer, "Score: %d", rr_game_get_player(display->_game)->score);
     text = TTF_RenderUTF8_Solid (display->_font, scoreStrBuffer, color);
@@ -394,6 +408,9 @@ void rr_sdl_display_draw(rrSDLDisplay* display) {
     SDL_RenderCopy(display->_renderer, display->_scoreText, NULL, &display->_scoreTextRect);
     rr_sdl_display_draw_lives(display);
     rr_sdl_display_draw_clock(display);
+
+    rr_ui_update(display->ui);
+    rr_ui_draw(display->ui);
 
     SDL_RenderPresent(display->_renderer);
 }

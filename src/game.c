@@ -280,3 +280,7 @@ int rr_game_set_active_level(rrGame* game, int level_num){
 
     return file_loaded;
 }
+
+rrGameState rr_game_get_state(rrGame* game) {
+    return game->state;
+}
