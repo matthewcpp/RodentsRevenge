@@ -120,7 +120,7 @@ void rr_game_round_clear(rrGame* game) {
 }
 
 /* TODO: Preserve last board state while game over state active */
-void rr_game_over(rrGame* game) {
+void rr_game_reset(rrGame* game) {
     size_t i;
 
     rr_entity_remove_from_grid(&game->player.entity, game->grid);
@@ -189,7 +189,7 @@ void rr_game_update_player_killed(rrGame* game) {
     if (game->player.lives_remaining >= 0)
         rr_game_respawn_player(game);
     else {
-        rr_game_over(game);
+        rr_game_reset(game);
     }
 }
 
@@ -252,6 +252,8 @@ void rr_game_update(rrGame* game, int time) {
 }
 
 int rr_game_restart(rrGame* game) {
+    assert(game->state == RR_GAME_STATE_UNSTARTED);
+
     game->player.score = 0;
     game->player.lives_remaining = 2;
     game->player.time_stuck = 0;

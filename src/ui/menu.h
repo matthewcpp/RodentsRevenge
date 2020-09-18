@@ -31,11 +31,11 @@ typedef struct {
     cutil_vector* active_submenu;
     int active_submenu_index;
 
-
+    void* user_data;
     int bar_height;
 } rrUiMenu;
 
-void rr_ui_menu_init(rrUiMenu* menu, rrRenderer* renderer);
+void rr_ui_menu_init(rrUiMenu* menu, void* user_data);
 void rr_ui_menu_uninit(rrUiMenu* menu);
 void rr_ui_menu_draw(rrUiMenu* menu, rrRenderer* renderer);
 void rr_ui_menu_update(rrUiMenu* menu, rrInput* input);

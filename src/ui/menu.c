@@ -6,56 +6,34 @@
 #define RR_MENU_ITEM_SPACING_V 2
 #define RR_SUBMENU_PADDING 2
 
-void rr_ui_menu_on_new_game(void* menu);
-void rr_ui_menu_on_select_level(void* menu);
 
-void rr_ui_menu_init_game_menu(rrUiMenu* menu, rrRenderer* renderer);
-void rr_ui_menu_init_options_menu(rrUiMenu* menu, rrRenderer* renderer);
 
 static rrColor fill_color = {0, 0, 200, 255};
 
-void rr_ui_menu_init(rrUiMenu* menu, rrRenderer* renderer) {
-    rr_ui_menu_init_game_menu(menu, renderer);
-    rr_ui_menu_init_options_menu(menu, renderer);
-
-    menu->bar_height = menu->items[RR_MENU_GAME]->rect.h + RR_MENU_ITEM_SPACING_V * 2;
-    menu->active_submenu_pos.y = menu->bar_height;
-
+void rr_ui_menu_init(rrUiMenu* menu, void* user_data) {
     menu->selected = 0;
     menu->active_submenu = NULL;
     menu->active_submenu_index = 0;
+    menu->user_data = user_data;
 }
 
 void rr_ui_menu_uninit(rrUiMenu* menu) {
     (void)menu;
 }
 
-void rr_ui_menu_init_game_menu(rrUiMenu* menu, rrRenderer* renderer) {
-    rrUiSubmenuItem* submenu_item;
-    cutil_vector* submenu = cutil_vector_create(cutil_trait_ptr());
 
-    menu->items[RR_MENU_GAME] = rr_renderer_create_text(renderer, 0, "Game");
-    menu->submenus[RR_MENU_GAME] = submenu;
-
-    submenu_item = rr_ui_submenu_item_create(rr_renderer_create_text(renderer, 0, "New Game"), rr_ui_menu_on_new_game);
-    cutil_vector_push_back(submenu, &submenu_item);
-    submenu_item = rr_ui_submenu_item_create(rr_renderer_create_text(renderer, 0, "High Scores..."), rr_ui_menu_on_new_game);
-    cutil_vector_push_back(submenu, &submenu_item);
-}
-
-void rr_ui_menu_init_options_menu(rrUiMenu* menu, rrRenderer* renderer) {
-    rrUiSubmenuItem* submenu_item;
-    cutil_vector* submenu = cutil_vector_create(cutil_trait_ptr());
-
-    menu->items[RR_MENU_OPTIONS] = rr_renderer_create_text(renderer, 0, "Options");
-    menu->submenus[RR_MENU_OPTIONS] = submenu;
-
-    submenu_item = rr_ui_submenu_item_create(rr_renderer_create_text(renderer, 0, "Level..."), rr_ui_menu_on_select_level);
-    cutil_vector_push_back(submenu, &submenu_item);
-}
 
 void rr_ui_menu_update_submenu(rrUiMenu* menu, rrInput* input) {
     if (rr_input_button_down(input, RR_INPUT_BUTTON_BACK)) {
+        menu->active_submenu = NULL;
+        menu->active_submenu_index = 0;
+    }
+
+    if (rr_input_button_down(input, RR_INPUT_BUTTON_ACCEPT)) {
+        rrUiSubmenuItem* item;
+        cutil_vector_get(menu->active_submenu, menu->active_submenu_index, &item);
+        item->callback(menu->user_data);
+        
         menu->active_submenu = NULL;
         menu->active_submenu_index = 0;
     }
@@ -96,6 +74,9 @@ void rr_ui_menu_draw_menu_bar(rrUiMenu* menu, rrRenderer* renderer) {
     rrPoint pos = {RR_MENU_ITEM_SPACING_H / 2, RR_MENU_ITEM_SPACING_V};
     rrColor white = {255, 255, 255, 255};
     int i;
+
+    menu->bar_height = menu->items[RR_MENU_GAME]->rect.h + RR_MENU_ITEM_SPACING_V * 2;
+    menu->active_submenu_pos.y = menu->bar_height;
 
     rr_renderer_get_screen_size(renderer, &screen_size);
     menu_bar_rect.w = screen_size.x;
@@ -210,12 +191,3 @@ rrUiSubmenuItem* rr_ui_submenu_item_create(rrSprite* sprite, rrUiMenuCallbackFun
 
     return item;
 }
-
-void rr_ui_menu_on_new_game(void* menu){
-    (void)menu;
-}
-
-void rr_ui_menu_on_select_level(void* menu) {
-    (void)menu;
-}
-

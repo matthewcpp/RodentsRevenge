@@ -25,6 +25,7 @@ rrGameState rr_game_get_state(rrGame* game);
 
 void rr_game_update(rrGame* game, int time);
 
+void rr_game_reset(rrGame* game);
 int rr_game_restart(rrGame* game);
 int rr_game_set_active_level(rrGame* game, int level_num);
 
