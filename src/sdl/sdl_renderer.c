@@ -64,6 +64,12 @@ rrSprite* rr_renderer_create_text(struct rrRenderer* renderer, int font, const c
     return textSprite;
 }
 
+void rr_renderer_destroy_sprite(struct rrRenderer* renderer, rrSprite* sprite) {
+    (void)renderer;
+    SDL_DestroyTexture(sprite->handle);
+    free(sprite);
+}
+
 void rr_renderer_draw_sprite(rrRenderer* renderer, rrSprite* sprite, rrPoint* position) {
     SDL_Rect dest_rect;
     dest_rect.x = position->x;

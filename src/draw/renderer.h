@@ -33,6 +33,8 @@ void rr_renderer_fill_rect(rrRenderer* renderer, rrRect* rect);
 void rr_renderer_draw_sprite(rrRenderer* renderer, rrSprite* sprite, rrPoint* position);
 
 rrSprite* rr_renderer_create_text(rrRenderer* renderer, int font, const char* text);
+void rr_renderer_destroy_sprite(struct rrRenderer* renderer, rrSprite* sprite);
+
 void rr_renderer_set_sprite_tint_color(rrRenderer* renderer, rrSprite* sprite, rrColor* color);
 
 #endif

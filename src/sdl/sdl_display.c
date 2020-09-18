@@ -37,10 +37,6 @@ struct rrSDLDisplay{
     SDL_Texture* _spritesheet;
     TTF_Font* _font;
 
-    int _previous_score;
-    SDL_Texture* _scoreText;
-    SDL_Rect _scoreTextRect;
-
     SDL_Texture* _livesText;
     SDL_Rect _livesTextRect;
 
@@ -53,7 +49,6 @@ struct rrSDLDisplay{
 };
 
 void rr_sdl_display_setup_display_elements(rrSDLDisplay* display);
-void rr_sdl_display_init_score_text(rrSDLDisplay* display);
 void rr_sdl_display_init_lives_text(rrSDLDisplay* display);
 
 rrSDLDisplay* rr_sdl_display_create(SDL_Window* window, rrGame* game, rrInput* input) {
@@ -64,8 +59,6 @@ rrSDLDisplay* rr_sdl_display_create(SDL_Window* window, rrGame* game, rrInput* i
     display->_game = game;
     display->_spritesheet = NULL;
     display->_font = NULL;
-    display->_previous_score = 0;
-    display->_scoreText = NULL;
     display->_livesText = NULL;
     display->input = input;
 
@@ -80,7 +73,6 @@ rrSDLDisplay* rr_sdl_display_create(SDL_Window* window, rrGame* game, rrInput* i
 void rr_sdl_display_destroy(rrSDLDisplay* display) {
     rr_sdl_animation_destroy(rr_game_get_player(display->_game)->death_animation);
 
-    SDL_DestroyTexture(display->_scoreText);
     SDL_DestroyTexture(display->_livesText);
     SDL_DestroyTexture(display->_spritesheet);
     SDL_DestroyRenderer(display->sdl_renderer);
@@ -104,7 +96,6 @@ void rr_sdl_display_setup_display_elements(rrSDLDisplay* display){
     rr_sdl_renderer_set_screen_size(display->renderer, &display->window_size);
     display->ui = rr_ui_create(display->_game, display->renderer, display->input);
 
-    rr_sdl_display_init_score_text(display);
     rr_sdl_display_init_lives_text(display);
 }
 
@@ -162,20 +153,6 @@ int rr_sdl_display_load_font(rrSDLDisplay* display, const char* path) {
     rr_sdl_renderer_set_font(display->renderer, display->_font);
 
     return display->_font != NULL;
-}
-
-void rr_sdl_display_init_score_text(rrSDLDisplay* display) {
-    SDL_Surface* text = NULL;
-    SDL_Color color={0,0,0, 255};
-    char scoreStrBuffer[32];
-    sprintf(scoreStrBuffer, "Score: %d", rr_game_get_player(display->_game)->score);
-    text = TTF_RenderUTF8_Solid (display->_font, scoreStrBuffer, color);
-    display->_scoreText = SDL_CreateTextureFromSurface(display->sdl_renderer, text);
-    SDL_FreeSurface(text);
-
-    SDL_QueryTexture(display->_scoreText, NULL, NULL, &display->_scoreTextRect.w, &display->_scoreTextRect.h);
-    display->_scoreTextRect.x = display->window_size.x - display->_scoreTextRect.w - 10;
-    display->_scoreTextRect.y = 10;
 }
 
 void rr_sdl_display_init_lives_text(rrSDLDisplay* display) {
@@ -388,32 +365,27 @@ void rr_sdl_display_draw_clock(rrSDLDisplay* display) {
     rr_sdl_display_draw_clock_hand(display, &clock_center, clock->minutes_pos);
 
     /* draw target mark */
+    SDL_SetRenderDrawColor(display->sdl_renderer, 0, 0, 255, 255);
     rr_sdl_display_draw_clock_target(display, &clock_center, clock->target_pos);
 }
 
 void rr_sdl_display_draw(rrSDLDisplay* display) {
-    rrPlayer* player = rr_game_get_player(display->_game);
-
-    if (!display->_scoreText)
+    if (!display->_livesText)
         rr_sdl_display_setup_display_elements(display);
 
     SDL_SetRenderDrawColor(display->sdl_renderer, 195, 195, 195, 255);
     SDL_RenderClear(display->sdl_renderer);
 
+
+    /* TODO: Figure out why this order is necessary */
     rr_sdl_display_draw_board_background(display);
     rr_sdl_display_draw_entities(display);
-
-    if (player->score != display->_previous_score){
-        rr_sdl_display_init_score_text(display);
-        display->_previous_score = player->score;
-    }
-
-    SDL_RenderCopy(display->sdl_renderer, display->_scoreText, NULL, &display->_scoreTextRect);
     rr_sdl_display_draw_lives(display);
-    rr_sdl_display_draw_clock(display);
 
     rr_ui_update(display->ui);
     rr_ui_draw(display->ui);
+
+    rr_sdl_display_draw_clock(display);
 
     SDL_RenderPresent(display->sdl_renderer);
 }

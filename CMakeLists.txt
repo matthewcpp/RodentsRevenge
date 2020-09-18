@@ -25,7 +25,8 @@ set(drawing_src
 
 set(ui_src
 	src/ui/ui.h src/ui/ui.c
-	src/ui/menu.h src/ui/menu.c)
+	src/ui/menu.h src/ui/menu.c
+		src/ui/score.h src/ui/score.c)
 
 set(sdl_src
 	src/sdl/sdl_input.h src/sdl/sdl_input.c

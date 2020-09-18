@@ -6,12 +6,6 @@
 
 #include "cutil/vector.h"
 
-typedef enum {
-    RR_MENU_GAME,
-    RR_MENU_OPTIONS,
-    RR_MENU_COUNT
-} rrUiMenuIndex;
-
 typedef void (*rrUiMenuCallbackFunc)(void* data);
 
 typedef struct {
@@ -24,8 +18,7 @@ rrUiSubmenuItem* rr_ui_submenu_item_create(rrSprite* sprite, rrUiMenuCallbackFun
 typedef struct {
     int selected;
 
-    rrSprite* items[RR_MENU_COUNT];
-    cutil_vector* submenus[RR_MENU_COUNT];
+    cutil_vector* items;
 
     rrPoint active_submenu_pos;
     cutil_vector* active_submenu;
@@ -33,11 +26,16 @@ typedef struct {
 
     void* user_data;
     int bar_height;
+    int active;
+
+    rrRenderer* _renderer;
+    rrInput* _input;
 } rrUiMenu;
 
-void rr_ui_menu_init(rrUiMenu* menu, void* user_data);
+void rr_ui_menu_init(rrUiMenu* menu, rrRenderer* renderer, rrInput* input, void* user_data);
 void rr_ui_menu_uninit(rrUiMenu* menu);
-void rr_ui_menu_draw(rrUiMenu* menu, rrRenderer* renderer);
-void rr_ui_menu_update(rrUiMenu* menu, rrInput* input);
+void rr_ui_menu_add(rrUiMenu* menu, rrSprite* sprite, cutil_vector* submenu_items);
+void rr_ui_menu_draw(rrUiMenu* menu);
+void rr_ui_menu_update(rrUiMenu* menu);
 
 #endif

@@ -3,7 +3,9 @@
 
 #include "../game.h"
 #include "../draw/renderer.h"
+
 #include "menu.h"
+#include "score.h"
 
 typedef struct {
     rrGame* game;
@@ -11,6 +13,7 @@ typedef struct {
     rrInput* input;
 
     rrUiMenu menu;
+    rrUiScore score;
 } rrUi;
 
 rrUi* rr_ui_create(rrGame* game, rrRenderer* renderer, rrInput* input);
