@@ -96,6 +96,10 @@ int rr_player_push(rrPlayer* player, rrPoint* target) {
         else if (end_cell_entity->type == RR_ENTITY_CHEESE) {
             rr_grid_destroy_basic_entity(player->_grid, end_cell_entity);
         }
+        else if (end_cell_entity->type == RR_ENTITY_HOLE) {
+            rr_point_sub(&end_cell_pos, &end_cell_pos, &dir);
+            rr_grid_destroy_basic_entity(player->_grid, rr_grid_get_entity_at_position(player->_grid, &end_cell_pos));
+        }
     }
 
     /* push all the blocks over */
