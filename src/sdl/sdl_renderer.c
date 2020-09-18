@@ -21,6 +21,10 @@ rrRenderer* rr_sdl_renderer_create(SDL_Renderer* sdl_renderer) {
     return renderer;
 }
 
+void rr_sdl_renderer_destroy(rrRenderer* renderer) {
+    (void)renderer;
+}
+
 void rr_sdl_renderer_set_font(rrRenderer* renderer, TTF_Font* font) {
     renderer->font = font;
 }

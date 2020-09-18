@@ -7,6 +7,10 @@
 #include <SDL_ttf.h>
 
 rrRenderer* rr_sdl_renderer_create(SDL_Renderer* renderer);
+
+/* TODO: Implement me */
+void rr_sdl_renderer_destroy(rrRenderer* renderer);
+
 void rr_sdl_renderer_set_screen_size(rrRenderer* renderer, rrPoint* screen_size);
 
 /* TODO: replace with font loading code */

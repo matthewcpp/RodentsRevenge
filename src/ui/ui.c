@@ -12,6 +12,10 @@ rrUi* rr_ui_create(rrGame* game, rrRenderer* renderer, rrInput* input) {
     return ui;
 }
 
+void rr_ui_destroy(rrUi* ui) {
+    rr_ui_menu_uninit(&ui->menu);
+}
+
 void rr_ui_draw(rrUi* ui) {
     if (rr_game_get_state(ui->game) != RR_GAME_STATE_PAUSED)
         return;

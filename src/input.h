@@ -7,7 +7,9 @@ typedef enum{
     RR_INPUT_BUTTON_LEFT,
     RR_INPUT_BUTTON_RIGHT,
     RR_INPUT_BUTTON_START,
-    RR_INPUT_BUTTON_COUNT
+    RR_INPUT_BUTTON_ACCEPT,
+    RR_INPUT_BUTTON_BACK,
+    RR_INPUT_BUTTON_COUNT,
 } rrInputButton;
 
 typedef struct rrInput rrInput;
