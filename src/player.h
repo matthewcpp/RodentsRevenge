@@ -15,6 +15,7 @@ typedef struct rrPlayer {
     rrInput* _input;
     int score;
     int lives_remaining;
+    int time_stuck;
 
     rrAnimation* death_animation;
     rrEntity* _killer_entity;

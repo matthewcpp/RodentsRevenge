@@ -217,7 +217,7 @@ void rr_game_update_state_playing(rrGame* game, int time) {
 
     if (game->player.entity.status == RR_STATUS_KILLED)
         rr_game_update_player_killed(game);
-    else if (game->player.entity.status == RR_STATUS_ACTIVE)
+    else if (game->player.entity.status == RR_STATUS_ACTIVE || game->player.entity.status == RR_STATUS_STUCK)
         rr_game_update_player_active(game, time);
 }
 
@@ -254,6 +254,7 @@ void rr_game_update(rrGame* game, int time) {
 int rr_game_restart(rrGame* game) {
     game->player.score = 0;
     game->player.lives_remaining = 2;
+    game->player.time_stuck = 0;
 
     rr_clock_reset(&game->clock);
 
