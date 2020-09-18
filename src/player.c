@@ -46,9 +46,11 @@ void rr_player_update_dying(rrPlayer* player, int time) {
         rr_entity_remove_from_grid(&player->entity, player->_grid);
         player->entity.status = RR_STATUS_KILLED;
 
-        rr_entity_place_in_grid_cell(player->_killer_entity, player->_grid, &position);
-        player->_killer_entity->status = RR_STATUS_ACTIVE;
-        player->_killer_entity = NULL;
+        if (player->_killer_entity){
+            rr_entity_place_in_grid_cell(player->_killer_entity, player->_grid, &position);
+            player->_killer_entity->status = RR_STATUS_ACTIVE;
+            player->_killer_entity = NULL;
+        }
     }
 }
 
@@ -85,7 +87,7 @@ int rr_player_push(rrPlayer* player, rrPoint* target) {
 
     if (end_cell_entity) {
         /* blocks along this vector are against an immovable object and cannot be moved. */
-        if (end_cell_entity->type == RR_ENTITY_WALL)
+        if (end_cell_entity->type == RR_ENTITY_WALL || end_cell_entity->type == RR_ENTITY_TRAP)
             return 0;
         else if (end_cell_entity->type == RR_ENTITY_ENEMY) {
             /* we can only push the block if the enemy was able to move to a safe square, otherwise its pinned. */
@@ -153,13 +155,19 @@ void rr_player_move(rrPlayer* player, rrPoint* delta) {
             rr_entity_move_to_grid_cell(&player->entity, player->_grid, &target);
             break;
 
+        case RR_ENTITY_TRAP:
+            rr_grid_destroy_basic_entity(player->_grid, target_cell_entity);
+            rr_entity_move_to_grid_cell(&player->entity, player->_grid, &target);
+            rr_player_kill(player, NULL);
+            break;
+
         default:
             break;
     }
 }
 
 void rr_player_kill(rrPlayer* player, rrEntity* entity) {
-    assert(entity->status == RR_STATUS_SUSPENDED);
+    assert(entity == NULL || entity->status == RR_STATUS_SUSPENDED);
 
     player->entity.status = RR_STATUS_DYING;
     rr_animation_reset(player->death_animation);
