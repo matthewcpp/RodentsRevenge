@@ -4,7 +4,7 @@
 
 #include "../enemy.h"
 #include "../vec2.h"
-#include "../ui/ui.h"
+#include "../ui/game_ui.h"
 #include "../draw/spritesheet.h"
 #include "../draw/sprites.h"
 
@@ -16,6 +16,11 @@
 
 #define RR_RENDERER_TILE_SIZE 16
 
+typedef enum {
+    RR_SCREEN_TITLE,
+    RR_SCREEN_GAME
+}rrDisplayScreen;
+
 struct rrSDLDisplay{
     rrGame* _game;
     SDL_Window* _window;
@@ -25,9 +30,10 @@ struct rrSDLDisplay{
 
     rrPoint _map_pos;
     rrPoint window_size;
+    rrDisplayScreen display_screen;
 
     rrRenderer* renderer;
-    rrUi* ui;
+    rrGameUi* game_ui;
     rrInput* input;
 };
 
@@ -39,9 +45,10 @@ rrSDLDisplay* rr_sdl_display_create(SDL_Window* window, rrGame* game, rrInput* i
     display->input = input;
     display->sdl_renderer = SDL_CreateRenderer(window, -1, 0);
     display->renderer = rr_sdl_renderer_create(display->sdl_renderer);
+    display->display_screen = RR_SCREEN_TITLE;
 
     display->_font = NULL;
-    display->ui = NULL;
+    display->game_ui = NULL;
 
     TTF_Init();
 
@@ -59,7 +66,7 @@ void rr_sdl_display_destroy(rrSDLDisplay* display) {
 
     SDL_DestroyRenderer(display->sdl_renderer);
 
-    rr_ui_destroy(display->ui);
+    rr_game_ui_destroy(display->game_ui);
     rr_sdl_renderer_destroy(display->renderer);
 
     if (display->_font)
@@ -245,11 +252,10 @@ void rr_sdl_display_draw_entities(rrSDLDisplay* display) {
     }
 }
 
-void rr_sdl_display_draw(rrSDLDisplay* display) {
-
-    if (display->ui == NULL){
-        display->ui = rr_ui_create(display->_game, display->renderer, display->input, &display->spritesheet);
-        display->_map_pos.y = display->ui->menu.bar_height + display->ui->clock._sprite->rect.h + 20;
+void rr_sdl_display_draw_game_scren(rrSDLDisplay* display) {
+    if (display->game_ui == NULL){
+        display->game_ui = rr_game_ui_create(display->_game, display->renderer, display->input, &display->spritesheet);
+        display->_map_pos.y = display->game_ui->menu.bar_height + display->game_ui->clock._sprite->rect.h + 20;
     }
 
 
@@ -260,8 +266,19 @@ void rr_sdl_display_draw(rrSDLDisplay* display) {
     rr_sdl_display_draw_board_background(display);
     rr_sdl_display_draw_entities(display);
 
-    rr_ui_update(display->ui);
-    rr_ui_draw(display->ui);
+    rr_game_ui_update(display->game_ui);
+    rr_game_ui_draw(display->game_ui);
 
     SDL_RenderPresent(display->sdl_renderer);
+}
+
+void rr_sdl_display_draw_title_screen(rrSDLDisplay* display){
+
+}
+
+void rr_sdl_display_draw(rrSDLDisplay* display) {
+    if (display->display_screen == RR_SCREEN_GAME)
+        rr_sdl_display_draw_game_scren(display);
+    else
+        rr_sdl_display_draw_title_screen(display);
 }

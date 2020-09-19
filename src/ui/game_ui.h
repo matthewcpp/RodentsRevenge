@@ -19,11 +19,11 @@ typedef struct {
     rrUiScore score;
     rrUiClock clock;
     rrUILives lives;
-} rrUi;
+} rrGameUi;
 
-rrUi* rr_ui_create(rrGame* game, rrRenderer* renderer, rrInput* input, rrSpritesheet* spritesheet);
-void rr_ui_destroy(rrUi* ui);
-void rr_ui_update(rrUi* ui);
-void rr_ui_draw(rrUi* ui);
+rrGameUi* rr_game_ui_create(rrGame* game, rrRenderer* renderer, rrInput* input, rrSpritesheet* spritesheet);
+void rr_game_ui_destroy(rrGameUi* ui);
+void rr_game_ui_update(rrGameUi* ui);
+void rr_game_ui_draw(rrGameUi* ui);
 
 #endif

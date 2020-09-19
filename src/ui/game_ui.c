@@ -1,12 +1,12 @@
-#include "ui.h"
+#include "game_ui.h"
 
 #include "../draw/sprites.h"
 
 void rr_ui_menu_init_game_menu(rrUiMenu* menu, rrRenderer* renderer);
 void rr_ui_menu_init_options_menu(rrUiMenu* menu, rrRenderer* renderer);
 
-rrUi* rr_ui_create(rrGame* game, rrRenderer* renderer, rrInput* input, rrSpritesheet* spritesheet) {
-    rrUi* ui = malloc(sizeof(rrUi));
+rrGameUi* rr_game_ui_create(rrGame* game, rrRenderer* renderer, rrInput* input, rrSpritesheet* spritesheet) {
+    rrGameUi* ui = malloc(sizeof(rrGameUi));
     rrPoint ui_element_offset;
 
     ui->game = game;
@@ -30,12 +30,12 @@ rrUi* rr_ui_create(rrGame* game, rrRenderer* renderer, rrInput* input, rrSprites
     return ui;
 }
 
-void rr_ui_destroy(rrUi* ui) {
+void rr_game_ui_destroy(rrGameUi* ui) {
     rr_ui_menu_uninit(&ui->menu);
     rr_ui_score_uninit(&ui->score);
 }
 
-void rr_ui_draw(rrUi* ui) {
+void rr_game_ui_draw(rrGameUi* ui) {
     rr_ui_score_draw(&ui->score);
     rr_ui_clock_draw(&ui->clock);
     rr_ui_lives_draw(&ui->lives);
@@ -44,13 +44,13 @@ void rr_ui_draw(rrUi* ui) {
     rr_ui_menu_draw(&ui->menu);
 }
 
-void rr_ui_update(rrUi* ui) {
+void rr_game_ui_update(rrGameUi* ui) {
     rr_ui_menu_update(&ui->menu);
     rr_ui_score_update(&ui->score);
 }
 
 void rr_ui_menu_on_new_game(void* user_data) {
-    rrUi* ui = (rrUi*)user_data;
+    rrGameUi* ui = (rrGameUi*)user_data;
 
     rr_game_reset(ui->game);
     rr_game_restart(ui->game);

@@ -26,7 +26,7 @@ set(drawing_src
 
 set(ui_src
 	src/ui/clock.h src/ui/clock.c
-	src/ui/ui.h src/ui/ui.c
+		src/ui/game_ui.h src/ui/game_ui.c
 	src/ui/menu.h src/ui/menu.c
 	src/ui/score.h src/ui/score.c
 	src/ui/lives.h src/ui/lives.c)
