@@ -5,27 +5,16 @@ XBE_TITLE = RodentsRevenge
 GEN_XISO = $(XBE_TITLE).iso
 NXDK_SDL = y
 
-SRCS =  $(CURDIR)/lib/cutil/src/allocator.c \
-		$(CURDIR)/lib/cutil/src/btree.c \
-		$(CURDIR)/lib/cutil/src/strbuf.c \
-		$(CURDIR)/lib/cutil/src/trait.c \
-		$(CURDIR)/lib/cutil/src/vector.c \
-		$(CURDIR)/src/clock.c \
-		$(CURDIR)/src/enemy.c \
-		$(CURDIR)/src/entity.c \
-		$(CURDIR)/src/game.c \
-		$(CURDIR)/src/grid.c \
-		$(CURDIR)/src/player.c \
-		$(CURDIR)/src/point.c \
-		$(CURDIR)/src/pool.c \
-		$(CURDIR)/src/spawner.c \
-		$(CURDIR)/src/util.c \
-		$(CURDIR)/src/vec2.c \
-		$(CURDIR)/src/sdl/sdl_animation.c \
-		$(CURDIR)/src/sdl/sdl_display.c \
-		$(CURDIR)/src/sdl/sdl_game.c \
-		$(CURDIR)/src/sdl/sdl_input.c \
-		$(CURDIR)/src/xbox/xbox_main.c
+SRCS =  lib/cutil/src/allocator.c \
+		lib/cutil/src/btree.c \
+		lib/cutil/src/strbuf.c \
+		lib/cutil/src/trait.c \
+		lib/cutil/src/vector.c \
+		$(wildcard src/*.c) \
+		$(wildcard src/draw/*.c) \
+		$(wildcard src/sdl/*.c) \
+		$(wildcard src/ui/*.c) \
+		src/xbox/xbox_main.c
 
 CFLAGS := $(CFLAGS) -I$(CURDIR)/lib/cutil/include -DRR_PLATFORM_XBOX
 
