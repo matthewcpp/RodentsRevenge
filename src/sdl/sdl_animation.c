@@ -1,34 +1,26 @@
 #include "../animation.h"
 #include "sdl_animation.h"
 
-#include <SDL.h>
-
 #include <stdlib.h>
 #include <string.h>
 
-rrAnimation* rr_sdl_animation_create(SDL_Texture* texture, int frame_count, rrPoint* frames, rrPoint* frame_size, int frame_time) {
-    int frame_data_size = frame_count * sizeof(rrPoint);
+rrAnimation* rr_sdl_animation_create(rrSpritesheet* spritesheet, int frame_count, rrSprite** frames, int frame_time) {
     rrAnimation* animation = malloc(sizeof(rrAnimation));
 
-    animation->texture = texture;
+    animation->frame_index = 0;
+    animation->spritesheet = spritesheet;
     animation->frame_count = frame_count;
     animation->frame_time = frame_time;
-    animation->frames = malloc(frame_data_size);
-    memcpy(animation->frames, frames, frame_data_size);
-
-    animation->current_frame_rect.w = frame_size->x;
-    animation->current_frame_rect.h = frame_size->y;
+    animation->frames = calloc(frame_count, sizeof(rrSprite*));
+    memcpy(animation->frames, frames, frame_count * sizeof(rrSprite*));
 
     rr_animation_reset(animation);
 
     return animation;
 }
 
-void rr_sdk_animation_update_frame_rect(rrAnimation* animation) {
-    int frame_index = animation->current_time / animation->frame_time;
-
-    animation->current_frame_rect.x = animation->frames[frame_index].x;
-    animation->current_frame_rect.y = animation->frames[frame_index].y;
+rrSprite* rr_sdl_animation_get_current_sprite(rrAnimation* animation) {
+    return animation->frames[animation->frame_index];
 }
 
 void rr_sdl_animation_destroy(rrAnimation* animation) {
@@ -37,17 +29,18 @@ void rr_sdl_animation_destroy(rrAnimation* animation) {
 }
 
 void rr_animation_update(rrAnimation* animation, int time) {
-    if (animation->current_time < animation->frame_time * animation->frame_count){
-        animation->current_time += time;
-        rr_sdk_animation_update_frame_rect(animation);
-    }
+    animation->current_time += time;
 
+    if (animation->current_time >= animation->frame_time){
+        animation->frame_index += animation->frame_index < animation->frame_count -1 ? 1 : 0;
+        animation->current_time -= animation->frame_time;
+    }
 }
 
 void rr_animation_reset(rrAnimation* animation) {
     animation->current_time = 0;
-    rr_sdk_animation_update_frame_rect(animation);
+    animation->frame_index = 0;
 }
 int rr_animation_complete(rrAnimation* animation) {
-    return animation->current_time >= animation->frame_time * animation->frame_count;
+    return animation->frame_index == animation->frame_count - 1;
 }

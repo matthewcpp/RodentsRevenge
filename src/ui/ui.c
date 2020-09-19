@@ -1,9 +1,11 @@
 #include "ui.h"
 
+#include "../draw/sprites.h"
+
 void rr_ui_menu_init_game_menu(rrUiMenu* menu, rrRenderer* renderer);
 void rr_ui_menu_init_options_menu(rrUiMenu* menu, rrRenderer* renderer);
 
-rrUi* rr_ui_create(rrGame* game, rrRenderer* renderer, rrInput* input) {
+rrUi* rr_ui_create(rrGame* game, rrRenderer* renderer, rrInput* input, rrSpritesheet* spritesheet) {
     rrUi* ui = malloc(sizeof(rrUi));
     rrPoint ui_element_offset;
 
@@ -20,7 +22,8 @@ rrUi* rr_ui_create(rrGame* game, rrRenderer* renderer, rrInput* input) {
 
     rr_ui_score_init(&ui->score, &ui_element_offset, game, renderer);
     ui_element_offset.x = 0;
-    rr_ui_clock_init(&ui->clock, renderer, game, NULL, &ui_element_offset);
+
+    rr_ui_clock_init(&ui->clock, renderer, game, spritesheet->sprites[RR_SPRITE_CLOCK], &ui_element_offset);
 
     return ui;
 }
@@ -34,6 +37,7 @@ void rr_ui_draw(rrUi* ui) {
     ui->menu.active = rr_game_get_state(ui->game) == RR_GAME_STATE_PAUSED;
     rr_ui_menu_draw(&ui->menu);
     rr_ui_score_draw(&ui->score);
+    rr_ui_clock_draw(&ui->clock);
 }
 
 void rr_ui_update(rrUi* ui) {

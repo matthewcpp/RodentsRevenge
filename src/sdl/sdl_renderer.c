@@ -2,6 +2,8 @@
 
 #include "cutil/vector.h"
 
+#include <SDL_image.h>
+
 #include <stdlib.h>
 
 struct rrRenderer{
@@ -43,6 +45,27 @@ void rr_renderer_color(struct rrRenderer* renderer, rrColor* color) {
 
 void rr_renderer_fill_rect(rrRenderer* renderer, rrRect* rect) {
     SDL_RenderFillRect(renderer->renderer, (SDL_Rect*)rect);
+}
+
+rrSprite* rr_renderer_load_sprite(rrRenderer* renderer, const char* path) {
+    SDL_Surface* surface = IMG_Load(path);
+    SDL_Texture* texture;
+    rrSprite* sprite;
+
+    if (!surface)
+        return NULL;
+
+    texture = SDL_CreateTextureFromSurface(renderer->renderer, surface);
+    SDL_FreeSurface(surface);
+
+    sprite = malloc(sizeof(rrSprite));
+    sprite->handle = texture;
+
+    SDL_QueryTexture(sprite->handle, NULL, NULL, &sprite->rect.w, &sprite->rect.h);
+    sprite->rect.x = 0;
+    sprite->rect.y = 0;
+
+    return sprite;
 }
 
 rrSprite* rr_renderer_create_text(struct rrRenderer* renderer, int font, const char* str) {

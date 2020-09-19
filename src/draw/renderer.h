@@ -35,6 +35,8 @@ void rr_renderer_fill_rect(rrRenderer* renderer, rrRect* rect);
 void rr_renderer_draw_sprite(rrRenderer* renderer, rrSprite* sprite, rrPoint* position);
 void rr_renderer_draw_line(rrRenderer* renderer, rrPoint* a, rrPoint* b);
 
+rrSprite* rr_renderer_load_sprite(rrRenderer* renderer, const char* path);
+
 rrSprite* rr_renderer_create_text(rrRenderer* renderer, int font, const char* text);
 void rr_renderer_destroy_sprite(struct rrRenderer* renderer, rrSprite* sprite);
 

@@ -2,6 +2,7 @@
 
 #include "../vec2.h"
 
+#include <assert.h>
 #include <math.h>
 
 #define RR_CLOCK_HAND_LENGTH 9.0
@@ -11,6 +12,7 @@
 
 void rr_ui_clock_init(rrUiClock* clock, rrRenderer* renderer, rrGame* game, rrSprite* sprite, rrPoint* offset) {
     rrPoint screen_size;
+    assert(sprite != NULL);
 
     clock->_renderer = renderer;
     clock->_game = game;
