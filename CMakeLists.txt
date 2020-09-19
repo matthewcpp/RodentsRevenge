@@ -13,7 +13,7 @@ set(game_src
 	src/enemy.h src/enemy.c
 	src/entity.h src/entity.c
 	src/spawner.h src/spawner.c
-		src/draw/animation.h
+
 	src/util.h src/util.c
 	src/clock.h src/clock.c
 	src/vec2.c src/vec2.h
@@ -21,19 +21,20 @@ set(game_src
 
 set(drawing_src
 	src/draw/renderer.h
-	src/draw/spritesheet.h src/draw/spritesheet.c)
+	src/draw/spritesheet.h src/draw/spritesheet.c
+	src/draw/animation.h src/draw/animation.c)
 
 set(ui_src
 	src/ui/clock.h src/ui/clock.c
 	src/ui/ui.h src/ui/ui.c
 	src/ui/menu.h src/ui/menu.c
-	src/ui/score.h src/ui/score.c)
+	src/ui/score.h src/ui/score.c
+	src/ui/lives.h src/ui/lives.c)
 
 set(sdl_src
 	src/sdl/sdl_input.h src/sdl/sdl_input.c
 	src/sdl/sdl_display.h src/sdl/sdl_display.c
-		src/draw/animation.c
-		src/sdl/sdl_game.h src/sdl/sdl_game.c
+	src/sdl/sdl_game.h src/sdl/sdl_game.c
 	src/sdl/sdl_renderer.h src/sdl/sdl_renderer.c)
 
 set(platform_src

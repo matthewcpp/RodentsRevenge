@@ -19,11 +19,13 @@ rrUi* rr_ui_create(rrGame* game, rrRenderer* renderer, rrInput* input, rrSprites
 
     ui_element_offset.y = ui->menu.bar_height + 10;
     ui_element_offset.x = -10;
-
     rr_ui_score_init(&ui->score, &ui_element_offset, game, renderer);
-    ui_element_offset.x = 0;
 
+    ui_element_offset.x = 0;
     rr_ui_clock_init(&ui->clock, renderer, game, spritesheet->sprites[RR_SPRITE_CLOCK], &ui_element_offset);
+
+    ui_element_offset.x = 10;
+    rr_ui_lives_init(&ui->lives, spritesheet->sprites[RR_SPRITE_REMAINING_LIFE], &ui_element_offset, game, renderer);
 
     return ui;
 }
@@ -34,10 +36,12 @@ void rr_ui_destroy(rrUi* ui) {
 }
 
 void rr_ui_draw(rrUi* ui) {
-    ui->menu.active = rr_game_get_state(ui->game) == RR_GAME_STATE_PAUSED;
-    rr_ui_menu_draw(&ui->menu);
     rr_ui_score_draw(&ui->score);
     rr_ui_clock_draw(&ui->clock);
+    rr_ui_lives_draw(&ui->lives);
+
+    ui->menu.active = rr_game_get_state(ui->game) == RR_GAME_STATE_PAUSED;
+    rr_ui_menu_draw(&ui->menu);
 }
 
 void rr_ui_update(rrUi* ui) {
