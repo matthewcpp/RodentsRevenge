@@ -68,6 +68,8 @@ void rr_sdl_input_update_joystick(rrInput* input, int time) {
     rr_sdl_input_update_button(input, RR_INPUT_BUTTON_LEFT, SDL_GameControllerGetButton(input->controller, SDL_CONTROLLER_BUTTON_DPAD_LEFT ), time);
     rr_sdl_input_update_button(input, RR_INPUT_BUTTON_RIGHT, SDL_GameControllerGetButton(input->controller, SDL_CONTROLLER_BUTTON_DPAD_RIGHT ), time);
     rr_sdl_input_update_button(input, RR_INPUT_BUTTON_START, SDL_GameControllerGetButton(input->controller, SDL_CONTROLLER_BUTTON_START ), time);
+    rr_sdl_input_update_button(input, RR_INPUT_BUTTON_ACCEPT, SDL_GameControllerGetButton(input->controller, SDL_CONTROLLER_BUTTON_A ), time);
+    rr_sdl_input_update_button(input, RR_INPUT_BUTTON_BACK, SDL_GameControllerGetButton(input->controller, SDL_CONTROLLER_BUTTON_B ), time);
 }
 
 void rr_sdl_update_keyboard(rrInput* input, int time) {
@@ -78,6 +80,8 @@ void rr_sdl_update_keyboard(rrInput* input, int time) {
     rr_sdl_input_update_button(input, RR_INPUT_BUTTON_LEFT, keyboard_state[SDL_SCANCODE_LEFT], time);
     rr_sdl_input_update_button(input, RR_INPUT_BUTTON_RIGHT, keyboard_state[SDL_SCANCODE_RIGHT], time);
     rr_sdl_input_update_button(input, RR_INPUT_BUTTON_START, keyboard_state[SDL_SCANCODE_SPACE], time);
+    rr_sdl_input_update_button(input, RR_INPUT_BUTTON_ACCEPT, keyboard_state[SDL_SCANCODE_RETURN], time);
+    rr_sdl_input_update_button(input, RR_INPUT_BUTTON_BACK, keyboard_state[SDL_SCANCODE_ESCAPE], time);
 }
 
 void rr_sdl_input_update(rrInput* input, int time) {

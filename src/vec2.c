@@ -7,6 +7,11 @@ void rr_vec2_from_point(rrVec2* vec, rrPoint* pt) {
     vec->y = (float)pt->y;
 }
 
+void rr_vec2_to_point(rrPoint* pt, rrVec2* vec) {
+    pt->x = (int) vec->x;
+    pt->y = (int) vec->y;
+}
+
 void rr_vec2_copy(rrVec2* dest, rrVec2* src) {
     dest->x = src->x;
     dest->y = src->y;

@@ -21,9 +21,11 @@ void rr_game_destroy(rrGame* game);
 rrClock* rr_game_get_clock(rrGame* game);
 rrPlayer* rr_game_get_player(rrGame* game);
 rrGrid* rr_game_get_grid(rrGame* game);
+rrGameState rr_game_get_state(rrGame* game);
 
 void rr_game_update(rrGame* game, int time);
 
+void rr_game_reset(rrGame* game);
 int rr_game_restart(rrGame* game);
 int rr_game_set_active_level(rrGame* game, int level_num);
 

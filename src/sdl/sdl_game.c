@@ -61,7 +61,7 @@ int rr_sdl_game_init(rrSDLGame* game, int screen_width, int screen_height) {
     }
 
     game->game = rr_game_create(game->input, game->asset_path);
-    game->display = rr_sdl_display_create(game->window, game->game);
+    game->display = rr_sdl_display_create(game->window, game->game, game->input);
 
     sprintf(asset_path, "%s%s%s", game->asset_path, rr_path_sep(), "spritesheet.png");
     if (!rr_sdl_display_load_spritesheet(game->display, asset_path)) {
@@ -69,7 +69,7 @@ int rr_sdl_game_init(rrSDLGame* game, int screen_width, int screen_height) {
         return 0;
     }
 
-    sprintf(asset_path, "%s%s%s", game->asset_path, rr_path_sep(), "vegur-regular.ttf");
+    sprintf(asset_path, "%s%s%s", game->asset_path, rr_path_sep(), "ms-sans-serif.ttf");
     if (!rr_sdl_display_load_font(game->display, asset_path)) {
         game->error_str = "Failed to load font";
         return 0;

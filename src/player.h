@@ -5,7 +5,7 @@
 #include "point.h"
 #include "grid.h"
 #include "input.h"
-#include "animation.h"
+#include "draw/animation.h"
 
 #include <stdint.h>
 
