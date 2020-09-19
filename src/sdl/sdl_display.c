@@ -124,7 +124,7 @@ int rr_sdl_display_load_font(rrSDLDisplay* display, const char* path) {
     if (display->_font)
         TTF_CloseFont(display->_font);
 
-    display->_font = TTF_OpenFont(path, 18);
+    display->_font = TTF_OpenFont(path, 8);
     rr_sdl_renderer_set_font(display->renderer, display->_font);
 
     return display->_font != NULL;
