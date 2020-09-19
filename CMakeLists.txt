@@ -13,7 +13,7 @@ set(game_src
 	src/enemy.h src/enemy.c
 	src/entity.h src/entity.c
 	src/spawner.h src/spawner.c
-	src/animation.h
+		src/draw/animation.h
 	src/util.h src/util.c
 	src/clock.h src/clock.c
 	src/vec2.c src/vec2.h
@@ -32,8 +32,8 @@ set(ui_src
 set(sdl_src
 	src/sdl/sdl_input.h src/sdl/sdl_input.c
 	src/sdl/sdl_display.h src/sdl/sdl_display.c
-	src/sdl/sdl_animation.c src/sdl/sdl_animation.h
-	src/sdl/sdl_game.h src/sdl/sdl_game.c
+		src/draw/animation.c
+		src/sdl/sdl_game.h src/sdl/sdl_game.c
 	src/sdl/sdl_renderer.h src/sdl/sdl_renderer.c)
 
 set(platform_src

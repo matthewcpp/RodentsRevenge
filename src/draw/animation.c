@@ -1,10 +1,9 @@
-#include "../animation.h"
-#include "sdl_animation.h"
+#include "animation.h"
 
 #include <stdlib.h>
 #include <string.h>
 
-rrAnimation* rr_sdl_animation_create(rrSpritesheet* spritesheet, int frame_count, rrSprite** frames, int frame_time) {
+rrAnimation* rr_animation_create(rrSpritesheet* spritesheet, int frame_count, rrSprite** frames, int frame_time) {
     rrAnimation* animation = malloc(sizeof(rrAnimation));
 
     animation->frame_index = 0;
@@ -19,11 +18,11 @@ rrAnimation* rr_sdl_animation_create(rrSpritesheet* spritesheet, int frame_count
     return animation;
 }
 
-rrSprite* rr_sdl_animation_get_current_sprite(rrAnimation* animation) {
+rrSprite* rr_animation_get_current_sprite(rrAnimation* animation) {
     return animation->frames[animation->frame_index];
 }
 
-void rr_sdl_animation_destroy(rrAnimation* animation) {
+void rr_animation_destroy(rrAnimation* animation) {
     free(animation->frames);
     free(animation);
 }

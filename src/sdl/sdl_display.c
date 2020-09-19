@@ -1,5 +1,5 @@
 #include "sdl_display.h"
-#include "sdl_animation.h"
+#include "../draw/animation.h"
 #include "sdl_renderer.h"
 
 #include "../enemy.h"
@@ -55,7 +55,7 @@ rrSDLDisplay* rr_sdl_display_create(SDL_Window* window, rrGame* game, rrInput* i
 }
 
 void rr_sdl_display_destroy(rrSDLDisplay* display) {
-    rr_sdl_animation_destroy(rr_game_get_player(display->_game)->death_animation);
+    rr_animation_destroy(rr_game_get_player(display->_game)->death_animation);
 
     SDL_DestroyRenderer(display->sdl_renderer);
 
@@ -115,7 +115,7 @@ int rr_sdl_display_load_spritesheet(rrSDLDisplay* display, const char* path) {
     frames[3] = display->spritesheet.sprites[RR_SPRITE_PLAYER_DEATH4];
     frames[4] = display->spritesheet.sprites[RR_SPRITE_PLAYER_DEATH5];
 
-    rr_game_get_player(display->_game)->death_animation = rr_sdl_animation_create(&display->spritesheet, 5, frames, 100);
+    rr_game_get_player(display->_game)->death_animation = rr_animation_create(&display->spritesheet, 5, frames, 100);
 
     return 1;
 }
@@ -181,7 +181,7 @@ void rr_sdl_display_draw_player(rrSDLDisplay* display, rrPlayer* player) {
             break;
 
         case RR_STATUS_DYING:
-            sprite = rr_sdl_animation_get_current_sprite(player->death_animation);
+            sprite = rr_animation_get_current_sprite(player->death_animation);
             break;
 
         default:
