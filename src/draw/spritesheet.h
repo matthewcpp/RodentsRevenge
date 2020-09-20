@@ -1,5 +1,5 @@
-#ifndef RR_SPRITESHEET_H
-#define RR_SPRITESHEET_H
+#ifndef RR_SPRITESHEET_INDEXSHEET_H
+#define RR_SPRITESHEET_INDEXSHEET_H
 
 #include "../draw/renderer.h"
 

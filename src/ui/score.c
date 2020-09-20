@@ -11,11 +11,6 @@ void rr_ui_score_init(rrUiScore* score, rrPoint* offset, rrGame* game, rrRendere
     rr_point_copy(&score->offset, offset);
 }
 
-void rr_ui_score_uninit(rrUiScore* score) {
-    if (score->sprite)
-        rr_renderer_destroy_sprite(score->_renderer, score->sprite);
-}
-
 void rr_ui_score_update(rrUiScore* score) {
     rrPlayer* player = rr_game_get_player(score->_game);
 
@@ -25,12 +20,16 @@ void rr_ui_score_update(rrUiScore* score) {
         char buffer[8];
         sprintf(buffer, "%d", player->score);
 
-        if (score->sprite)
-            rr_renderer_destroy_sprite(score->_renderer, score->sprite);
+        if (score->sprite == NULL){
+            score->sprite = rr_renderer_create_text(score->_renderer, 0, buffer);
+            rr_color_black(&color);
+            rr_renderer_set_sprite_tint_color(score->_renderer, score->sprite, &color);
+        }
+        else {
+            rr_renderer_update_text_sprite(score->_renderer, score->sprite, 0, buffer);
+        }
 
-        score->sprite = rr_renderer_create_text(score->_renderer, 0, buffer);
-        rr_color_black(&color);
-        rr_renderer_set_sprite_tint_color(score->_renderer, score->sprite, &color);
+
 
         rr_renderer_get_screen_size(score->_renderer, &screen_size);
         rr_point_set(&score->pos, screen_size.x - score->sprite->rect.w, 0);

@@ -14,7 +14,6 @@ typedef struct {
 }rrUiScore;
 
 void rr_ui_score_init(rrUiScore* score, rrPoint* top_right_offset, rrGame* game, rrRenderer* renderer);
-void rr_ui_score_uninit(rrUiScore* score);
 void rr_ui_score_update(rrUiScore* score);
 void rr_ui_score_draw(rrUiScore* score);
 

@@ -20,7 +20,6 @@ typedef struct {
 } rrGameUi;
 
 rrGameUi* rr_game_ui_create(rrGame* game, rrRenderer* renderer, rrInput* input, rrSpritesheet* spritesheet);
-void rr_game_ui_destroy(rrGameUi* ui);
 void rr_game_ui_update(rrGameUi* ui);
 void rr_game_ui_draw(rrGameUi* ui);
 

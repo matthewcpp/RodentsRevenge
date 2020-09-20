@@ -7,7 +7,8 @@
 #include "../ui/game_ui.h"
 #include "../ui/title_ui.h"
 #include "../draw/spritesheet.h"
-#include "../draw/sprites.h"
+#include "../assets.h"
+#include "../util.h"
 
 #include <SDL_image.h>
 
@@ -27,7 +28,6 @@ struct rrSDLDisplay{
     SDL_Window* _window;
     SDL_Renderer* sdl_renderer;
     rrSpritesheet spritesheet;
-    rrSprite* app_icon;
     TTF_Font* _font;
 
     rrPoint _map_pos;
@@ -68,12 +68,8 @@ rrSDLDisplay* rr_sdl_display_create(SDL_Window* window, rrGame* game, rrInput* i
 void rr_sdl_display_destroy(rrSDLDisplay* display) {
     rr_animation_destroy(rr_game_get_player(display->_game)->death_animation);
 
-    SDL_DestroyRenderer(display->sdl_renderer);
-
-    if (display->game_ui)
-        rr_game_ui_destroy(display->game_ui);
-
     rr_sdl_renderer_destroy(display->renderer);
+    SDL_DestroyRenderer(display->sdl_renderer);
 
     if (display->_font)
         TTF_CloseFont(display->_font);
@@ -83,7 +79,7 @@ void rr_sdl_display_destroy(rrSDLDisplay* display) {
     free(display);
 }
 
-void rr_sdl_display_add_sprite_info(rrSDLDisplay* display, SpriteIndex index, int x, int y, int w, int h) {
+void rr_sdl_display_add_sprite_info(rrSDLDisplay* display, rrSpriteSheetIndex index, int x, int y, int w, int h) {
     rrRect rect;
     rect.x = x;
     rect.y = y;
@@ -93,51 +89,69 @@ void rr_sdl_display_add_sprite_info(rrSDLDisplay* display, SpriteIndex index, in
     rr_spritesheet_add_sprite(&display->spritesheet, index, &rect);
 }
 
-void rr_sdl_display_add_tile_sprite_info(rrSDLDisplay* display, SpriteIndex index, int x, int y) {
+void rr_sdl_display_add_tile_sprite_info(rrSDLDisplay* display, rrSpriteSheetIndex index, int x, int y) {
     rr_sdl_display_add_sprite_info(display, index, x, y, 16, 16);
 }
 
-int rr_sdl_display_load_app_icon(rrSDLDisplay* display, const char* path) {
-    display->app_icon = rr_renderer_load_sprite(display->renderer, path);
+void rr_sdl_display_init_spritesheet(rrSDLDisplay* display) {
+    rr_spritesheet_init(&display->spritesheet, display->renderer->sprites[RR_SPRITE_SPRITESHEET], RR_SPRITESHEET_INDEX_COUNT);
 
-    return display->app_icon != NULL;
+    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_BLOCK, 18, 0);
+    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_MOUSE, 54, 34);
+    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_WALL, 36, 0);
+    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_CAT, 85, 52);
+    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_CAT_WAIT, 0, 36);
+    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_CHEESE, 36, 54);
+    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_REMAINING_LIFE, 36, 18);
+    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_HOLE, 0, 0);
+    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_STUCK_PLAYER, 0, 54);
+    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_MOUSETRAP, 18, 54);
+    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_PLAYER_DEATH1, 18, 36);
+    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_PLAYER_DEATH2, 54, 54);
+    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_PLAYER_DEATH3, 36, 36);
+    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_PLAYER_DEATH4, 0, 18);
+    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_PLAYER_DEATH5, 18, 18);
+    rr_sdl_display_add_sprite_info(display, RR_SPRITESHEET_INDEX_CLOCK, 54, 0, 29, 32);
 }
 
-int rr_sdl_display_load_spritesheet(rrSDLDisplay* display, const char* path) {
-    rrSprite* frames[5];
-    rrSprite* sprite = rr_renderer_load_sprite(display->renderer, path);
-    if (!sprite)
+void rr_sdl_display_init_animation(rrSDLDisplay* display) {
+    rrSprite* animation_frames[5];
+
+    animation_frames[0] = display->spritesheet.sprites[RR_SPRITESHEET_INDEX_PLAYER_DEATH1];
+    animation_frames[1] = display->spritesheet.sprites[RR_SPRITESHEET_INDEX_PLAYER_DEATH2];
+    animation_frames[2] = display->spritesheet.sprites[RR_SPRITESHEET_INDEX_PLAYER_DEATH3];
+    animation_frames[3] = display->spritesheet.sprites[RR_SPRITESHEET_INDEX_PLAYER_DEATH4];
+    animation_frames[4] = display->spritesheet.sprites[RR_SPRITESHEET_INDEX_PLAYER_DEATH5];
+
+    rr_game_get_player(display->_game)->death_animation = rr_animation_create(&display->spritesheet, 5, animation_frames, 100);
+}
+
+int rr_sdl_display_load_sprites(rrSDLDisplay* display, const char* base_dir) {
+    rrSprite* sprite;
+    char asset_path[256];
+    sprintf(asset_path, "%s%s%s", base_dir, rr_path_sep(), "spritesheet.png");
+
+    sprite = rr_renderer_load_sprite(display->renderer, asset_path);
+    if (sprite) {
+        display->renderer->sprites[RR_SPRITE_SPRITESHEET] = sprite;
+        rr_sdl_display_init_spritesheet(display);
+        rr_sdl_display_init_animation(display);
+    }
+    else {
         return 0;
+    }
 
-    rr_spritesheet_init(&display->spritesheet, sprite, RR_SPRITE_COUNT);
+    sprintf(asset_path, "%s%s%s", base_dir, rr_path_sep(), "logo.png");
+    sprite = rr_renderer_load_sprite(display->renderer, asset_path);
 
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITE_BLOCK, 18, 0);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITE_MOUSE, 54, 34);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITE_WALL, 36, 0);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITE_CAT, 85, 52);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITE_CAT_WAIT, 0, 36);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITE_CHEESE, 36, 54);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITE_REMAINING_LIFE, 36, 18);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITE_HOLE, 0, 0);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITE_STUCK_PLAYER, 0, 54);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITE_MOUSETRAP, 18, 54);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITE_PLAYER_DEATH1, 18, 36);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITE_PLAYER_DEATH2, 54, 54);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITE_PLAYER_DEATH3, 36, 36);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITE_PLAYER_DEATH4, 0, 18);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITE_PLAYER_DEATH5, 18, 18);
-    rr_sdl_display_add_sprite_info(display, RR_SPRITE_CLOCK, 54, 0, 29, 32);
-
-    frames[0] = display->spritesheet.sprites[RR_SPRITE_PLAYER_DEATH1];
-    frames[1] = display->spritesheet.sprites[RR_SPRITE_PLAYER_DEATH2];
-    frames[2] = display->spritesheet.sprites[RR_SPRITE_PLAYER_DEATH3];
-    frames[3] = display->spritesheet.sprites[RR_SPRITE_PLAYER_DEATH4];
-    frames[4] = display->spritesheet.sprites[RR_SPRITE_PLAYER_DEATH5];
-
-    rr_game_get_player(display->_game)->death_animation = rr_animation_create(&display->spritesheet, 5, frames, 100);
+    if (sprite)
+        display->renderer->sprites[RR_SPRITE_TITLE_LOGO] = sprite;
+    else
+        return 0;
 
     return 1;
 }
+
 
 int rr_sdl_display_load_font(rrSDLDisplay* display, const char* path) {
     if (display->_font)
@@ -161,7 +175,7 @@ void rr_sdl_display_draw_board_background(rrSDLDisplay* display) {
 }
 
 void rr_sdl_display_draw_enemy(rrSDLDisplay* display, rrEnemy* enemy) {
-    SpriteIndex sprite_index;
+    rrSpriteSheetIndex sprite_index;
     rrPoint draw_pos;
     rr_point_copy(&draw_pos, &display->_map_pos);
     draw_pos.x += enemy->entity.position.x * RR_RENDERER_TILE_SIZE;
@@ -169,11 +183,11 @@ void rr_sdl_display_draw_enemy(rrSDLDisplay* display, rrEnemy* enemy) {
 
     switch (enemy->entity.status) {
         case RR_STATUS_ACTIVE:
-            sprite_index = RR_SPRITE_CAT;
+            sprite_index = RR_SPRITESHEET_INDEX_CAT;
             break;
 
         case RR_STATUS_WAITING:
-            sprite_index = RR_SPRITE_CAT_WAIT;
+            sprite_index = RR_SPRITESHEET_INDEX_CAT_WAIT;
             break;
 
         default:
@@ -192,11 +206,11 @@ void rr_sdl_display_draw_player(rrSDLDisplay* display, rrPlayer* player) {
 
     switch (player->entity.status) {
         case RR_STATUS_ACTIVE:
-            sprite = display->spritesheet.sprites[RR_SPRITE_MOUSE];
+            sprite = display->spritesheet.sprites[RR_SPRITESHEET_INDEX_MOUSE];
             break;
 
         case RR_STATUS_STUCK:
-            sprite = display->spritesheet.sprites[RR_SPRITE_STUCK_PLAYER];
+            sprite = display->spritesheet.sprites[RR_SPRITESHEET_INDEX_STUCK_PLAYER];
             break;
 
         case RR_STATUS_DYING:
@@ -210,7 +224,7 @@ void rr_sdl_display_draw_player(rrSDLDisplay* display, rrPlayer* player) {
     rr_renderer_draw_sprite(display->renderer, sprite, &draw_pos);
 }
 
-void rr_sdl_display_draw_basic_block(rrSDLDisplay* display, SpriteIndex sprite, rrPoint* cell) {
+void rr_sdl_display_draw_basic_block(rrSDLDisplay* display, rrSpriteSheetIndex sprite, rrPoint* cell) {
     rrPoint draw_pos;
     rr_point_copy(&draw_pos, &display->_map_pos);
     draw_pos.x += cell->x * RR_RENDERER_TILE_SIZE;
@@ -230,23 +244,23 @@ void rr_sdl_display_draw_entities(rrSDLDisplay* display) {
 
             switch (entity->type) {
                 case RR_ENTITY_WALL:
-                    rr_sdl_display_draw_basic_block(display, RR_SPRITE_WALL, &cell);
+                    rr_sdl_display_draw_basic_block(display, RR_SPRITESHEET_INDEX_WALL, &cell);
                     break;
 
                 case RR_ENTITY_BLOCK:
-                    rr_sdl_display_draw_basic_block(display, RR_SPRITE_BLOCK, &cell);
+                    rr_sdl_display_draw_basic_block(display, RR_SPRITESHEET_INDEX_BLOCK, &cell);
                     break;
 
                 case RR_ENTITY_CHEESE:
-                    rr_sdl_display_draw_basic_block(display, RR_SPRITE_CHEESE, &cell);
+                    rr_sdl_display_draw_basic_block(display, RR_SPRITESHEET_INDEX_CHEESE, &cell);
                     break;
 
                 case RR_ENTITY_HOLE:
-                    rr_sdl_display_draw_basic_block(display, RR_SPRITE_HOLE, &cell);
+                    rr_sdl_display_draw_basic_block(display, RR_SPRITESHEET_INDEX_HOLE, &cell);
                     break;
 
                 case RR_ENTITY_TRAP:
-                    rr_sdl_display_draw_basic_block(display, RR_SPRITE_MOUSETRAP, &cell);
+                    rr_sdl_display_draw_basic_block(display, RR_SPRITESHEET_INDEX_MOUSETRAP, &cell);
                     break;
 
                 case RR_ENTITY_ENEMY:
@@ -294,7 +308,7 @@ void rr_sdl_display_draw_title_screen(rrSDLDisplay* display){
     SDL_RenderClear(display->sdl_renderer);
 
     if (!display->title_ui) {
-        display->title_ui = rr_title_ui_create(display->app_icon, display->renderer, display->_game, display->input);
+        display->title_ui = rr_title_ui_create(display->renderer, display->_game, display->input);
         rr_ui_button_set_callback(&display->title_ui->buttons[0], rr_sdl_display_on_new_game, display);
     }
 
