@@ -29,8 +29,7 @@ set(ui_src
 	src/ui/clock.h src/ui/clock.c
 	src/ui/game_ui.h src/ui/game_ui.c
 	src/ui/title_ui.h src/ui/title_ui.c
-	src/ui/menu.h src/ui/menu.c
-	src/ui/button.h src/ui/button.c
+        src/ui/button.h src/ui/button.c
 	src/ui/score.h src/ui/score.c
 	src/ui/lives.h src/ui/lives.c)
 
