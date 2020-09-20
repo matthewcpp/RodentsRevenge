@@ -1,4 +1,5 @@
 #include "score.h"
+#include "../assets.h"
 
 #include <stdio.h>
 
@@ -21,12 +22,12 @@ void rr_ui_score_update(rrUiScore* score) {
         sprintf(buffer, "%d", player->score);
 
         if (score->sprite == NULL){
-            score->sprite = rr_renderer_create_text(score->_renderer, 0, buffer);
+            score->sprite = rr_renderer_create_text(score->_renderer, RR_FONT_SCORE, buffer);
             rr_color_black(&color);
             rr_renderer_set_sprite_tint_color(score->_renderer, score->sprite, &color);
         }
         else {
-            rr_renderer_update_text_sprite(score->_renderer, score->sprite, 0, buffer);
+            rr_renderer_update_text_sprite(score->_renderer, score->sprite, RR_FONT_SCORE, buffer);
         }
 
 
@@ -38,5 +39,10 @@ void rr_ui_score_update(rrUiScore* score) {
 }
 
 void rr_ui_score_draw(rrUiScore* score) {
-    rr_renderer_draw_sprite(score->_renderer, score->sprite, &score->pos);
+    rrPoint draw_pos;
+    rr_point_copy(&draw_pos, &score->pos);
+
+    rr_renderer_draw_sprite(score->_renderer, score->sprite, &draw_pos);
+    draw_pos.x += 1;
+    rr_renderer_draw_sprite(score->_renderer, score->sprite, &draw_pos);
 }

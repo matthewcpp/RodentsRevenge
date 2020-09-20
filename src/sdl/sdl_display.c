@@ -28,7 +28,6 @@ struct rrSDLDisplay{
     SDL_Window* _window;
     SDL_Renderer* sdl_renderer;
     rrSpritesheet spritesheet;
-    TTF_Font* _font;
 
     rrPoint _map_pos;
     rrPoint window_size;
@@ -50,7 +49,6 @@ rrSDLDisplay* rr_sdl_display_create(SDL_Window* window, rrGame* game, rrInput* i
     display->renderer = rr_sdl_renderer_create(display->sdl_renderer);
     display->display_screen = RR_SCREEN_TITLE;
 
-    display->_font = NULL;
     display->game_ui = NULL;
     display->title_ui = NULL;
 
@@ -70,9 +68,6 @@ void rr_sdl_display_destroy(rrSDLDisplay* display) {
 
     rr_sdl_renderer_destroy(display->renderer);
     SDL_DestroyRenderer(display->sdl_renderer);
-
-    if (display->_font)
-        TTF_CloseFont(display->_font);
 
     TTF_Quit();
 
@@ -126,10 +121,10 @@ void rr_sdl_display_init_animation(rrSDLDisplay* display) {
     rr_game_get_player(display->_game)->death_animation = rr_animation_create(&display->spritesheet, 5, animation_frames, 100);
 }
 
-int rr_sdl_display_load_sprites(rrSDLDisplay* display, const char* base_dir) {
+int rr_sdl_display_load_sprites(rrSDLDisplay* display, const char* asset_dir) {
     rrSprite* sprite;
     char asset_path[256];
-    sprintf(asset_path, "%s%s%s", base_dir, rr_path_sep(), "spritesheet.png");
+    sprintf(asset_path, "%s%s%s", asset_dir, rr_path_sep(), "spritesheet.png");
 
     sprite = rr_renderer_load_sprite(display->renderer, asset_path);
     if (sprite) {
@@ -141,7 +136,7 @@ int rr_sdl_display_load_sprites(rrSDLDisplay* display, const char* base_dir) {
         return 0;
     }
 
-    sprintf(asset_path, "%s%s%s", base_dir, rr_path_sep(), "logo.png");
+    sprintf(asset_path, "%s%s%s", asset_dir, rr_path_sep(), "logo.png");
     sprite = rr_renderer_load_sprite(display->renderer, asset_path);
 
     if (sprite)
@@ -153,14 +148,25 @@ int rr_sdl_display_load_sprites(rrSDLDisplay* display, const char* base_dir) {
 }
 
 
-int rr_sdl_display_load_font(rrSDLDisplay* display, const char* path) {
-    if (display->_font)
-        TTF_CloseFont(display->_font);
+int rr_sdl_display_load_fonts(rrSDLDisplay* display, const char* asset_dir) {
+    TTF_Font* font;
+    char asset_path[256];
+    sprintf(asset_path, "%s%s%s", asset_dir, rr_path_sep(), "ms-sans-serif.ttf");
 
-    display->_font = TTF_OpenFont(path, 24);
-    rr_sdl_renderer_set_font(display->renderer, display->_font);
+    font = TTF_OpenFont(asset_path, 24);
+    if (font)
+        display->renderer->fonts[RR_FONT_TITLE] = font;
+    else
+        return 0;
 
-    return display->_font != NULL;
+    font = TTF_OpenFont(asset_path, 16);
+    if (font)
+        display->renderer->fonts[RR_FONT_BUTTON] = font;
+    else
+        return 0;
+
+
+    return 1;
 }
 
 void rr_sdl_display_draw_board_background(rrSDLDisplay* display) {

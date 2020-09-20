@@ -53,7 +53,7 @@ void rr_title_ui_layout(rrTitleUi* ui) {
     render_pos.y = 10;
     rr_ui_basic_sprite_init(&ui->app_icon, &render_pos, app_icon, ui->_renderer);
 
-    app_text_sprite = rr_renderer_create_text(ui->_renderer, 0, "Rodent's Revenge");
+    app_text_sprite = rr_renderer_create_text(ui->_renderer, RR_FONT_TITLE, "Rodent's Revenge");
     rr_color_black(&color);
     rr_renderer_set_sprite_tint_color(ui->_renderer, app_text_sprite, &color);
     render_pos.y += ui->app_icon.sprite->rect.h + 10;

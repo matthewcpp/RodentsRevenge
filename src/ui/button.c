@@ -1,4 +1,5 @@
 #include "button.h"
+#include "../assets.h"
 
 #include <stddef.h>
 
@@ -11,7 +12,7 @@ void rr_ui_button_init(rrUiButton* button, rrRenderer* renderer, const char* tex
     button->_renderer = renderer;
     rr_point_copy(&button->pos, pos);
 
-    button->sprite = rr_renderer_create_text(renderer, 0, text);
+    button->sprite = rr_renderer_create_text(renderer, RR_FONT_BUTTON, text);
     rr_renderer_set_sprite_tint_color(renderer, button->sprite, &color);
 
     button->active = 0;

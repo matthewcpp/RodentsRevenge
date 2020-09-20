@@ -14,6 +14,7 @@ rrRenderer* rr_sdl_renderer_create(SDL_Renderer* sdl_renderer) {
 
     renderer->text_sprites = cutil_vector_create(cutil_trait_ptr());
     renderer->sprites = calloc(RR_SPRITE_COUNT, sizeof(rrSprite*));
+    renderer->fonts = calloc(RR_FONT_COUNT, sizeof(TTF_Font*));
     return renderer;
 }
 
@@ -35,10 +36,16 @@ void rr_sdl_renderer_destroy(rrRenderer* renderer) {
             free(sprite);
         }
     }
-}
 
-void rr_sdl_renderer_set_font(rrRenderer* renderer, TTF_Font* font) {
-    renderer->font = font;
+    for (i = 0; i < RR_FONT_COUNT; i++) {
+        TTF_Font* font = renderer->fonts[i];
+        if (font)
+            TTF_CloseFont(font);
+    }
+
+    free(renderer->sprites);
+    free(renderer->fonts);
+    cutil_vector_destroy(renderer->text_sprites);
 }
 
 void rr_sdl_renderer_set_screen_size(rrRenderer* renderer, rrPoint* screen_size) {
@@ -87,7 +94,7 @@ void rr_renderer_create_text_texture(rrRenderer* renderer, rrSprite* text_sprite
     SDL_Color color={255,255,255, 255};
 
     (void)font;
-    text_surface = TTF_RenderUTF8_Solid (renderer->font, text, color);
+    text_surface = TTF_RenderUTF8_Solid (renderer->fonts[font], text, color);
     text_sprite->handle = SDL_CreateTextureFromSurface(renderer->renderer, text_surface);
     SDL_FreeSurface(text_surface);
     SDL_QueryTexture(text_sprite->handle, NULL, NULL, &text_sprite->rect.w, &text_sprite->rect.h);
