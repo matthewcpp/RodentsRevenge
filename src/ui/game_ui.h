@@ -5,7 +5,6 @@
 #include "../draw/renderer.h"
 #include "../draw/spritesheet.h"
 
-#include "menu.h"
 #include "score.h"
 #include "clock.h"
 #include "lives.h"
@@ -15,7 +14,6 @@ typedef struct {
     rrRenderer* renderer;
     rrInput* input;
 
-    rrUiMenu menu;
     rrUiScore score;
     rrUiClock clock;
     rrUILives lives;

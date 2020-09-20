@@ -69,6 +69,12 @@ int rr_sdl_game_init(rrSDLGame* game, int screen_width, int screen_height) {
         return 0;
     }
 
+    sprintf(asset_path, "%s%s%s", game->asset_path, rr_path_sep(), "logo.png");
+    if (!rr_sdl_display_load_app_icon(game->display, asset_path)) {
+        game->error_str = "Failed to load logo";
+        return 0;
+    }
+
     sprintf(asset_path, "%s%s%s", game->asset_path, rr_path_sep(), "ms-sans-serif.ttf");
     if (!rr_sdl_display_load_font(game->display, asset_path)) {
         game->error_str = "Failed to load font";

@@ -5,6 +5,7 @@
 #include "../enemy.h"
 #include "../vec2.h"
 #include "../ui/game_ui.h"
+#include "../ui/title_ui.h"
 #include "../draw/spritesheet.h"
 #include "../draw/sprites.h"
 
@@ -26,6 +27,7 @@ struct rrSDLDisplay{
     SDL_Window* _window;
     SDL_Renderer* sdl_renderer;
     rrSpritesheet spritesheet;
+    rrSprite* app_icon;
     TTF_Font* _font;
 
     rrPoint _map_pos;
@@ -34,6 +36,7 @@ struct rrSDLDisplay{
 
     rrRenderer* renderer;
     rrGameUi* game_ui;
+    rrTitleUi* title_ui;
     rrInput* input;
 };
 
@@ -49,6 +52,7 @@ rrSDLDisplay* rr_sdl_display_create(SDL_Window* window, rrGame* game, rrInput* i
 
     display->_font = NULL;
     display->game_ui = NULL;
+    display->title_ui = NULL;
 
     TTF_Init();
 
@@ -66,7 +70,9 @@ void rr_sdl_display_destroy(rrSDLDisplay* display) {
 
     SDL_DestroyRenderer(display->sdl_renderer);
 
-    rr_game_ui_destroy(display->game_ui);
+    if (display->game_ui)
+        rr_game_ui_destroy(display->game_ui);
+
     rr_sdl_renderer_destroy(display->renderer);
 
     if (display->_font)
@@ -89,6 +95,12 @@ void rr_sdl_display_add_sprite_info(rrSDLDisplay* display, SpriteIndex index, in
 
 void rr_sdl_display_add_tile_sprite_info(rrSDLDisplay* display, SpriteIndex index, int x, int y) {
     rr_sdl_display_add_sprite_info(display, index, x, y, 16, 16);
+}
+
+int rr_sdl_display_load_app_icon(rrSDLDisplay* display, const char* path) {
+    display->app_icon = rr_renderer_load_sprite(display->renderer, path);
+
+    return display->app_icon != NULL;
 }
 
 int rr_sdl_display_load_spritesheet(rrSDLDisplay* display, const char* path) {
@@ -131,7 +143,7 @@ int rr_sdl_display_load_font(rrSDLDisplay* display, const char* path) {
     if (display->_font)
         TTF_CloseFont(display->_font);
 
-    display->_font = TTF_OpenFont(path, 8);
+    display->_font = TTF_OpenFont(path, 24);
     rr_sdl_renderer_set_font(display->renderer, display->_font);
 
     return display->_font != NULL;
@@ -255,7 +267,7 @@ void rr_sdl_display_draw_entities(rrSDLDisplay* display) {
 void rr_sdl_display_draw_game_scren(rrSDLDisplay* display) {
     if (display->game_ui == NULL){
         display->game_ui = rr_game_ui_create(display->_game, display->renderer, display->input, &display->spritesheet);
-        display->_map_pos.y = display->game_ui->menu.bar_height + display->game_ui->clock._sprite->rect.h + 20;
+        display->_map_pos.y =  display->game_ui->clock._sprite->rect.h + 20;
     }
 
 
@@ -272,8 +284,25 @@ void rr_sdl_display_draw_game_scren(rrSDLDisplay* display) {
     SDL_RenderPresent(display->sdl_renderer);
 }
 
-void rr_sdl_display_draw_title_screen(rrSDLDisplay* display){
+void rr_sdl_display_on_new_game(void* user_data) {
+    rrSDLDisplay* display = (rrSDLDisplay*)user_data;
+    display->display_screen = RR_SCREEN_GAME;
+}
 
+void rr_sdl_display_draw_title_screen(rrSDLDisplay* display){
+    SDL_SetRenderDrawColor(display->sdl_renderer, 195, 195, 195, 255);
+    SDL_RenderClear(display->sdl_renderer);
+
+    if (!display->title_ui) {
+        display->title_ui = rr_title_ui_create(display->app_icon, display->renderer, display->_game, display->input);
+        rr_ui_button_set_callback(&display->title_ui->buttons[0], rr_sdl_display_on_new_game, display);
+    }
+
+
+    rr_title_ui_update(display->title_ui);
+    rr_title_ui_draw(display->title_ui);
+
+    SDL_RenderPresent(display->sdl_renderer);
 }
 
 void rr_sdl_display_draw(rrSDLDisplay* display) {

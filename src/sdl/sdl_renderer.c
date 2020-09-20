@@ -47,6 +47,10 @@ void rr_renderer_fill_rect(rrRenderer* renderer, rrRect* rect) {
     SDL_RenderFillRect(renderer->renderer, (SDL_Rect*)rect);
 }
 
+void rr_renderer_draw_rect(rrRenderer* renderer, rrRect* rect) {
+    SDL_RenderDrawRect(renderer->renderer, (SDL_Rect*)rect);
+}
+
 rrSprite* rr_renderer_load_sprite(rrRenderer* renderer, const char* path) {
     SDL_Surface* surface = IMG_Load(path);
     SDL_Texture* texture;
@@ -138,4 +142,11 @@ void rr_color_red(rrColor* color) {
     color->g = 0;
     color->b = 0;
     color->a = 255;
+}
+
+void rr_color_set(rrColor*color, unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
+    color->r = r;
+    color->g = g;
+    color->b = b;
+    color->a = a;
 }
