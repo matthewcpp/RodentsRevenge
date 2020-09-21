@@ -34,7 +34,6 @@ rrSDLGame* rr_sdl_game_create(const char* asset_path) {
 
 int rr_sdl_game_init(rrSDLGame* game, int screen_width, int screen_height) {
     int result;
-    char asset_path[256];
 
     srand ((unsigned int)time(NULL));
 
@@ -63,21 +62,13 @@ int rr_sdl_game_init(rrSDLGame* game, int screen_width, int screen_height) {
     game->game = rr_game_create(game->input, game->asset_path);
     game->display = rr_sdl_display_create(game->window, game->game, game->input);
 
-    sprintf(asset_path, "%s%s%s", game->asset_path, rr_path_sep(), "spritesheet.png");
-    if (!rr_sdl_display_load_spritesheet(game->display, asset_path)) {
-        game->error_str = "Failed to load spritesheet";
+    if (!rr_sdl_display_load_sprites(game->display, game->asset_path)) {
+        game->error_str = "Failed to load sprites";
         return 0;
     }
 
-    sprintf(asset_path, "%s%s%s", game->asset_path, rr_path_sep(), "logo.png");
-    if (!rr_sdl_display_load_app_icon(game->display, asset_path)) {
-        game->error_str = "Failed to load logo";
-        return 0;
-    }
-
-    sprintf(asset_path, "%s%s%s", game->asset_path, rr_path_sep(), "ms-sans-serif.ttf");
-    if (!rr_sdl_display_load_font(game->display, asset_path)) {
-        game->error_str = "Failed to load font";
+    if (!rr_sdl_display_load_fonts(game->display, game->asset_path)) {
+        game->error_str = "Failed to load fonts";
         return 0;
     }
 

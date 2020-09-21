@@ -23,7 +23,7 @@ typedef struct {
 } rrTitleUi;
 
 /* TODO: UI should be able to get app icon on its own. */
-rrTitleUi* rr_title_ui_create(rrSprite* app_icon, rrRenderer* renderer, rrGame* game, rrInput* input);
+rrTitleUi* rr_title_ui_create(rrRenderer* renderer, rrGame* game, rrInput* input);
 
 void rr_title_ui_update(rrTitleUi* ui);
 void rr_title_ui_draw(rrTitleUi* ui);
