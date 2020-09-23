@@ -14,6 +14,8 @@ typedef struct {
 
     int current_level;
 
+    rrRect _layout_rect;
+
     rrUiBasicSprite level_prompt;
     rrUiBasicSprite level_text;
     rrUiButton ok_button;

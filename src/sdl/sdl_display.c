@@ -345,6 +345,7 @@ void rr_sdl_display_draw_level_select_screen(rrSDLDisplay* display){
         display->level_select_ui = rr_ui_level_select_create(display->_game, display->renderer, display->input);
     }
 
+    rr_title_ui_draw(display->title_ui);
     rr_ui_level_select_update(display->level_select_ui);
     rr_ui_level_select_draw(display->level_select_ui);
 

@@ -5,6 +5,9 @@
 
 rrPoint button_size = {225, 70};
 
+#define RR_UI_BUTTON_PADDING_H 25
+#define RR_UI_BUTTON_PADDING_V 15
+
 void rr_ui_button_init(rrUiButton* button, rrRenderer* renderer, const char* text, rrPoint* pos){
     rrColor color;
     rr_color_black(&color);
@@ -25,10 +28,7 @@ void rr_ui_button_draw(rrUiButton* button) {
     rrPoint text_point;
     rrColor color;
 
-    button_rect.x = button->element.position.x;
-    button_rect.y = button->element.position.y;
-    button_rect.w = button->sprite->rect.w + 50;
-    button_rect.h = button->sprite->rect.h + 30;
+    rr_ui_button_get_rect(button, &button_rect);
 
     rr_color_set(&color, 130, 130, 130, 255);
     rr_renderer_color(button->_renderer, &color);
@@ -56,8 +56,8 @@ void rr_ui_button_draw(rrUiButton* button) {
     rr_renderer_color(button->_renderer, &color);
     rr_renderer_draw_rect(button->_renderer, &button_rect);
 
-    text_point.x = button_rect.x + 25;
-    text_point.y = button_rect.y + 15;
+    text_point.x = button_rect.x + RR_UI_BUTTON_PADDING_H;
+    text_point.y = button_rect.y + RR_UI_BUTTON_PADDING_V;
     rr_renderer_draw_sprite(button->_renderer, button->sprite, &text_point);
 
     if (button->element.active) {
@@ -72,8 +72,8 @@ void rr_ui_button_draw(rrUiButton* button) {
 }
 
 void rr_ui_button_get_size(rrUiButton* button, rrPoint* size) {
-    size->x = button->sprite->rect.w + 50;
-    size->y = button->sprite->rect.h + 30;
+    size->x = button->sprite->rect.w + RR_UI_BUTTON_PADDING_H * 2;
+    size->y = button->sprite->rect.h + RR_UI_BUTTON_PADDING_V * 2;
 }
 
 void rr_ui_button_set_callback(rrUiButton* button, rrUiButtonCallbackFunc callback, void* user_data) {
@@ -85,4 +85,11 @@ void rr_ui_button_activate(rrUiButton* button) {
     if (button->_callback) {
         button->_callback(button->_user_data);
     }
+}
+
+void rr_ui_button_get_rect(rrUiButton* button, rrRect* rect) {
+    rect->x = button->element.position.x;
+    rect->y = button->element.position.y;
+    rect->w = button->sprite->rect.w + RR_UI_BUTTON_PADDING_H * 2;
+    rect->h = button->sprite->rect.h + RR_UI_BUTTON_PADDING_V * 2;
 }

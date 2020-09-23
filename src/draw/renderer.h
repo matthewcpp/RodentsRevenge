@@ -25,6 +25,10 @@ typedef struct
     int w, h;
 } rrRect;
 
+void rr_rect_encapsulate(rrRect* target, rrRect* rect);
+int rr_rect_right(rrRect* rect);
+int rr_rect_bottom(rrRect* rect);
+
 typedef struct {
     void* handle;
     rrRect rect;
