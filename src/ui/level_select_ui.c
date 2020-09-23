@@ -23,8 +23,26 @@ void rr_ui_level_select_delete(rrUILevelSelect* level_select) {
     rr_ui_active_alement_group_uninit(&level_select->element_group);
 }
 
+void rr_ui_level_select_update_active_level_text(rrUILevelSelect* level_select) {
+    if (rr_input_button_down(level_select->_input, RR_INPUT_BUTTON_DOWN))
+        rr_ui_active_alement_group_next(&level_select->element_group);
+}
+
+void rr_ui_level_select_update_active_buttons(rrUILevelSelect* level_select) {
+    if (rr_input_button_down(level_select->_input, RR_INPUT_BUTTON_RIGHT))
+        rr_ui_active_alement_group_next(&level_select->element_group);
+    else if (rr_input_button_down(level_select->_input, RR_INPUT_BUTTON_LEFT))
+        rr_ui_active_alement_group_previous(&level_select->element_group);
+    else if (rr_input_button_down(level_select->_input, RR_INPUT_BUTTON_UP))
+        rr_ui_active_alement_group_set(&level_select->element_group, 0);
+}
+
+
 void rr_ui_level_select_update(rrUILevelSelect* level_select) {
-    (void)level_select;
+    if (level_select->level_text.element.active)
+        rr_ui_level_select_update_active_level_text(level_select);
+    else
+        rr_ui_level_select_update_active_buttons(level_select);
 }
 
 void rr_ui_level_select_layout(rrUILevelSelect* level_select) {
@@ -74,6 +92,8 @@ void rr_level_select_draw_level_text(rrUILevelSelect* level_select) {
         rr_color_white(&color);
         rr_renderer_color(level_select->_renderer, &color);
         rr_renderer_fill_rect(level_select->_renderer, &text_rect);
+
+        rr_color_black(&color);
     }
 
     rr_renderer_set_sprite_tint_color(level_select->_renderer, level_select->level_text.sprite, &color);

@@ -17,6 +17,7 @@ typedef struct {
 void rr_ui_active_element_group_init(rrUiActiveElementGroup* element_group);
 void rr_ui_active_alement_group_uninit(rrUiActiveElementGroup* element_group);
 void rr_ui_active_alement_group_add(rrUiActiveElementGroup* element_group, rrUiElement* element);
+void rr_ui_active_alement_group_set(rrUiActiveElementGroup* element_group, int index);
 void rr_ui_active_alement_group_next(rrUiActiveElementGroup* element_group);
 void rr_ui_active_alement_group_previous(rrUiActiveElementGroup* element_group);
 
