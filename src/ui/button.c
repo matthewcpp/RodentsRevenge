@@ -10,12 +10,12 @@ void rr_ui_button_init(rrUiButton* button, rrRenderer* renderer, const char* tex
     rr_color_black(&color);
 
     button->_renderer = renderer;
-    rr_point_copy(&button->pos, pos);
+    rr_point_copy(&button->element.position, pos);
 
     button->sprite = rr_renderer_create_text(renderer, RR_FONT_BUTTON, text);
     rr_renderer_set_sprite_tint_color(renderer, button->sprite, &color);
 
-    button->active = 0;
+    button->element.active = 0;
     button->_callback = NULL;
     button->_user_data = NULL;
 }
@@ -25,8 +25,8 @@ void rr_ui_button_draw(rrUiButton* button) {
     rrPoint text_point;
     rrColor color;
 
-    button_rect.x = button->pos.x;
-    button_rect.y = button->pos.y;
+    button_rect.x = button->element.position.x;
+    button_rect.y = button->element.position.y;
     button_rect.w = button->sprite->rect.w + 50;
     button_rect.h = button->sprite->rect.h + 30;
 
@@ -60,7 +60,7 @@ void rr_ui_button_draw(rrUiButton* button) {
     text_point.y = button_rect.y + 15;
     rr_renderer_draw_sprite(button->_renderer, button->sprite, &text_point);
 
-    if (button->active) {
+    if (button->element.active) {
         rrRect active_rect;
         active_rect.x = text_point.x;
         active_rect.y = text_point.y;

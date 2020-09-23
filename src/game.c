@@ -13,7 +13,7 @@
 
 rrPoint starting_pos = {11,11};
 
-#define RR_LEVEL_COUNT 2
+#define RR_LEVEL_COUNT 4
 #define RR_CLOCK_WIND_SPEED_MOD 100
 
 struct rrGame {
@@ -285,4 +285,8 @@ int rr_game_set_active_level(rrGame* game, int level_num){
 
 rrGameState rr_game_get_state(rrGame* game) {
     return game->state;
+}
+
+int rr_game_get_level_count() {
+    return RR_LEVEL_COUNT;
 }

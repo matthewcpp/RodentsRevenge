@@ -16,14 +16,14 @@ rrTitleUi* rr_title_ui_create(rrRenderer* renderer, rrGame* game, rrInput* input
     rr_title_ui_layout(ui);
 
     ui->active_index = 0;
-    ui->buttons[ui->active_index].active = 1;
+    ui->buttons[ui->active_index].element.active = 1;
 
     return ui;
 }
 
 void rr_title_ui_set_active_index(rrTitleUi* ui, int index) {
-    ui->buttons[ui->active_index].active = 0;
-    ui->buttons[index].active = 1;
+    ui->buttons[ui->active_index].element.active = 0;
+    ui->buttons[index].element.active = 1;
     ui->active_index = index;
 }
 
@@ -64,13 +64,13 @@ void rr_title_ui_layout(rrTitleUi* ui) {
     render_pos.y += ui->app_text.sprite->rect.h + 15;
     rr_ui_button_init(button, ui->_renderer, "New Game", &render_pos);
     rr_ui_button_get_size(button, &button_size);
-    button->pos.x = screen_size.x / 2 - button_size.x / 2;
+    button->element.position.x = screen_size.x / 2 - button_size.x / 2;
 
     button = &ui->buttons[1];
     render_pos.y += button_size.y + 5;
     rr_ui_button_init(button, ui->_renderer, "Pick Level", &render_pos);
     rr_ui_button_get_size(button, &button_size);
-    button->pos.x = screen_size.x / 2 - button_size.x / 2;
+    button->element.position.x = screen_size.x / 2 - button_size.x / 2;
 }
 
 void rr_title_ui_draw(rrTitleUi* ui) {

@@ -2,14 +2,14 @@
 #define RR_BUTTON_H
 
 #include "../draw/renderer.h"
+#include "element.h"
 
 typedef void (*rrUiButtonCallbackFunc)(void* data);
 
 typedef struct {
-    rrPoint pos;
+    rrUiElement element;
     rrRenderer* _renderer;
     rrSprite* sprite;
-    int active;
 
     rrUiButtonCallbackFunc _callback;
     void* _user_data;
