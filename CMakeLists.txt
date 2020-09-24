@@ -20,18 +20,22 @@ set(game_src
 	src/pool.h src/pool.c)
 
 set(drawing_src
-	src/draw/renderer.h
+	src/draw/renderer.h src/draw/renderer.c
 	src/draw/spritesheet.h src/draw/spritesheet.c
 	src/draw/animation.h src/draw/animation.c)
 
 set(ui_src
+	src/ui/basic_rect.h src/ui/basic_rect.c
+	src/ui/common.h src/ui/common.c
+	src/ui/element.h src/ui/element.c
 	src/ui/basic_sprite.h src/ui/basic_sprite.c
 	src/ui/clock.h src/ui/clock.c
 	src/ui/game_ui.h src/ui/game_ui.c
 	src/ui/title_ui.h src/ui/title_ui.c
-        src/ui/button.h src/ui/button.c
+	src/ui/button.h src/ui/button.c
 	src/ui/score.h src/ui/score.c
-	src/ui/lives.h src/ui/lives.c)
+	src/ui/lives.h src/ui/lives.c
+	src/ui/level_select_ui.h src/ui/level_select_ui.c)
 
 set(sdl_src
 	src/sdl/sdl_input.h src/sdl/sdl_input.c

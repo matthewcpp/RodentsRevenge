@@ -2,14 +2,14 @@
 #define RR_BUTTON_H
 
 #include "../draw/renderer.h"
+#include "element.h"
 
 typedef void (*rrUiButtonCallbackFunc)(void* data);
 
 typedef struct {
-    rrPoint pos;
+    rrUiElement element;
     rrRenderer* _renderer;
     rrSprite* sprite;
-    int active;
 
     rrUiButtonCallbackFunc _callback;
     void* _user_data;
@@ -20,5 +20,6 @@ void rr_ui_button_draw(rrUiButton* button);
 void rr_ui_button_get_size(rrUiButton* button, rrPoint* size);
 void rr_ui_button_set_callback(rrUiButton* button, rrUiButtonCallbackFunc callback, void* user_data);
 void rr_ui_button_activate(rrUiButton* button);
+void rr_ui_button_get_rect(rrUiButton* button, rrRect* rect);
 
 #endif

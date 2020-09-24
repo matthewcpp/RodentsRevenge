@@ -30,8 +30,6 @@ void rr_ui_score_update(rrUiScore* score) {
             rr_renderer_update_text_sprite(score->_renderer, score->sprite, RR_FONT_SCORE, buffer);
         }
 
-
-
         rr_renderer_get_screen_size(score->_renderer, &screen_size);
         rr_point_set(&score->pos, screen_size.x - score->sprite->rect.w, 0);
         rr_point_add(&score->pos, &score->pos, &score->offset);

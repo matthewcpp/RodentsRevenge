@@ -15,6 +15,11 @@ void rr_point_add(rrPoint* out, rrPoint* a, rrPoint* b) {
     out->y = a->y + b->y;
 }
 
+void rr_point_add_and_assign(rrPoint* out, rrPoint* pt) {
+    out->x += pt->x;
+    out->y += pt->y;
+}
+
 void rr_point_sub(rrPoint* out, rrPoint* a, rrPoint* b) {
     out->x = a->x - b->x;
     out->y = a->y - b->y;

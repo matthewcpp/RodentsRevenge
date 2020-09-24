@@ -6,6 +6,7 @@
 #include "../vec2.h"
 #include "../ui/game_ui.h"
 #include "../ui/title_ui.h"
+#include "../ui/level_select_ui.h"
 #include "../draw/spritesheet.h"
 #include "../assets.h"
 #include "../util.h"
@@ -20,7 +21,8 @@
 
 typedef enum {
     RR_SCREEN_TITLE,
-    RR_SCREEN_GAME
+    RR_SCREEN_GAME,
+    RR_SCREEN_LEVEL_SELECT
 }rrDisplayScreen;
 
 struct rrSDLDisplay{
@@ -36,6 +38,7 @@ struct rrSDLDisplay{
     rrRenderer* renderer;
     rrGameUi* game_ui;
     rrTitleUi* title_ui;
+    rrUILevelSelect * level_select_ui;
     rrInput* input;
 };
 
@@ -51,6 +54,7 @@ rrSDLDisplay* rr_sdl_display_create(SDL_Window* window, rrGame* game, rrInput* i
 
     display->game_ui = NULL;
     display->title_ui = NULL;
+    display->level_select_ui = NULL;
 
     TTF_Init();
 
@@ -68,6 +72,9 @@ void rr_sdl_display_destroy(rrSDLDisplay* display) {
 
     rr_sdl_renderer_destroy(display->renderer);
     SDL_DestroyRenderer(display->sdl_renderer);
+
+    if (display->level_select_ui)
+        rr_ui_level_select_delete(display->level_select_ui);
 
     TTF_Quit();
 
@@ -309,6 +316,11 @@ void rr_sdl_display_on_new_game(void* user_data) {
     display->display_screen = RR_SCREEN_GAME;
 }
 
+void rr_sdl_display_on_level_select(void* user_data) {
+    rrSDLDisplay* display = (rrSDLDisplay*)user_data;
+    display->display_screen = RR_SCREEN_LEVEL_SELECT;
+}
+
 void rr_sdl_display_draw_title_screen(rrSDLDisplay* display){
     SDL_SetRenderDrawColor(display->sdl_renderer, 195, 195, 195, 255);
     SDL_RenderClear(display->sdl_renderer);
@@ -316,8 +328,8 @@ void rr_sdl_display_draw_title_screen(rrSDLDisplay* display){
     if (!display->title_ui) {
         display->title_ui = rr_title_ui_create(display->renderer, display->_game, display->input);
         rr_ui_button_set_callback(&display->title_ui->buttons[0], rr_sdl_display_on_new_game, display);
+        rr_ui_button_set_callback(&display->title_ui->buttons[1], rr_sdl_display_on_level_select, display);
     }
-
 
     rr_title_ui_update(display->title_ui);
     rr_title_ui_draw(display->title_ui);
@@ -325,9 +337,44 @@ void rr_sdl_display_draw_title_screen(rrSDLDisplay* display){
     SDL_RenderPresent(display->sdl_renderer);
 }
 
+void rr_sdl_display_on_level_select_screen_cancel(void* user_data) {
+    rrSDLDisplay* display = (rrSDLDisplay*)user_data;
+    display->display_screen = RR_SCREEN_TITLE;
+}
+
+void rr_sdl_display_on_level_select_screen_ok(void* user_data) {
+    rrSDLDisplay* display = (rrSDLDisplay*)user_data;
+    rr_game_set_active_level(display->_game, display->level_select_ui->current_level);
+    display->display_screen = RR_SCREEN_GAME;
+}
+
+void rr_sdl_display_draw_level_select_screen(rrSDLDisplay* display){
+    SDL_SetRenderDrawColor(display->sdl_renderer, 195, 195, 195, 255);
+    SDL_RenderClear(display->sdl_renderer);
+
+    if (!display->level_select_ui) {
+        display->level_select_ui = rr_ui_level_select_create(display->_game, display->renderer, display->input);
+        rr_ui_button_set_callback(&display->level_select_ui->cancel_button, rr_sdl_display_on_level_select_screen_cancel, display);
+        rr_ui_button_set_callback(&display->level_select_ui->ok_button, rr_sdl_display_on_level_select_screen_ok, display);
+    }
+
+    rr_title_ui_draw(display->title_ui);
+    rr_ui_level_select_update(display->level_select_ui);
+    rr_ui_level_select_draw(display->level_select_ui);
+
+    SDL_RenderPresent(display->sdl_renderer);
+}
+
 void rr_sdl_display_draw(rrSDLDisplay* display) {
-    if (display->display_screen == RR_SCREEN_GAME)
-        rr_sdl_display_draw_game_scren(display);
-    else
-        rr_sdl_display_draw_title_screen(display);
+    switch (display->display_screen) {
+        case RR_SCREEN_GAME:
+            rr_sdl_display_draw_game_scren(display);
+            break;
+        case RR_SCREEN_TITLE:
+            rr_sdl_display_draw_title_screen(display);
+            break;
+        case RR_SCREEN_LEVEL_SELECT:
+            rr_sdl_display_draw_level_select_screen(display);
+            break;
+    }
 }
