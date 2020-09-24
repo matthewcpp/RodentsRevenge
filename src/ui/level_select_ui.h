@@ -5,6 +5,7 @@
 #include "../input.h"
 #include "../draw/renderer.h"
 #include "basic_sprite.h"
+#include "basic_rect.h"
 #include "button.h"
 
 typedef struct {
@@ -14,8 +15,9 @@ typedef struct {
 
     int current_level;
 
-    rrRect _layout_rect;
+    rrRect layout_rect;
 
+    rrUiBasicRect bar;
     rrUiBasicSprite level_prompt;
     rrUiBasicSprite level_text;
     rrUiButton ok_button;

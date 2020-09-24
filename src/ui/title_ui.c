@@ -68,7 +68,7 @@ void rr_title_ui_layout(rrTitleUi* ui) {
 
     button = &ui->buttons[1];
     render_pos.y += button_size.y + 5;
-    rr_ui_button_init(button, ui->_renderer, "Pick Level", &render_pos);
+    rr_ui_button_init(button, ui->_renderer, "Pick Level...", &render_pos);
     rr_ui_button_get_size(button, &button_size);
     button->element.position.x = screen_size.x / 2 - button_size.x / 2;
 }

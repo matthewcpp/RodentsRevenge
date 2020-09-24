@@ -1,5 +1,6 @@
 #include "button.h"
 #include "../assets.h"
+#include "common.h"
 
 #include <stddef.h>
 
@@ -24,7 +25,7 @@ void rr_ui_button_init(rrUiButton* button, rrRenderer* renderer, const char* tex
 }
 
 void rr_ui_button_draw(rrUiButton* button) {
-    rrRect button_rect, inset_rect;
+    rrRect button_rect;
     rrPoint text_point;
     rrColor color;
 
@@ -34,23 +35,7 @@ void rr_ui_button_draw(rrUiButton* button) {
     rr_renderer_color(button->_renderer, &color);
     rr_renderer_fill_rect(button->_renderer, &button_rect);
 
-    inset_rect = button_rect;
-    inset_rect.w -= 3;
-    inset_rect.h -= 3;
-
-    rr_color_white(&color);
-    rr_renderer_color(button->_renderer, &color);
-    rr_renderer_fill_rect(button->_renderer, &inset_rect);
-
-    rr_color_set(&color, 195, 195, 195, 255);
-    rr_renderer_color(button->_renderer, &color);
-
-    inset_rect = button_rect;
-    inset_rect.x += 3;
-    inset_rect.y += 3;
-    inset_rect.w -= 6;
-    inset_rect.h -= 6;
-    rr_renderer_fill_rect(button->_renderer, &inset_rect);
+    rr_ui_draw_inset_rect(button->_renderer, &button_rect);
 
     rr_color_black(&color);
     rr_renderer_color(button->_renderer, &color);

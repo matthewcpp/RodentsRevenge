@@ -25,6 +25,8 @@ set(drawing_src
 	src/draw/animation.h src/draw/animation.c)
 
 set(ui_src
+	src/ui/basic_rect.h src/ui/basic_rect.c
+	src/ui/common.h src/ui/common.c
 	src/ui/element.h src/ui/element.c
 	src/ui/basic_sprite.h src/ui/basic_sprite.c
 	src/ui/clock.h src/ui/clock.c
