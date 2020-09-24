@@ -60,11 +60,18 @@ void rr_ui_level_select_update_active_buttons(rrUILevelSelect* level_select) {
         rr_ui_active_element_group_previous(&level_select->element_group);
     else if (rr_input_button_down(level_select->_input, RR_INPUT_BUTTON_UP))
         rr_ui_active_element_group_set(&level_select->element_group, 0);
+    else if (rr_input_button_down(level_select->_input, RR_INPUT_BUTTON_ACCEPT)) {
+        rrUiButton * button = (rrUiButton*)rr_ui_active_element_group_get_current(&level_select->element_group);
+        rr_ui_button_activate(button);
+    }
 }
 
-
 void rr_ui_level_select_update(rrUILevelSelect* level_select) {
-    if (level_select->level_text.element.active)
+    if (rr_input_button_down(level_select->_input, RR_INPUT_BUTTON_START))
+        rr_ui_button_activate(&level_select->ok_button);
+    else if (rr_input_button_down(level_select->_input, RR_INPUT_BUTTON_BACK))
+        rr_ui_button_activate(&level_select->cancel_button);
+    else if (level_select->level_text.element.active)
         rr_ui_level_select_update_active_level_text(level_select);
     else
         rr_ui_level_select_update_active_buttons(level_select);

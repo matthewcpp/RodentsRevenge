@@ -20,5 +20,6 @@ void rr_ui_active_element_group_add(rrUiActiveElementGroup* element_group, rrUiE
 void rr_ui_active_element_group_set(rrUiActiveElementGroup* element_group, int index);
 void rr_ui_active_element_group_next(rrUiActiveElementGroup* element_group);
 void rr_ui_active_element_group_previous(rrUiActiveElementGroup* element_group);
+rrUiElement * rr_ui_active_element_group_get_current(rrUiActiveElementGroup* element_group);
 
 #endif

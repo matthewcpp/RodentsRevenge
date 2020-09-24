@@ -337,12 +337,25 @@ void rr_sdl_display_draw_title_screen(rrSDLDisplay* display){
     SDL_RenderPresent(display->sdl_renderer);
 }
 
+void rr_sdl_display_on_level_select_screen_cancel(void* user_data) {
+    rrSDLDisplay* display = (rrSDLDisplay*)user_data;
+    display->display_screen = RR_SCREEN_TITLE;
+}
+
+void rr_sdl_display_on_level_select_screen_ok(void* user_data) {
+    rrSDLDisplay* display = (rrSDLDisplay*)user_data;
+    rr_game_set_active_level(display->_game, display->level_select_ui->current_level);
+    display->display_screen = RR_SCREEN_GAME;
+}
+
 void rr_sdl_display_draw_level_select_screen(rrSDLDisplay* display){
     SDL_SetRenderDrawColor(display->sdl_renderer, 195, 195, 195, 255);
     SDL_RenderClear(display->sdl_renderer);
 
     if (!display->level_select_ui) {
         display->level_select_ui = rr_ui_level_select_create(display->_game, display->renderer, display->input);
+        rr_ui_button_set_callback(&display->level_select_ui->cancel_button, rr_sdl_display_on_level_select_screen_cancel, display);
+        rr_ui_button_set_callback(&display->level_select_ui->ok_button, rr_sdl_display_on_level_select_screen_ok, display);
     }
 
     rr_title_ui_draw(display->title_ui);

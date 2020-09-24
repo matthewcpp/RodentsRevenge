@@ -53,4 +53,13 @@ void rr_ui_active_element_group_add(rrUiActiveElementGroup* element_group, rrUiE
     }
 }
 
+rrUiElement * rr_ui_active_element_group_get_current(rrUiActiveElementGroup* element_group) {
+    rrUiElement * element;
 
+    if (cutil_vector_size(element_group->elements) == 0)
+        return NULL;
+
+    cutil_vector_get(element_group->elements, element_group->current_element, &element);
+
+    return element;
+}
