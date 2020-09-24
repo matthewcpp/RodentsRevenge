@@ -23,7 +23,7 @@ rrUILevelSelect* rr_ui_level_select_create(rrGame* game, rrRenderer* renderer, r
 }
 
 void rr_ui_level_select_delete(rrUILevelSelect* level_select) {
-    rr_ui_active_alement_group_uninit(&level_select->element_group);
+    rr_ui_active_element_group_uninit(&level_select->element_group);
 }
 
 void rr_ui_lecel_select_update_level_text_text(rrUILevelSelect* level_select) {
@@ -34,7 +34,7 @@ void rr_ui_lecel_select_update_level_text_text(rrUILevelSelect* level_select) {
 
 void rr_ui_level_select_update_active_level_text(rrUILevelSelect* level_select) {
     if (rr_input_button_down(level_select->_input, RR_INPUT_BUTTON_DOWN))
-        rr_ui_active_alement_group_next(&level_select->element_group);
+        rr_ui_active_element_group_next(&level_select->element_group);
     else if (rr_input_button_down(level_select->_input, RR_INPUT_BUTTON_LEFT)) {
         level_select->current_level -= 1;
 
@@ -55,11 +55,11 @@ void rr_ui_level_select_update_active_level_text(rrUILevelSelect* level_select) 
 
 void rr_ui_level_select_update_active_buttons(rrUILevelSelect* level_select) {
     if (rr_input_button_down(level_select->_input, RR_INPUT_BUTTON_RIGHT))
-        rr_ui_active_alement_group_next(&level_select->element_group);
+        rr_ui_active_element_group_next(&level_select->element_group);
     else if (rr_input_button_down(level_select->_input, RR_INPUT_BUTTON_LEFT))
-        rr_ui_active_alement_group_previous(&level_select->element_group);
+        rr_ui_active_element_group_previous(&level_select->element_group);
     else if (rr_input_button_down(level_select->_input, RR_INPUT_BUTTON_UP))
-        rr_ui_active_alement_group_set(&level_select->element_group, 0);
+        rr_ui_active_element_group_set(&level_select->element_group, 0);
 }
 
 
@@ -100,7 +100,7 @@ void rr_ui_level_select_layout(rrUILevelSelect* level_select) {
     rrRect content_rect = {0, 0, 0, 10};
 
     rr_color_set(&color, 0, 0, 130, 255);
-    rr_ui_basic_rect_init(&level_select->bar, &content_rect, &color, level_select->_renderer); // width will be set later
+    rr_ui_basic_rect_init(&level_select->bar, &content_rect, &color, level_select->_renderer); /* width will be set below */
     position.y = content_rect.h;
 
     rr_color_black(&color);
@@ -118,14 +118,14 @@ void rr_ui_level_select_layout(rrUILevelSelect* level_select) {
     level_select->level_text.element.active = 1;
     rr_renderer_set_sprite_tint_color(level_select->_renderer, text_sprite, &color);
     rr_ui_basic_sprite_init(&level_select->level_text, &position, text_sprite, level_select->_renderer);
-    rr_ui_active_alement_group_add(&level_select->element_group, &level_select->level_text.element);
+    rr_ui_active_element_group_add(&level_select->element_group, &level_select->level_text.element);
     rr_ui_basic_sprite_get_rect(&level_select->level_prompt, &element_rect);
     rr_rect_encapsulate(&content_rect, &element_rect);
     position.y += text_sprite->rect.h + 10;
 
     rr_ui_button_init(&level_select->ok_button, level_select->_renderer, "Ok", &position);
     rr_ui_button_get_size(&level_select->ok_button, &button_size);
-    rr_ui_active_alement_group_add(&level_select->element_group, &level_select->ok_button.element);
+    rr_ui_active_element_group_add(&level_select->element_group, &level_select->ok_button.element);
     rr_ui_basic_sprite_get_rect(&level_select->level_prompt, &element_rect);
     rr_rect_encapsulate(&content_rect, &element_rect);
     position.x += button_size.x + 10;
@@ -136,7 +136,7 @@ void rr_ui_level_select_layout(rrUILevelSelect* level_select) {
 
     level_select->bar.rect.w = content_rect.w;
 
-    rr_ui_active_alement_group_add(&level_select->element_group, &level_select->cancel_button.element);
+    rr_ui_active_element_group_add(&level_select->element_group, &level_select->cancel_button.element);
 
     rr_ui_level_select_center_content(level_select, &content_rect);
 }
