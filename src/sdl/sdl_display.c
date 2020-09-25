@@ -73,6 +73,9 @@ void rr_sdl_display_destroy(rrSDLDisplay* display) {
     rr_sdl_renderer_destroy(display->renderer);
     SDL_DestroyRenderer(display->sdl_renderer);
 
+    if (display->game_ui)
+        rr_game_ui_destroy(display->game_ui);
+
     if (display->level_select_ui)
         rr_ui_level_select_delete(display->level_select_ui);
 
@@ -291,17 +294,17 @@ void rr_sdl_display_draw_entities(rrSDLDisplay* display) {
     }
 }
 
+void rr_sdl_display_on_game_exit(void* user_data) {
+    rrSDLDisplay* display = (rrSDLDisplay*)user_data;
+    rr_game_reset(display->_game);
+    rr_game_set_active_level(display->_game, 1);
+    display->display_screen = RR_SCREEN_TITLE;
+}
+
 void rr_sdl_display_draw_game_scren(rrSDLDisplay* display) {
-    if (display->game_ui == NULL){
-        display->game_ui = rr_game_ui_create(display->_game, display->renderer, display->input, &display->spritesheet);
-        display->_map_pos.y =  display->game_ui->clock._sprite->rect.h + 20;
-    }
-
-
     SDL_SetRenderDrawColor(display->sdl_renderer, 195, 195, 195, 255);
     SDL_RenderClear(display->sdl_renderer);
 
-    /* TODO: Figure out why this order is necessary */
     rr_sdl_display_draw_board_background(display);
     rr_sdl_display_draw_entities(display);
 
@@ -311,25 +314,28 @@ void rr_sdl_display_draw_game_scren(rrSDLDisplay* display) {
     SDL_RenderPresent(display->sdl_renderer);
 }
 
+void rr_sdl_display_set_screen(rrSDLDisplay* display, rrDisplayScreen screen) {
+    display->display_screen = screen;
+
+    if (screen == RR_SCREEN_GAME) {
+        rr_game_ui_show(display->game_ui);
+    }
+}
+
 void rr_sdl_display_on_new_game(void* user_data) {
     rrSDLDisplay* display = (rrSDLDisplay*)user_data;
-    display->display_screen = RR_SCREEN_GAME;
+    rr_sdl_display_set_screen(display, RR_SCREEN_GAME);
+
 }
 
 void rr_sdl_display_on_level_select(void* user_data) {
     rrSDLDisplay* display = (rrSDLDisplay*)user_data;
-    display->display_screen = RR_SCREEN_LEVEL_SELECT;
+    rr_sdl_display_set_screen(display, RR_SCREEN_LEVEL_SELECT);
 }
 
 void rr_sdl_display_draw_title_screen(rrSDLDisplay* display){
     SDL_SetRenderDrawColor(display->sdl_renderer, 195, 195, 195, 255);
     SDL_RenderClear(display->sdl_renderer);
-
-    if (!display->title_ui) {
-        display->title_ui = rr_title_ui_create(display->renderer, display->_game, display->input);
-        rr_ui_button_set_callback(&display->title_ui->buttons[0], rr_sdl_display_on_new_game, display);
-        rr_ui_button_set_callback(&display->title_ui->buttons[1], rr_sdl_display_on_level_select, display);
-    }
 
     rr_title_ui_update(display->title_ui);
     rr_title_ui_draw(display->title_ui);
@@ -339,30 +345,38 @@ void rr_sdl_display_draw_title_screen(rrSDLDisplay* display){
 
 void rr_sdl_display_on_level_select_screen_cancel(void* user_data) {
     rrSDLDisplay* display = (rrSDLDisplay*)user_data;
-    display->display_screen = RR_SCREEN_TITLE;
+    rr_sdl_display_set_screen(display, RR_SCREEN_TITLE);
 }
 
 void rr_sdl_display_on_level_select_screen_ok(void* user_data) {
     rrSDLDisplay* display = (rrSDLDisplay*)user_data;
     rr_game_set_active_level(display->_game, display->level_select_ui->current_level);
-    display->display_screen = RR_SCREEN_GAME;
+    rr_sdl_display_set_screen(display, RR_SCREEN_GAME);
 }
 
 void rr_sdl_display_draw_level_select_screen(rrSDLDisplay* display){
     SDL_SetRenderDrawColor(display->sdl_renderer, 195, 195, 195, 255);
     SDL_RenderClear(display->sdl_renderer);
 
-    if (!display->level_select_ui) {
-        display->level_select_ui = rr_ui_level_select_create(display->_game, display->renderer, display->input);
-        rr_ui_button_set_callback(&display->level_select_ui->cancel_button, rr_sdl_display_on_level_select_screen_cancel, display);
-        rr_ui_button_set_callback(&display->level_select_ui->ok_button, rr_sdl_display_on_level_select_screen_ok, display);
-    }
-
     rr_title_ui_draw(display->title_ui);
     rr_ui_level_select_update(display->level_select_ui);
     rr_ui_level_select_draw(display->level_select_ui);
 
     SDL_RenderPresent(display->sdl_renderer);
+}
+
+void rr_sdl_display_init_ui(rrSDLDisplay* display) {
+    display->title_ui = rr_title_ui_create(display->renderer, display->_game, display->input);
+    rr_ui_button_set_callback(&display->title_ui->buttons[0], rr_sdl_display_on_new_game, display);
+    rr_ui_button_set_callback(&display->title_ui->buttons[1], rr_sdl_display_on_level_select, display);
+
+    display->level_select_ui = rr_ui_level_select_create(display->_game, display->renderer, display->input);
+    rr_ui_button_set_callback(&display->level_select_ui->cancel_button, rr_sdl_display_on_level_select_screen_cancel, display);
+    rr_ui_button_set_callback(&display->level_select_ui->ok_button, rr_sdl_display_on_level_select_screen_ok, display);
+
+    display->game_ui = rr_game_ui_create(display->_game, display->renderer, display->input, &display->spritesheet);
+    display->_map_pos.y =  display->game_ui->clock._sprite->rect.h + 20;
+    rr_ui_button_set_callback(&display->game_ui->pause_dialog->exit_button, rr_sdl_display_on_game_exit, display);
 }
 
 void rr_sdl_display_draw(rrSDLDisplay* display) {

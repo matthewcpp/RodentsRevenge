@@ -35,7 +35,8 @@ set(ui_src
 	src/ui/button.h src/ui/button.c
 	src/ui/score.h src/ui/score.c
 	src/ui/lives.h src/ui/lives.c
-	src/ui/level_select_ui.h src/ui/level_select_ui.c)
+	src/ui/level_select_ui.h src/ui/level_select_ui.c
+	src/ui/pause_dialog.h src/ui/pause_dialog.c)
 
 set(sdl_src
 	src/sdl/sdl_input.h src/sdl/sdl_input.c

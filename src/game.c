@@ -207,11 +207,6 @@ void rr_game_update_state_winding_clock(rrGame* game, int time) {
 }
 
 void rr_game_update_state_playing(rrGame* game, int time) {
-    if (rr_input_button_down(game->_input, RR_INPUT_BUTTON_START)) {
-        game->state = RR_GAME_STATE_PAUSED;
-        return;
-    }
-
     rr_player_update(&game->player, time);
     rr_clock_update(&game->clock, time);
 
@@ -226,8 +221,10 @@ void rr_game_update_state_unstarted(rrGame* game) {
         rr_game_restart(game);
 }
 
-void rr_game_update_state_paused(rrGame* game) {
-    if (rr_input_button_down(game->_input, RR_INPUT_BUTTON_START))
+void rr_game_set_paused(rrGame* game, int paused) {
+    if (paused)
+        game->state = RR_GAME_STATE_PAUSED;
+    else
         game->state = RR_GAME_STATE_PLAYING;
 }
 
@@ -246,7 +243,6 @@ void rr_game_update(rrGame* game, int time) {
             break;
 
         case RR_GAME_STATE_PAUSED:
-            rr_game_update_state_paused(game);
             break;
     }
 }
