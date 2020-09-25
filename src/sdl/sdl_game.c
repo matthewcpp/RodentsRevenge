@@ -72,6 +72,8 @@ int rr_sdl_game_init(rrSDLGame* game, int screen_width, int screen_height) {
         return 0;
     }
 
+    rr_sdl_display_init_ui(game->display);
+
     return 1;
 }
 

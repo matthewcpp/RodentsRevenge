@@ -23,6 +23,8 @@ rrPlayer* rr_game_get_player(rrGame* game);
 rrGrid* rr_game_get_grid(rrGame* game);
 rrGameState rr_game_get_state(rrGame* game);
 
+void rr_game_set_paused(rrGame* game, int paused);
+
 void rr_game_update(rrGame* game, int time);
 
 void rr_game_reset(rrGame* game);

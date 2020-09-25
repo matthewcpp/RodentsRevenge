@@ -24,6 +24,11 @@ void rr_ui_pause_dialog_destroy(rrUIPauseDialog* pause_dialog) {
     free(pause_dialog);
 }
 
+void rr_ui_pause_dialog_show(rrUIPauseDialog* pause_dialog) {
+    rr_ui_active_element_group_set(&pause_dialog->element_group, 0);
+    pause_dialog->active = 1;
+}
+
 void rr_ui_pause_dialog_update(rrUIPauseDialog* level_select) {
     if (rr_input_button_down(level_select->_input, RR_INPUT_BUTTON_RIGHT))
         rr_ui_active_element_group_next(&level_select->element_group);
@@ -34,14 +39,9 @@ void rr_ui_pause_dialog_update(rrUIPauseDialog* level_select) {
         rr_ui_button_activate(button);
     }
     else if (rr_input_button_down(level_select->_input, RR_INPUT_BUTTON_START))
-        rr_ui_button_activate(&level_select->ok_button);
+        rr_ui_button_activate(&level_select->resume_button);
     else if (rr_input_button_down(level_select->_input, RR_INPUT_BUTTON_BACK))
-        rr_ui_button_activate(&level_select->cancel_button);
-}
-
-void rr_ui_pause_dialog_on_resume(void* user_data) {
-    rrUIPauseDialog* pause_dialog = (rrUIPauseDialog*)user_data;
-    pause_dialog->active = 0;
+        rr_ui_button_activate(&level_select->exit_button);
 }
 
 void rr_ui_pause_dialog_center_content(rrUIPauseDialog* level_select, rrRect* content_rect) {
@@ -59,8 +59,8 @@ void rr_ui_pause_dialog_center_content(rrUIPauseDialog* level_select, rrRect* co
     level_select->bar.rect.w = level_select->layout_rect.w - 8;
 
     rr_point_add_and_assign(&level_select->level_prompt.element.position, &offset);
-    rr_point_add_and_assign(&level_select->ok_button.element.position, &offset);
-    rr_point_add_and_assign(&level_select->cancel_button.element.position, &offset);
+    rr_point_add_and_assign(&level_select->resume_button.element.position, &offset);
+    rr_point_add_and_assign(&level_select->exit_button.element.position, &offset);
 }
 
 void rr_ui_pause_dialog_layout(rrUIPauseDialog* level_select) {
@@ -84,21 +84,20 @@ void rr_ui_pause_dialog_layout(rrUIPauseDialog* level_select) {
     rr_rect_encapsulate(&content_rect, &element_rect);
     position.y += text_sprite->rect.h + 10;
 
-    rr_ui_button_init(&level_select->ok_button, level_select->_renderer, "Resume", &position);
-    rr_ui_button_set_callback(&level_select->ok_button, rr_ui_pause_dialog_on_resume, level_select);
-    rr_ui_button_get_size(&level_select->ok_button, &button_size);
-    rr_ui_active_element_group_add(&level_select->element_group, &level_select->ok_button.element);
+    rr_ui_button_init(&level_select->resume_button, level_select->_renderer, "Resume", &position);
+    rr_ui_button_get_size(&level_select->resume_button, &button_size);
+    rr_ui_active_element_group_add(&level_select->element_group, &level_select->resume_button.element);
     rr_ui_basic_sprite_get_rect(&level_select->level_prompt, &element_rect);
     rr_rect_encapsulate(&content_rect, &element_rect);
     position.x += button_size.x + 10;
 
-    rr_ui_button_init(&level_select->cancel_button, level_select->_renderer, "Exit", &position);
-    rr_ui_button_get_rect(&level_select->cancel_button, &element_rect);
+    rr_ui_button_init(&level_select->exit_button, level_select->_renderer, "Exit", &position);
+    rr_ui_button_get_rect(&level_select->exit_button, &element_rect);
     rr_rect_encapsulate(&content_rect, &element_rect);
 
     level_select->bar.rect.w = content_rect.w;
 
-    rr_ui_active_element_group_add(&level_select->element_group, &level_select->cancel_button.element);
+    rr_ui_active_element_group_add(&level_select->element_group, &level_select->exit_button.element);
 
     rr_ui_pause_dialog_center_content(level_select, &content_rect);
 }
@@ -114,6 +113,6 @@ void rr_ui_pause_dialog_draw(rrUIPauseDialog* level_select) {
     rr_ui_basic_rect_draw(&level_select->bar);
     rr_ui_basic_sprite_draw(&level_select->level_prompt);
 
-    rr_ui_button_draw(&level_select->ok_button);
-    rr_ui_button_draw(&level_select->cancel_button);
+    rr_ui_button_draw(&level_select->resume_button);
+    rr_ui_button_draw(&level_select->exit_button);
 }
