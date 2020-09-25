@@ -73,6 +73,9 @@ void rr_sdl_display_destroy(rrSDLDisplay* display) {
     rr_sdl_renderer_destroy(display->renderer);
     SDL_DestroyRenderer(display->sdl_renderer);
 
+    if (display->game_ui)
+        rr_game_ui_destroy(display->game_ui);
+
     if (display->level_select_ui)
         rr_ui_level_select_delete(display->level_select_ui);
 
