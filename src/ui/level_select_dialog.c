@@ -1,4 +1,4 @@
-#include "level_select_ui.h"
+#include "level_select_dialog.h"
 #include "../assets.h"
 #include "common.h"
 
@@ -15,6 +15,7 @@ rrUILevelSelect* rr_ui_level_select_create(rrGame* game, rrRenderer* renderer, r
     level_select->_game = game;
     level_select->_renderer = renderer;
     level_select->current_level = 1;
+    level_select->active = 0;
 
     rr_ui_active_element_group_init(&level_select->element_group);
     rr_ui_level_select_layout(level_select);
@@ -24,6 +25,10 @@ rrUILevelSelect* rr_ui_level_select_create(rrGame* game, rrRenderer* renderer, r
 
 void rr_ui_level_select_delete(rrUILevelSelect* level_select) {
     rr_ui_active_element_group_uninit(&level_select->element_group);
+}
+
+void rr_ui_level_select_show(rrUILevelSelect* level_select) {
+    rr_ui_active_element_group_set(&level_select->element_group, 0);
 }
 
 void rr_ui_lecel_select_update_level_text_text(rrUILevelSelect* level_select) {

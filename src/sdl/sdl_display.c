@@ -1,14 +1,10 @@
 #include "sdl_display.h"
-#include "../draw/animation.h"
 #include "sdl_renderer.h"
 
 #include "../enemy.h"
-#include "../vec2.h"
 #include "../ui/game_ui.h"
 #include "../ui/title_ui.h"
-#include "../ui/level_select_ui.h"
-#include "../draw/spritesheet.h"
-#include "../assets.h"
+#include "../ui/level_select_dialog.h"
 #include "../util.h"
 
 #include <SDL_image.h>
@@ -21,8 +17,7 @@
 
 typedef enum {
     RR_SCREEN_TITLE,
-    RR_SCREEN_GAME,
-    RR_SCREEN_LEVEL_SELECT
+    RR_SCREEN_GAME
 }rrDisplayScreen;
 
 struct rrSDLDisplay{
@@ -38,7 +33,6 @@ struct rrSDLDisplay{
     rrRenderer* renderer;
     rrGameUi* game_ui;
     rrTitleUi* title_ui;
-    rrUILevelSelect * level_select_ui;
     rrInput* input;
 };
 
@@ -54,7 +48,6 @@ rrSDLDisplay* rr_sdl_display_create(SDL_Window* window, rrGame* game, rrInput* i
 
     display->game_ui = NULL;
     display->title_ui = NULL;
-    display->level_select_ui = NULL;
 
     TTF_Init();
 
@@ -73,11 +66,9 @@ void rr_sdl_display_destroy(rrSDLDisplay* display) {
     rr_sdl_renderer_destroy(display->renderer);
     SDL_DestroyRenderer(display->sdl_renderer);
 
-    if (display->game_ui)
-        rr_game_ui_destroy(display->game_ui);
 
-    if (display->level_select_ui)
-        rr_ui_level_select_delete(display->level_select_ui);
+    rr_game_ui_destroy(display->game_ui);
+    rr_title_ui_destroy(display->title_ui);
 
     TTF_Quit();
 
@@ -294,11 +285,18 @@ void rr_sdl_display_draw_entities(rrSDLDisplay* display) {
     }
 }
 
-void rr_sdl_display_on_game_exit(void* user_data) {
-    rrSDLDisplay* display = (rrSDLDisplay*)user_data;
-    rr_game_reset(display->_game);
-    rr_game_set_active_level(display->_game, 1);
-    display->display_screen = RR_SCREEN_TITLE;
+void rr_sdl_display_set_screen(rrSDLDisplay* display, rrDisplayScreen screen) {
+    display->display_screen = screen;
+
+    switch (display->display_screen) {
+        case RR_SCREEN_TITLE:
+            rr_title_ui_show(display->title_ui);
+            break;
+
+        case RR_SCREEN_GAME:
+            rr_game_ui_show(display->game_ui);
+            break;
+    }
 }
 
 void rr_sdl_display_draw_game_scren(rrSDLDisplay* display) {
@@ -314,25 +312,6 @@ void rr_sdl_display_draw_game_scren(rrSDLDisplay* display) {
     SDL_RenderPresent(display->sdl_renderer);
 }
 
-void rr_sdl_display_set_screen(rrSDLDisplay* display, rrDisplayScreen screen) {
-    display->display_screen = screen;
-
-    if (screen == RR_SCREEN_GAME) {
-        rr_game_ui_show(display->game_ui);
-    }
-}
-
-void rr_sdl_display_on_new_game(void* user_data) {
-    rrSDLDisplay* display = (rrSDLDisplay*)user_data;
-    rr_sdl_display_set_screen(display, RR_SCREEN_GAME);
-
-}
-
-void rr_sdl_display_on_level_select(void* user_data) {
-    rrSDLDisplay* display = (rrSDLDisplay*)user_data;
-    rr_sdl_display_set_screen(display, RR_SCREEN_LEVEL_SELECT);
-}
-
 void rr_sdl_display_draw_title_screen(rrSDLDisplay* display){
     SDL_SetRenderDrawColor(display->sdl_renderer, 195, 195, 195, 255);
     SDL_RenderClear(display->sdl_renderer);
@@ -343,36 +322,31 @@ void rr_sdl_display_draw_title_screen(rrSDLDisplay* display){
     SDL_RenderPresent(display->sdl_renderer);
 }
 
-void rr_sdl_display_on_level_select_screen_cancel(void* user_data) {
+void rr_sdl_display_on_new_game(void* user_data) {
     rrSDLDisplay* display = (rrSDLDisplay*)user_data;
-    rr_sdl_display_set_screen(display, RR_SCREEN_TITLE);
-}
-
-void rr_sdl_display_on_level_select_screen_ok(void* user_data) {
-    rrSDLDisplay* display = (rrSDLDisplay*)user_data;
-    rr_game_set_active_level(display->_game, display->level_select_ui->current_level);
     rr_sdl_display_set_screen(display, RR_SCREEN_GAME);
+    rr_game_restart(display->_game);
 }
 
-void rr_sdl_display_draw_level_select_screen(rrSDLDisplay* display){
-    SDL_SetRenderDrawColor(display->sdl_renderer, 195, 195, 195, 255);
-    SDL_RenderClear(display->sdl_renderer);
+void rr_sdl_display_on_select_level(void* user_data) {
+    rrSDLDisplay* display = (rrSDLDisplay*)user_data;
 
-    rr_title_ui_draw(display->title_ui);
-    rr_ui_level_select_update(display->level_select_ui);
-    rr_ui_level_select_draw(display->level_select_ui);
+    rr_sdl_display_set_screen(display, RR_SCREEN_GAME);
+    rr_game_set_active_level(display->_game, display->title_ui->level_select_dialog->current_level);
+    rr_game_restart(display->_game);
+}
 
-    SDL_RenderPresent(display->sdl_renderer);
+void rr_sdl_display_on_game_exit(void* user_data) {
+    rrSDLDisplay* display = (rrSDLDisplay*)user_data;
+    rr_game_reset(display->_game);
+    rr_game_set_active_level(display->_game, 1);
+    rr_sdl_display_set_screen(display, RR_SCREEN_TITLE);
 }
 
 void rr_sdl_display_init_ui(rrSDLDisplay* display) {
     display->title_ui = rr_title_ui_create(display->renderer, display->_game, display->input);
-    rr_ui_button_set_callback(&display->title_ui->buttons[0], rr_sdl_display_on_new_game, display);
-    rr_ui_button_set_callback(&display->title_ui->buttons[1], rr_sdl_display_on_level_select, display);
-
-    display->level_select_ui = rr_ui_level_select_create(display->_game, display->renderer, display->input);
-    rr_ui_button_set_callback(&display->level_select_ui->cancel_button, rr_sdl_display_on_level_select_screen_cancel, display);
-    rr_ui_button_set_callback(&display->level_select_ui->ok_button, rr_sdl_display_on_level_select_screen_ok, display);
+    rr_ui_button_set_callback(&display->title_ui->new_game_button, rr_sdl_display_on_new_game, display);
+    rr_ui_button_set_callback(&display->title_ui->level_select_dialog->ok_button, rr_sdl_display_on_select_level, display);
 
     display->game_ui = rr_game_ui_create(display->_game, display->renderer, display->input, &display->spritesheet);
     display->_map_pos.y =  display->game_ui->clock._sprite->rect.h + 20;
@@ -386,9 +360,6 @@ void rr_sdl_display_draw(rrSDLDisplay* display) {
             break;
         case RR_SCREEN_TITLE:
             rr_sdl_display_draw_title_screen(display);
-            break;
-        case RR_SCREEN_LEVEL_SELECT:
-            rr_sdl_display_draw_level_select_screen(display);
             break;
     }
 }
