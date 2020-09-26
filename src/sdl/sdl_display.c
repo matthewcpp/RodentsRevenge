@@ -90,22 +90,26 @@ void rr_sdl_display_add_tile_sprite_info(rrSDLDisplay* display, rrSpriteSheetInd
 void rr_sdl_display_init_spritesheet(rrSDLDisplay* display) {
     rr_spritesheet_init(&display->spritesheet, display->renderer->sprites[RR_SPRITE_SPRITESHEET], RR_SPRITESHEET_INDEX_COUNT);
 
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_BLOCK, 18, 0);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_MOUSE, 54, 34);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_WALL, 36, 0);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_CAT, 85, 52);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_CAT_WAIT, 0, 36);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_CHEESE, 36, 54);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_REMAINING_LIFE, 36, 18);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_HOLE, 0, 0);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_STUCK_PLAYER, 0, 54);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_MOUSETRAP, 18, 54);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_PLAYER_DEATH1, 18, 36);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_PLAYER_DEATH2, 54, 54);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_PLAYER_DEATH3, 36, 36);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_PLAYER_DEATH4, 0, 18);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_PLAYER_DEATH5, 18, 18);
-    rr_sdl_display_add_sprite_info(display, RR_SPRITESHEET_INDEX_CLOCK, 54, 0, 29, 32);
+    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_BLOCK, 1, 1);
+    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_MOUSE, 37, 37);
+    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_WALL, 37, 55);
+    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_CAT, 19, 1);
+    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_CAT_WAIT, 37, 1);
+    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_CHEESE, 55, 1);
+    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_REMAINING_LIFE, 55, 37);
+    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_HOLE, 19, 37);
+    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_STUCK_PLAYER, 19, 55);
+    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_MOUSETRAP, 1, 55);
+    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_PLAYER_DEATH1, 1, 19);
+    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_PLAYER_DEATH2, 19, 19);
+    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_PLAYER_DEATH3, 37, 19);
+    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_PLAYER_DEATH4, 55, 19);
+    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_PLAYER_DEATH5, 1, 37);
+
+    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_YARN, 55, 55);
+    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_YARN_EXPLODE1, 73, 1);
+    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_YARN_EXPLODE2, 73, 15);
+    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_YARN_EXPLODE3, 73, 33);
 }
 
 void rr_sdl_display_init_animation(rrSDLDisplay* display) {
@@ -140,6 +144,14 @@ int rr_sdl_display_load_sprites(rrSDLDisplay* display, const char* asset_dir) {
 
     if (sprite)
         display->renderer->sprites[RR_SPRITE_TITLE_LOGO] = sprite;
+    else
+        return 0;
+
+    sprintf(asset_path, "%s%s%s", asset_dir, rr_path_sep(), "clock.png");
+    sprite = rr_renderer_load_sprite(display->renderer, asset_path);
+
+    if (sprite)
+        display->renderer->sprites[RR_SPRITE_CLOCK] = sprite;
     else
         return 0;
 
