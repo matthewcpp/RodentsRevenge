@@ -4,13 +4,11 @@
 #include "../enemy.h"
 #include "../ui/game_ui.h"
 #include "../ui/title_ui.h"
-#include "../ui/level_select_dialog.h"
 #include "../util.h"
 
 #include <SDL_image.h>
 
 #include <assert.h>
-#include <math.h>
 #include <stdio.h>
 
 #define RR_RENDERER_TILE_SIZE 16

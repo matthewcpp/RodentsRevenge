@@ -12,14 +12,15 @@ typedef struct {
     rrInput* _input;
     rrRenderer* _renderer;
 
-    rrRect layout_rect;
+    rrRect _layout_rect;
+    rrUiActiveElementGroup _element_group;
+
     int active;
 
     rrUiBasicRect bar;
     rrUiBasicSprite level_prompt;
     rrUiButton resume_button;
     rrUiButton exit_button;
-    rrUiActiveElementGroup element_group;
 } rrUIPauseDialog;
 
 rrUIPauseDialog* rr_ui_pause_dialog_create(rrRenderer* renderer, rrInput* input);

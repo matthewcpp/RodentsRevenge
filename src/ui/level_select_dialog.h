@@ -16,14 +16,14 @@ typedef struct {
     int current_level;
     int active;
 
-    rrRect layout_rect;
+    rrRect _layout_rect;
+    rrUiActiveElementGroup _element_group;
 
     rrUiBasicRect bar;
     rrUiBasicSprite level_prompt;
     rrUiBasicSprite level_text;
     rrUiButton ok_button;
     rrUiButton cancel_button;
-    rrUiActiveElementGroup element_group;
 } rrUILevelSelect;
 
 rrUILevelSelect* rr_ui_level_select_create(rrGame* game, rrRenderer* renderer, rrInput* input);
