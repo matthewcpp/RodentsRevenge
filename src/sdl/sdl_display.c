@@ -2,6 +2,7 @@
 #include "sdl_renderer.h"
 
 #include "../enemy.h"
+#include "../yarn.h"
 #include "../ui/game_ui.h"
 #include "../ui/title_ui.h"
 #include "../util.h"
@@ -241,6 +242,16 @@ void rr_sdl_display_draw_player(rrSDLDisplay* display, rrPlayer* player) {
     rr_renderer_draw_sprite(display->renderer, sprite, &draw_pos);
 }
 
+void rr_sdl_display_draw_yarn(rrSDLDisplay* display, rrYarn* player) {
+    rrSprite* sprite = display->spritesheet.sprites[RR_SPRITESHEET_INDEX_YARN];
+    rrPoint draw_pos;
+    rr_point_copy(&draw_pos, &display->_map_pos);
+    draw_pos.x += player->entity.position.x * RR_RENDERER_TILE_SIZE;
+    draw_pos.y += player->entity.position.y * RR_RENDERER_TILE_SIZE;
+
+    rr_renderer_draw_sprite(display->renderer, sprite, &draw_pos);
+}
+
 void rr_sdl_display_draw_basic_block(rrSDLDisplay* display, rrSpriteSheetIndex sprite, rrPoint* cell) {
     rrPoint draw_pos;
     rr_point_copy(&draw_pos, &display->_map_pos);
@@ -283,6 +294,9 @@ void rr_sdl_display_draw_entities(rrSDLDisplay* display) {
                 case RR_ENTITY_ENEMY:
                     rr_sdl_display_draw_enemy(display, (rrEnemy*)entity);
                     break;
+
+                case RR_ENTITY_YARN:
+                    rr_sdl_display_draw_yarn(display, (rrYarn*)entity);
 
                 case RR_ENTITY_PLAYER:
                     rr_sdl_display_draw_player(display, (rrPlayer*)entity);

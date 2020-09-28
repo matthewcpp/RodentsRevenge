@@ -2,10 +2,9 @@
 
 #include "enemy.h"
 #include "pool.h"
+#include "yarn.h"
 #include "spawner.h"
 #include "util.h"
-
-#include "cutil/vector.h"
 
 #include <assert.h>
 #include <string.h>
@@ -23,7 +22,9 @@ struct rrGame {
     rrGameState state;
 
     cutil_vector* _enemies;
+    cutil_vector* _yarns;
     rrPool* _enemy_pool;
+    rrPool* _yarn_pool;
     rrInput* _input;
     rrSpawner* _spawner;
     int current_level;
@@ -40,8 +41,10 @@ rrGame* rr_game_create(rrInput* input, const char* asset_path) {
     rr_player_init(&game->player, game->grid, input);
 
     game->_enemies = cutil_vector_create(cutil_trait_ptr());
-    game->_enemy_pool = rr_pool_create(_rr_enemey_create_pooled, rr_enemy_reset_pooled, rr_pool_default_delete_func, game);
-    game->_spawner = rr_spawner_create(game->grid, game->_enemies, game->_enemy_pool);
+    game->_yarns = cutil_vector_create(cutil_trait_ptr());
+    game->_enemy_pool = rr_pool_create(_rr_enemy_create_pooled, _rr_enemy_reset_pooled, rr_pool_default_delete_func, game);
+    game->_yarn_pool = rr_pool_create(_rr_yarn_create_pooled, _rr_yarn_reset_pooled, rr_pool_default_delete_func, game);
+    game->_spawner = rr_spawner_create(game->grid, game->_enemy_pool, game->_yarn_pool);
 
     game->state = RR_GAME_STATE_UNSTARTED;
     rr_clock_init(&game->clock);
@@ -58,8 +61,11 @@ rrGame* rr_game_create(rrInput* input, const char* asset_path) {
 
 void rr_game_destroy(rrGame* game) {
     rr_pool_return_vec(game->_enemy_pool, game->_enemies);
+    rr_pool_return_vec(game->_yarn_pool, game->_yarns);
     cutil_vector_destroy(game->_enemies);
+    cutil_vector_destroy(game->_yarns);
     rr_pool_destroy(game->_enemy_pool);
+    rr_pool_destroy(game->_yarn_pool);
 
     rr_grid_destroy(game->grid);
     rr_spawner_destroy(game->_spawner);
@@ -145,7 +151,7 @@ void rr_game_next_level(rrGame* game){
 
     rr_game_set_active_level(game, next_level);
     rr_game_respawn_player(game);
-    rr_spawner_spawn_enemies(game->_spawner);
+    rr_spawner_spawn_enemies(game->_spawner, game->_enemies);
 }
 
 void rr_game_update_player_active(rrGame* game, int time) {
@@ -160,7 +166,7 @@ void rr_game_update_player_active(rrGame* game, int time) {
     /* Player has not defeated all enemies in time...more will spawn now! */
     if (rr_clock_did_tick_target(&game->clock) && game->clock.target_pos != 0) {
         rr_clock_advance_target(&game->clock);
-        rr_spawner_spawn_enemies(game->_spawner);
+        rr_spawner_spawn_enemies(game->_spawner, game->_enemies);
     }
 
     /* check to see if any previously spawned enemies are still active. */
@@ -201,7 +207,7 @@ void rr_game_update_state_winding_clock(rrGame* game, int time) {
 
         rr_clock_advance_target(&game->clock);
 
-        rr_spawner_spawn_enemies(game->_spawner);
+        rr_spawner_spawn_enemies(game->_spawner, game->_enemies);
         game->state = RR_GAME_STATE_PLAYING;
     }
 }
@@ -212,8 +218,17 @@ void rr_game_update_state_playing(rrGame* game, int time) {
 
     if (game->player.entity.status == RR_STATUS_KILLED)
         rr_game_update_player_killed(game);
-    else if (game->player.entity.status == RR_STATUS_ACTIVE || game->player.entity.status == RR_STATUS_STUCK)
+    else if (game->player.entity.status == RR_STATUS_ACTIVE || game->player.entity.status == RR_STATUS_STUCK) {
+        size_t i, count = cutil_vector_size(game->_yarns);
+
         rr_game_update_player_active(game, time);
+
+        for (i = 0; i < count; i++) {
+            rrYarn* yarn;
+            cutil_vector_get(game->_yarns, i, &yarn);
+            rr_yarn_update(yarn);
+        }
+    }
 }
 
 void rr_game_update_state_unstarted(rrGame* game) {
@@ -258,7 +273,7 @@ int rr_game_restart(rrGame* game) {
 
     game->state = RR_GAME_STATE_PLAYING;
     rr_game_respawn_player(game);
-    rr_spawner_spawn_enemies(game->_spawner);
+    rr_spawner_spawn_enemies(game->_spawner, game->_enemies);
 
     return 1;
 }

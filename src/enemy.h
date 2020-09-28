@@ -2,8 +2,8 @@
 #define RODENTSREVENGE_ENEMY_H
 
 #include "entity.h"
-#include "point.h"
 #include "grid.h"
+#include "point.h"
 
 typedef struct {
     rrEntity entity;
@@ -21,7 +21,7 @@ int rr_enemy_move(rrEnemy* enemy);
  */
 void rr_enemy_suspend(rrEnemy* enemy);
 
-void* _rr_enemey_create_pooled(void* user_data);
-void rr_enemy_reset_pooled(void* item, void* user_data);
+void* _rr_enemy_create_pooled(void* user_data);
+void _rr_enemy_reset_pooled(void* item, void* user_data);
 
 #endif

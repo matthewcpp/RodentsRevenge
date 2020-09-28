@@ -74,7 +74,7 @@ void rr_enemy_suspend(rrEnemy* enemy) {
     enemy->entity.status = RR_STATUS_SUSPENDED;
 }
 
-void* _rr_enemey_create_pooled(void* user_data) {
+void* _rr_enemy_create_pooled(void* user_data) {
     rrGame* game = (rrGame*)user_data;
 
     rrEnemy* enemy = malloc(sizeof(rrEnemy));
@@ -84,7 +84,7 @@ void* _rr_enemey_create_pooled(void* user_data) {
 }
 
 /** ensures that the enemy has been removed from the board before it is returned to the reserve.  Failure to do this can leave the board in an inconsistent state. */
-void rr_enemy_reset_pooled(void* item, void* user_data) {
+void _rr_enemy_reset_pooled(void* item, void* user_data) {
     rrEnemy* enemy = (rrEnemy*)item;
     rrGame* game = (rrGame*)user_data;
 

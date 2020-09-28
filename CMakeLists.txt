@@ -13,7 +13,7 @@ set(game_src
 	src/enemy.h src/enemy.c
 	src/entity.h src/entity.c
 	src/spawner.h src/spawner.c
-
+	src/yarn.h src/yarn.c
 	src/util.h src/util.c
 	src/clock.h src/clock.c
 	src/vec2.c src/vec2.h
@@ -35,7 +35,7 @@ set(ui_src
 	src/ui/button.h src/ui/button.c
 	src/ui/score.h src/ui/score.c
 	src/ui/lives.h src/ui/lives.c
-        src/ui/level_select_dialog.h src/ui/level_select_dialog.c
+	src/ui/level_select_dialog.h src/ui/level_select_dialog.c
 	src/ui/pause_dialog.h src/ui/pause_dialog.c)
 
 set(sdl_src
