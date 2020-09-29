@@ -12,6 +12,7 @@ rrSpawner* rr_spawner_create(rrGrid* grid, rrPool* enemy_pool, rrPool* yarn_pool
 void rr_spawner_destroy(rrSpawner* spawner);
 
 int rr_spawner_spawn_enemies(rrSpawner* spawner, cutil_vector* enemy_list);
+void rr_spawner_spawn_yarn(rrSpawner* spawner, cutil_vector* yarn_list);
 void rr_spawner_get_spawn_pos(rrSpawner* spawner, rrPoint* position);
 
 /** Sets spawner properties parsed from a level file. */

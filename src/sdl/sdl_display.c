@@ -297,6 +297,7 @@ void rr_sdl_display_draw_entities(rrSDLDisplay* display) {
 
                 case RR_ENTITY_YARN:
                     rr_sdl_display_draw_yarn(display, (rrYarn*)entity);
+                    break;
 
                 case RR_ENTITY_PLAYER:
                     rr_sdl_display_draw_player(display, (rrPlayer*)entity);

@@ -1,6 +1,7 @@
 #include "spawner.h"
 
 #include "enemy.h"
+#include "yarn.h"
 
 #include "cutil/strbuf.h"
 #include "cutil/vector.h"
@@ -127,4 +128,76 @@ void rr_spawner_set_properties(rrSpawner* spawner, cutil_btree* properties) {
     }
 
     rr_spawner_parse_spawn_values(spawner, spawner_props);
+}
+
+int yarn_directions[3] = {-1, 0, 1};
+
+/* Generate a point and direction from a cell on the grid border. */
+void rr_spawner_get_random_yarn_spawn(rrSpawner* spawner, rrPoint* spawn_pos, rrPoint* direction) {
+    int cell_index, cell_count;
+    rrPoint grid_size;
+    rr_grid_get_size(spawner->grid, &grid_size);
+
+    /* remove corners from consideration */
+    cell_count = (grid_size.x - 2) * 2 + (grid_size.y - 2 ) * 2;
+
+    cell_index = rand() % cell_count;
+
+    /* top row */
+    if (cell_index < grid_size.x){
+        spawn_pos->x = 1 + cell_index;
+        spawn_pos->y = 0;
+        direction->y = 1;
+        direction->x = yarn_directions[rand() % 3];
+        return;
+    }
+
+    cell_index -= grid_size.x;
+    /* bottom row */
+    if (cell_index < grid_size.x) {
+        spawn_pos->x = 1 + cell_index;
+        spawn_pos->y = grid_size.y - 1;
+        direction->y = -1;
+        direction->x = yarn_directions[rand() % 3];
+        return;
+    }
+
+    cell_index -= grid_size.x;
+    /* right column */
+    if (cell_index < grid_size.y) {
+        spawn_pos->x = 0;
+        spawn_pos->y = 1 + cell_index;
+        direction->y = yarn_directions[rand() % 3];
+        direction->x = 1;
+        return;
+    }
+
+    cell_index -= grid_size.y;
+    /* left column */
+    spawn_pos->x = grid_size.x - 1;
+    spawn_pos->y = 1 + cell_index;
+    direction->y = yarn_directions[rand() % 3];
+    direction->x = -1;
+}
+
+void rr_spawner_spawn_yarn(rrSpawner* spawner, cutil_vector* yarn_list) {
+    rrEntity* entity;
+    rrYarn* yarn;
+    rrPoint spawn_pos, direction, test_move;
+    int valid_spawn;
+
+    do {
+        rr_spawner_get_random_yarn_spawn(spawner, &spawn_pos, &direction);
+        entity = rr_grid_get_entity_at_position(spawner->grid, &spawn_pos);
+        assert(entity != NULL);
+        valid_spawn = entity->type == RR_ENTITY_WALL;
+
+        rr_point_add(&test_move, &spawn_pos, &direction);
+        valid_spawn &= rr_grid_get_entity_at_position(spawner->grid, &test_move) == NULL;
+
+    } while (!valid_spawn);
+
+    yarn = (rrYarn*)rr_pool_get(spawner->yarn_pool);
+    rr_yarn_start(yarn, &spawn_pos, &direction);
+    cutil_vector_push_back(yarn_list, &yarn);
 }

@@ -222,3 +222,8 @@ void rr_grid_destroy_basic_entity(rrGrid* grid, rrEntity* entity) {
 cutil_btree* rr_grid_get_properties(rrGrid* grid) {
     return grid->properties;
 }
+
+void rr_grid_get_size(rrGrid* grid, rrPoint* size) {
+    size->x = grid->width;
+    size->y = grid->height;
+}

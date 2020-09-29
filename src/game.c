@@ -139,6 +139,14 @@ void rr_game_reset(rrGame* game) {
     }
     cutil_vector_clear(game->_enemies);
 
+    for (i = 0; i < cutil_vector_size(game->_yarns); i++) {
+        rrYarn* yarn;
+        cutil_vector_get(game->_yarns, i, &yarn);
+        rr_entity_remove_from_grid(&yarn->entity, game->grid);
+        rr_pool_return(game->_yarn_pool, yarn);
+    }
+    cutil_vector_clear(game->_yarns);
+
     rr_game_set_active_level(game, game->current_level);
     game->state = RR_GAME_STATE_UNSTARTED;
 }
