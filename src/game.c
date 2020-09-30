@@ -234,7 +234,7 @@ void rr_game_update_state_playing(rrGame* game, int time) {
         for (i = 0; i < count; i++) {
             rrYarn* yarn;
             cutil_vector_get(game->_yarns, i, &yarn);
-            rr_yarn_update(yarn);
+            rr_yarn_update(yarn, time);
         }
     }
 }
