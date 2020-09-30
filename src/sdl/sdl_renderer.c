@@ -221,15 +221,22 @@ void rr_sdl_renderer_init_spritesheet(rrRenderer* renderer) {
 }
 
 void rr_sdl_display_init_animations(rrRenderer* renderer) {
-    rrSprite* animation_frames[5];
+    rrSprite* player_death_frames[5];
+    rrSprite* yarn_explode_frames[3];
 
-    animation_frames[0] = renderer->spritesheet->sprites[RR_SPRITESHEET_INDEX_PLAYER_DEATH1];
-    animation_frames[1] = renderer->spritesheet->sprites[RR_SPRITESHEET_INDEX_PLAYER_DEATH2];
-    animation_frames[2] = renderer->spritesheet->sprites[RR_SPRITESHEET_INDEX_PLAYER_DEATH3];
-    animation_frames[3] = renderer->spritesheet->sprites[RR_SPRITESHEET_INDEX_PLAYER_DEATH4];
-    animation_frames[4] = renderer->spritesheet->sprites[RR_SPRITESHEET_INDEX_PLAYER_DEATH5];
+    player_death_frames[0] = renderer->spritesheet->sprites[RR_SPRITESHEET_INDEX_PLAYER_DEATH1];
+    player_death_frames[1] = renderer->spritesheet->sprites[RR_SPRITESHEET_INDEX_PLAYER_DEATH2];
+    player_death_frames[2] = renderer->spritesheet->sprites[RR_SPRITESHEET_INDEX_PLAYER_DEATH3];
+    player_death_frames[3] = renderer->spritesheet->sprites[RR_SPRITESHEET_INDEX_PLAYER_DEATH4];
+    player_death_frames[4] = renderer->spritesheet->sprites[RR_SPRITESHEET_INDEX_PLAYER_DEATH5];
 
-    rr_renderer_create_animation(renderer, RR_ANIMATION_PLAYER_DEATH, 5, animation_frames, 100);
+    rr_renderer_create_animation(renderer, RR_ANIMATION_PLAYER_DEATH, 5, player_death_frames, 100);
+
+    yarn_explode_frames[0] = renderer->spritesheet->sprites[RR_SPRITESHEET_INDEX_YARN_EXPLODE1];
+    yarn_explode_frames[1] = renderer->spritesheet->sprites[RR_SPRITESHEET_INDEX_YARN_EXPLODE2];
+    yarn_explode_frames[2] = renderer->spritesheet->sprites[RR_SPRITESHEET_INDEX_YARN_EXPLODE3];
+
+    rr_renderer_create_animation(renderer, RR_ANIMATION_YARN_EXPLODE, 3, yarn_explode_frames, 125);
 }
 
 

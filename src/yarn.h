@@ -1,6 +1,7 @@
 #ifndef RR_YARN_H
 #define RR_YARN_H
 
+#include "draw/renderer.h"
 #include "entity.h"
 #include "grid.h"
 
@@ -12,9 +13,10 @@ typedef struct {
     rrEntity* _collision;
     int move_count;
     int status_time;
+    rrAnimationPlayer explode_animation;
 } rrYarn;
 
-void rr_yarn_init(rrYarn* yarn, rrGrid* grid);
+void rr_yarn_init(rrYarn* yarn, rrGrid* grid, rrRenderer* renderer);
 void rr_yarn_start(rrYarn* yarn, rrPoint* position, rrPoint* direction);
 void rr_yarn_update(rrYarn* yarn, int time);
 

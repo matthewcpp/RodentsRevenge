@@ -120,12 +120,17 @@ void rr_sdl_display_draw_player(rrSDLDisplay* display, rrPlayer* player) {
     rr_renderer_draw_sprite(display->renderer, sprite, &draw_pos);
 }
 
-void rr_sdl_display_draw_yarn(rrSDLDisplay* display, rrYarn* player) {
-    rrSprite* sprite = display->renderer->spritesheet->sprites[RR_SPRITESHEET_INDEX_YARN];
+void rr_sdl_display_draw_yarn(rrSDLDisplay* display, rrYarn* yarn) {
+    rrSprite* sprite;
     rrPoint draw_pos;
     rr_point_copy(&draw_pos, &display->_map_pos);
-    draw_pos.x += player->entity.position.x * RR_RENDERER_TILE_SIZE;
-    draw_pos.y += player->entity.position.y * RR_RENDERER_TILE_SIZE;
+    draw_pos.x += yarn->entity.position.x * RR_RENDERER_TILE_SIZE;
+    draw_pos.y += yarn->entity.position.y * RR_RENDERER_TILE_SIZE;
+
+    if (yarn->entity.status == RR_STATUS_DYING)
+        sprite = rr_animation_player_get_current_sprite(&yarn->explode_animation);
+    else
+        sprite = display->renderer->spritesheet->sprites[RR_SPRITESHEET_INDEX_YARN];
 
     rr_renderer_draw_sprite(display->renderer, sprite, &draw_pos);
 }

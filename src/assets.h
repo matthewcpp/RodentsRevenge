@@ -44,6 +44,7 @@ typedef enum {
 
 typedef enum {
     RR_ANIMATION_PLAYER_DEATH,
+    RR_ANIMATION_YARN_EXPLODE,
     RR_ANIMATION_COUNT
 } rrAnimationIndex;
 

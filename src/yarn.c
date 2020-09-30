@@ -1,5 +1,6 @@
 #include "yarn.h"
 
+#include "assets.h"
 #include "game.h"
 #include "util.h"
 
@@ -11,9 +12,10 @@
 
 void _rr_yarn_reset(rrYarn* yarn);
 
-void rr_yarn_init(rrYarn* yarn, rrGrid* grid) {
+void rr_yarn_init(rrYarn* yarn, rrGrid* grid, rrRenderer* renderer) {
     rr_entity_init(&yarn->entity, RR_ENTITY_YARN);
     yarn->_grid = grid;
+    rr_animation_player_init(&yarn->explode_animation, rr_renderer_get_animation(renderer, RR_ANIMATION_YARN_EXPLODE));
     _rr_yarn_reset(yarn);
 }
 
@@ -60,10 +62,18 @@ void rr_yarn_update_active(rrYarn* yarn, int time) {
         yarn->move_count += 1;
     }
     else {
-        yarn->entity.status = RR_STATUS_STUCK;
+        yarn->entity.status = RR_STATUS_DYING;
+        rr_animation_player_reset(&yarn->explode_animation);
     }
 
     yarn->status_time = 0;
+}
+
+void rr_yarn_update_dying(rrYarn* yarn, int time) {
+    rr_animation_player_update(&yarn->explode_animation, time);
+
+    if (rr_animation_player_complete(&yarn->explode_animation))
+        yarn->entity.status = RR_STATUS_KILLED;
 }
 
 void rr_yarn_update(rrYarn* yarn, int time) {
@@ -74,6 +84,10 @@ void rr_yarn_update(rrYarn* yarn, int time) {
 
         case RR_STATUS_ACTIVE:
             rr_yarn_update_active(yarn, time);
+            break;
+
+        case RR_STATUS_DYING:
+            rr_yarn_update_dying(yarn, time);
             break;
 
         default:
@@ -91,7 +105,7 @@ void _rr_yarn_reset(rrYarn* yarn) {
 void* _rr_yarn_create_pooled(void* user_data){
     rrGame* game = (rrGame*)user_data;
     rrYarn* yarn = malloc(sizeof(rrYarn));
-    rr_yarn_init(yarn, rr_game_get_grid(game));
+    rr_yarn_init(yarn, rr_game_get_grid(game), rr_game_get_renderer(game));
 
     return yarn;
 }

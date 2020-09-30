@@ -38,6 +38,7 @@ rrGame* rr_game_create(rrInput* input, rrRenderer* renderer, const char* asset_p
     rrGame* game = malloc(sizeof(rrGame));
 
     game->_input = input;
+    game->_renderer = renderer;
     game->grid = rr_grid_create(RR_GRID_WIDTH, RR_GRID_HEIGHT);
     rr_player_init(&game->player, game->grid, input, renderer);
 
@@ -164,6 +165,21 @@ void rr_game_next_level(rrGame* game){
     rr_spawner_spawn_enemies(game->_spawner, game->_enemies);
 }
 
+void rr_game_update_yarn(rrGame* game, int time) {
+    int i, count = (int)cutil_vector_size(game->_yarns);
+
+    for (i = count - 1; i >= 0; i--) {
+        rrYarn* yarn;
+        cutil_vector_get(game->_yarns, i, &yarn);
+        rr_yarn_update(yarn, time);
+
+        if (yarn->entity.status == RR_STATUS_KILLED) {
+            cutil_vector_pop_back(game->_yarns);
+            rr_pool_return(game->_yarn_pool, yarn);
+        }
+    }
+}
+
 void rr_game_update_player_active(rrGame* game, int time) {
     size_t i;
     unsigned int round_clear = 1;
@@ -172,6 +188,8 @@ void rr_game_update_player_active(rrGame* game, int time) {
         if (game->clock.seconds_pos == 14 || game->clock.seconds_pos == 0)
         game->player.score += 1;
     }
+
+    rr_game_update_yarn(game, time);
 
     /* Player has not defeated all enemies in time...more will spawn now! */
     if (rr_clock_did_tick_target(&game->clock) && game->clock.target_pos != 0) {
@@ -229,15 +247,9 @@ void rr_game_update_state_playing(rrGame* game, int time) {
     if (game->player.entity.status == RR_STATUS_KILLED)
         rr_game_update_player_killed(game);
     else if (game->player.entity.status == RR_STATUS_ACTIVE || game->player.entity.status == RR_STATUS_STUCK) {
-        size_t i, count = cutil_vector_size(game->_yarns);
-
         rr_game_update_player_active(game, time);
 
-        for (i = 0; i < count; i++) {
-            rrYarn* yarn;
-            cutil_vector_get(game->_yarns, i, &yarn);
-            rr_yarn_update(yarn, time);
-        }
+
     }
 }
 
@@ -311,4 +323,8 @@ rrGameState rr_game_get_state(rrGame* game) {
 
 int rr_game_get_level_count() {
     return RR_LEVEL_COUNT;
+}
+
+rrRenderer* rr_game_get_renderer(rrGame* game) {
+    return game->_renderer;
 }
