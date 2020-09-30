@@ -1,26 +1,12 @@
 #include "sdl_game.h"
 
 #include "sdl_input.h"
-#include "sdl_display.h"
-
-#include "../game.h"
-#include "../util.h"
 
 #include <SDL.h>
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-
-struct rrSDLGame {
-    rrGame* game;
-    rrInput* input;
-    rrSDLDisplay* display;
-    SDL_Window* window;
-    char* asset_path;
-    const char* error_str;
-};
 
 rrSDLGame* rr_sdl_game_create(const char* asset_path) {
     rrSDLGame* game = calloc(sizeof(rrSDLGame), 1);
@@ -59,18 +45,19 @@ int rr_sdl_game_init(rrSDLGame* game, int screen_width, int screen_height) {
         return 0;
     }
 
-    game->game = rr_game_create(game->input, game->asset_path);
-    game->display = rr_sdl_display_create(game->window, game->game, game->input);
-
-    if (!rr_sdl_display_load_sprites(game->display, game->asset_path)) {
+    game->renderer = rr_sdl_renderer_create(game->window);
+    if (!rr_sdl_renderer_load_sprites(game->renderer, game->asset_path)) {
         game->error_str = "Failed to load sprites";
         return 0;
     }
 
-    if (!rr_sdl_display_load_fonts(game->display, game->asset_path)) {
+    if (!rr_sdl_renderer_load_fonts(game->renderer, game->asset_path)) {
         game->error_str = "Failed to load fonts";
         return 0;
     }
+
+    game->game = rr_game_create(game->input, game->renderer, game->asset_path);
+    game->display = rr_sdl_display_create(game->game, game->input, game->renderer);
 
     rr_sdl_display_init_ui(game->display);
 
@@ -98,7 +85,11 @@ void rr_sdl_game_run(rrSDLGame* game) {
         if (time_delta >= 32) {
             rr_sdl_input_update(game->input, time_delta);
             rr_game_update(game->game, time_delta);
+
+            rr_sdl_renderer_begin(game->renderer);
             rr_sdl_display_draw(game->display);
+            rr_sdl_renderer_end(game->renderer);
+
             last_update = now;
         }
         SDL_Delay(1);
@@ -119,6 +110,9 @@ void rr_sdl_game_destroy(rrSDLGame* game) {
         rr_game_destroy(game->game);
     }
 
+    if (game->renderer)
+        rr_sdl_renderer_destroy(game->renderer);
+
     if (game->window) {
         SDL_DestroyWindow(game->window);
     }
@@ -137,3 +131,4 @@ rrInput* rr_sdl_game_get_input(rrSDLGame* game) {
 rrGame* rr_sdl_game_get_base_game(rrSDLGame* sdl_game) {
     return sdl_game->game;
 }
+

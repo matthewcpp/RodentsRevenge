@@ -4,7 +4,7 @@
 
 void rr_game_ui_on_pause_dialog_resume(void* user_data);
 
-    rrGameUi* rr_game_ui_create(rrGame* game, rrRenderer* renderer, rrInput* input, rrSpritesheet* spritesheet) {
+rrGameUi* rr_game_ui_create(rrGame* game, rrRenderer* renderer, rrInput* input, rrSpritesheet* spritesheet) {
     rrGameUi* ui = malloc(sizeof(rrGameUi));
     rrPoint ui_element_offset;
 

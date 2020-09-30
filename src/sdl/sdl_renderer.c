@@ -1,20 +1,25 @@
 #include "sdl_renderer.h"
-
-
+#include "../util.h"
 
 #include <SDL_image.h>
 
+#include <assert.h>
+#include <stdio.h>
 #include <stdlib.h>
 
-
-
-rrRenderer* rr_sdl_renderer_create(SDL_Renderer* sdl_renderer) {
+rrRenderer* rr_sdl_renderer_create(SDL_Window* window) {
     rrRenderer* renderer = malloc(sizeof(rrRenderer));
-    renderer->renderer = sdl_renderer;
+    renderer->renderer = SDL_CreateRenderer(window, -1, 0);
+    SDL_GetRendererOutputSize(renderer->renderer, &renderer->screen_size.x, &renderer->screen_size.y);
 
     renderer->text_sprites = cutil_vector_create(cutil_trait_ptr());
     renderer->sprites = calloc(RR_SPRITE_COUNT, sizeof(rrSprite*));
     renderer->fonts = calloc(RR_FONT_COUNT, sizeof(TTF_Font*));
+    renderer->animations = calloc(RR_ANIMATION_COUNT, sizeof(rrAnimation*));
+    renderer->spritesheet = NULL;
+
+    TTF_Init();
+
     return renderer;
 }
 
@@ -43,13 +48,34 @@ void rr_sdl_renderer_destroy(rrRenderer* renderer) {
             TTF_CloseFont(font);
     }
 
+    for (i = 0; i < RR_ANIMATION_COUNT; i++) {
+        rrAnimation * animation = renderer->animations[i];
+        if (animation) {
+            rr_animation_destroy(animation);
+        }
+    }
+
+    if (renderer->spritesheet)
+        rr_spritesheet_destroy(renderer->spritesheet);
+
     free(renderer->sprites);
     free(renderer->fonts);
+    free(renderer->animations);
+
     cutil_vector_destroy(renderer->text_sprites);
+
+    SDL_DestroyRenderer(renderer->renderer);
+
+    TTF_Quit();
 }
 
-void rr_sdl_renderer_set_screen_size(rrRenderer* renderer, rrPoint* screen_size) {
-    rr_point_copy(&renderer->screen_size, screen_size);
+void rr_sdl_renderer_begin(rrRenderer* renderer) {
+    SDL_SetRenderDrawColor(renderer->renderer, 195, 195, 195, 255);
+    SDL_RenderClear(renderer->renderer);
+}
+
+void rr_sdl_renderer_end(rrRenderer* renderer) {
+    SDL_RenderPresent(renderer->renderer);
 }
 
 void rr_renderer_get_screen_size(rrRenderer* renderer, rrPoint* size) {
@@ -87,6 +113,16 @@ rrSprite* rr_renderer_load_sprite(rrRenderer* renderer, const char* path) {
     sprite->rect.y = 0;
 
     return sprite;
+}
+
+rrAnimation* rr_renderer_create_animation(rrRenderer* renderer, int index, int frame_count, rrSprite** frames, int frame_time) {
+    assert(index < RR_ANIMATION_COUNT);
+    if (renderer->animations[index])
+        rr_animation_destroy(renderer->animations[index]);
+
+    renderer->animations[index] = rr_animation_create(frame_count, frames, frame_time);
+
+    return renderer->animations[index];
 }
 
 void rr_renderer_create_text_texture(rrRenderer* renderer, rrSprite* text_sprite, int font, const char* text) {
@@ -142,4 +178,112 @@ rrSprite* rr_renderer_get_sprite(rrRenderer* renderer, int index) {
         return NULL;
 
     return renderer->sprites[index];
+}
+
+rrAnimation* rr_renderer_get_animation(rrRenderer* renderer, int index) {
+    assert(index < RR_ANIMATION_COUNT);
+    return renderer->animations[index];
+}
+
+void rr_sdl_renderer_spritesheet_add_tile(rrRenderer* renderer, rrSpriteSheetIndex index, int x, int y) {
+    rrRect rect;
+    rect.x = x;
+    rect.y = y;
+    rect.w = 16;
+    rect.h = 16;
+
+    rr_spritesheet_add_sprite(renderer->spritesheet, index, &rect);
+}
+
+void rr_sdl_renderer_init_spritesheet(rrRenderer* renderer) {
+    renderer->spritesheet = rr_spritesheet_create(renderer->sprites[RR_SPRITE_SPRITESHEET], RR_SPRITESHEET_INDEX_COUNT);
+
+    rr_sdl_renderer_spritesheet_add_tile(renderer, RR_SPRITESHEET_INDEX_BLOCK, 1, 1);
+    rr_sdl_renderer_spritesheet_add_tile(renderer, RR_SPRITESHEET_INDEX_MOUSE, 37, 37);
+    rr_sdl_renderer_spritesheet_add_tile(renderer, RR_SPRITESHEET_INDEX_WALL, 37, 55);
+    rr_sdl_renderer_spritesheet_add_tile(renderer, RR_SPRITESHEET_INDEX_CAT, 19, 1);
+    rr_sdl_renderer_spritesheet_add_tile(renderer, RR_SPRITESHEET_INDEX_CAT_WAIT, 37, 1);
+    rr_sdl_renderer_spritesheet_add_tile(renderer, RR_SPRITESHEET_INDEX_CHEESE, 55, 1);
+    rr_sdl_renderer_spritesheet_add_tile(renderer, RR_SPRITESHEET_INDEX_REMAINING_LIFE, 55, 37);
+    rr_sdl_renderer_spritesheet_add_tile(renderer, RR_SPRITESHEET_INDEX_HOLE, 19, 37);
+    rr_sdl_renderer_spritesheet_add_tile(renderer, RR_SPRITESHEET_INDEX_STUCK_PLAYER, 19, 55);
+    rr_sdl_renderer_spritesheet_add_tile(renderer, RR_SPRITESHEET_INDEX_MOUSETRAP, 1, 55);
+    rr_sdl_renderer_spritesheet_add_tile(renderer, RR_SPRITESHEET_INDEX_PLAYER_DEATH1, 1, 19);
+    rr_sdl_renderer_spritesheet_add_tile(renderer, RR_SPRITESHEET_INDEX_PLAYER_DEATH2, 19, 19);
+    rr_sdl_renderer_spritesheet_add_tile(renderer, RR_SPRITESHEET_INDEX_PLAYER_DEATH3, 37, 19);
+    rr_sdl_renderer_spritesheet_add_tile(renderer, RR_SPRITESHEET_INDEX_PLAYER_DEATH4, 55, 19);
+    rr_sdl_renderer_spritesheet_add_tile(renderer, RR_SPRITESHEET_INDEX_PLAYER_DEATH5, 1, 37);
+
+    rr_sdl_renderer_spritesheet_add_tile(renderer, RR_SPRITESHEET_INDEX_YARN, 55, 55);
+    rr_sdl_renderer_spritesheet_add_tile(renderer, RR_SPRITESHEET_INDEX_YARN_EXPLODE1, 73, 1);
+    rr_sdl_renderer_spritesheet_add_tile(renderer, RR_SPRITESHEET_INDEX_YARN_EXPLODE2, 73, 15);
+    rr_sdl_renderer_spritesheet_add_tile(renderer, RR_SPRITESHEET_INDEX_YARN_EXPLODE3, 73, 33);
+}
+
+void rr_sdl_display_init_animations(rrRenderer* renderer) {
+    rrSprite* animation_frames[5];
+
+    animation_frames[0] = renderer->spritesheet->sprites[RR_SPRITESHEET_INDEX_PLAYER_DEATH1];
+    animation_frames[1] = renderer->spritesheet->sprites[RR_SPRITESHEET_INDEX_PLAYER_DEATH2];
+    animation_frames[2] = renderer->spritesheet->sprites[RR_SPRITESHEET_INDEX_PLAYER_DEATH3];
+    animation_frames[3] = renderer->spritesheet->sprites[RR_SPRITESHEET_INDEX_PLAYER_DEATH4];
+    animation_frames[4] = renderer->spritesheet->sprites[RR_SPRITESHEET_INDEX_PLAYER_DEATH5];
+
+    rr_renderer_create_animation(renderer, RR_ANIMATION_PLAYER_DEATH, 5, animation_frames, 100);
+}
+
+
+int rr_sdl_renderer_load_sprites(rrRenderer* renderer, const char* asset_dir) {
+    rrSprite* sprite;
+    char asset_path[256];
+    sprintf(asset_path, "%s%s%s", asset_dir, rr_path_sep(), "spritesheet.png");
+
+    sprite = rr_renderer_load_sprite(renderer, asset_path);
+    if (sprite) {
+        renderer->sprites[RR_SPRITE_SPRITESHEET] = sprite;
+        rr_sdl_renderer_init_spritesheet(renderer);
+        rr_sdl_display_init_animations(renderer);
+    }
+    else {
+        return 0;
+    }
+
+    sprintf(asset_path, "%s%s%s", asset_dir, rr_path_sep(), "logo.png");
+    sprite = rr_renderer_load_sprite(renderer, asset_path);
+
+    if (sprite)
+        renderer->sprites[RR_SPRITE_TITLE_LOGO] = sprite;
+    else
+        return 0;
+
+    sprintf(asset_path, "%s%s%s", asset_dir, rr_path_sep(), "clock.png");
+    sprite = rr_renderer_load_sprite(renderer, asset_path);
+
+    if (sprite)
+        renderer->sprites[RR_SPRITE_CLOCK] = sprite;
+    else
+        return 0;
+
+    return 1;
+}
+
+int rr_sdl_renderer_load_fonts(rrRenderer* renderer, const char* asset_dir) {
+    TTF_Font* font;
+    char asset_path[256];
+    sprintf(asset_path, "%s%s%s", asset_dir, rr_path_sep(), "ms-sans-serif.ttf");
+
+    font = TTF_OpenFont(asset_path, 24);
+    if (font)
+        renderer->fonts[RR_FONT_TITLE] = font;
+    else
+        return 0;
+
+    font = TTF_OpenFont(asset_path, 16);
+    if (font)
+        renderer->fonts[RR_FONT_BUTTON] = font;
+    else
+        return 0;
+
+
+    return 1;
 }

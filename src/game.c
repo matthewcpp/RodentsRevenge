@@ -26,6 +26,7 @@ struct rrGame {
     rrPool* _enemy_pool;
     rrPool* _yarn_pool;
     rrInput* _input;
+    rrRenderer* _renderer;
     rrSpawner* _spawner;
     int current_level;
 
@@ -33,12 +34,12 @@ struct rrGame {
     size_t _asset_path_len;
 };
 
-rrGame* rr_game_create(rrInput* input, const char* asset_path) {
+rrGame* rr_game_create(rrInput* input, rrRenderer* renderer, const char* asset_path) {
     rrGame* game = malloc(sizeof(rrGame));
 
     game->_input = input;
     game->grid = rr_grid_create(RR_GRID_WIDTH, RR_GRID_HEIGHT);
-    rr_player_init(&game->player, game->grid, input);
+    rr_player_init(&game->player, game->grid, input, renderer);
 
     game->_enemies = cutil_vector_create(cutil_trait_ptr());
     game->_yarns = cutil_vector_create(cutil_trait_ptr());
@@ -129,7 +130,8 @@ void rr_game_round_clear(rrGame* game) {
 void rr_game_reset(rrGame* game) {
     size_t i;
 
-    rr_entity_remove_from_grid(&game->player.entity, game->grid);
+    if (!rr_entity_position_is_invalid(&game->player.entity))
+        rr_entity_remove_from_grid(&game->player.entity, game->grid);
 
     for (i = 0; i < cutil_vector_size(game->_enemies); i++) {
         rrEnemy* enemy;
@@ -282,6 +284,7 @@ int rr_game_restart(rrGame* game) {
     game->state = RR_GAME_STATE_PLAYING;
     rr_game_respawn_player(game);
     rr_spawner_spawn_enemies(game->_spawner, game->_enemies);
+    rr_spawner_spawn_yarn(game->_spawner, game->_yarns);
 
     return 1;
 }

@@ -20,7 +20,10 @@ set(game_src
 	src/pool.h src/pool.c)
 
 set(drawing_src
-	src/draw/renderer.h src/draw/renderer.c
+	src/draw/color.h src/draw/color.c
+	src/draw/rect.h src/draw/rect.c
+	src/draw/renderer.h
+	src/draw/sprite.h
 	src/draw/spritesheet.h src/draw/spritesheet.c
 	src/draw/animation.h src/draw/animation.c)
 

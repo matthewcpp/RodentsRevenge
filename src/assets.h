@@ -42,4 +42,9 @@ typedef enum {
     RR_FONT_COUNT = 2
 } rrFontIndex;
 
+typedef enum {
+    RR_ANIMATION_PLAYER_DEATH,
+    RR_ANIMATION_COUNT
+} rrAnimationIndex;
+
 #endif

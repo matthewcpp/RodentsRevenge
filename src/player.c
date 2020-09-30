@@ -1,20 +1,27 @@
 #include "player.h"
 #include "enemy.h"
 
+#include "assets.h"
+
 #include <assert.h>
 
 #define RR_PLAYER_INPUT_REPEAT_TIME 1000
 #define RR_PLAYER_HOLE_STUCK_TIME 10000
 
-void rr_player_init(rrPlayer* player, rrGrid* grid, rrInput* input) {
+void rr_player_init(rrPlayer* player, rrGrid* grid, rrInput* input, rrRenderer* renderer) {
     rr_entity_init(&player->entity, RR_ENTITY_PLAYER);
     player->_grid = grid;
     player->_input = input;
     player->score = 0;
     player->lives_remaining = 2;
     player->_killer_entity = NULL;
-    player->death_animation = NULL;
     player->time_stuck = 0;
+
+    rr_animation_player_init(&player->death_animation, rr_renderer_get_animation(renderer, RR_ANIMATION_PLAYER_DEATH));
+}
+
+void rr_player_init_assets(rrPlayer* player) {
+    rr_animation_player_init(&player->death_animation, rr_renderer_get_animation(player->_renderer, RR_ANIMATION_PLAYER_DEATH));
 }
 
 int rr_player_input_button_active(rrInput* input, rrInputButton button) {
@@ -37,9 +44,9 @@ void rr_player_update_active(rrPlayer* player) {
 }
 
 void rr_player_update_dying(rrPlayer* player, int time) {
-    rr_animation_update(player->death_animation, time);
+    rr_animation_player_update(&player->death_animation, time);
 
-    if (rr_animation_complete(player->death_animation)) {
+    if (rr_animation_player_complete(&player->death_animation)) {
         rrPoint position;
         rr_point_copy(&position, &player->entity.position);
 
@@ -179,7 +186,7 @@ void rr_player_kill(rrPlayer* player, rrEntity* entity) {
     assert(entity == NULL || entity->status == RR_STATUS_SUSPENDED);
 
     player->entity.status = RR_STATUS_DYING;
-    rr_animation_reset(player->death_animation);
+    rr_animation_player_reset(&player->death_animation);
 
     player->_killer_entity = entity;
 }

@@ -15,7 +15,7 @@ typedef enum {
 
 typedef struct rrGame rrGame;
 
-rrGame* rr_game_create(rrInput* input, const char* asset_path);
+rrGame* rr_game_create(rrInput* input, rrRenderer* renderer, const char* asset_path);
 void rr_game_destroy(rrGame* game);
 
 rrClock* rr_game_get_clock(rrGame* game);

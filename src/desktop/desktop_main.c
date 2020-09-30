@@ -5,7 +5,7 @@
 #define RR_SCREEN_WIDTH 640
 #define RR_SCREEN_HEIGHT 480
 
-int main(){
+int main(int argc, char** argv) {
     rrSDLGame* sdl_game;
 
     sdl_game = rr_sdl_game_create(ASSET_DIRECTORY);
@@ -16,6 +16,9 @@ int main(){
 
     rr_sdl_game_run(sdl_game);
     rr_sdl_game_destroy(sdl_game);
+
+    (void)argc;
+    (void)argv;
 
     return 0;
 }
