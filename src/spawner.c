@@ -144,7 +144,7 @@ void rr_spawner_get_random_yarn_spawn(rrSpawner* spawner, rrPoint* spawn_pos, rr
     cell_index = rand() % cell_count;
 
     /* top row */
-    if (cell_index < grid_size.x){
+    if (cell_index < grid_size.x - 2){
         spawn_pos->x = 1 + cell_index;
         spawn_pos->y = 0;
         direction->y = 1;
@@ -154,7 +154,7 @@ void rr_spawner_get_random_yarn_spawn(rrSpawner* spawner, rrPoint* spawn_pos, rr
 
     cell_index -= grid_size.x;
     /* bottom row */
-    if (cell_index < grid_size.x) {
+    if (cell_index < grid_size.x - 2) {
         spawn_pos->x = 1 + cell_index;
         spawn_pos->y = grid_size.y - 1;
         direction->y = -1;
@@ -164,7 +164,7 @@ void rr_spawner_get_random_yarn_spawn(rrSpawner* spawner, rrPoint* spawn_pos, rr
 
     cell_index -= grid_size.x;
     /* right column */
-    if (cell_index < grid_size.y) {
+    if (cell_index < grid_size.y - 2) {
         spawn_pos->x = 0;
         spawn_pos->y = 1 + cell_index;
         direction->y = yarn_directions[rand() % 3];

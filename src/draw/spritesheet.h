@@ -4,6 +4,8 @@
 #include "rect.h"
 #include "sprite.h"
 
+#include <stddef.h>
+
 typedef struct {
     rrSprite* source;
     rrSprite** sprites;
