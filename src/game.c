@@ -85,8 +85,9 @@ void rr_game_respawn_player(rrGame* game) {
 
 void rr_game_round_clear(rrGame* game) {
     int i;
+    int count = (int)cutil_vector_size(game->_enemies);
 
-    for (i = 0; i < cutil_vector_size(game->_enemies); i++){
+    for (i = 0; i < count; i++){
         rrEnemy* enemy;
         rrPoint position;
         cutil_vector_get(game->_enemies, i, &enemy);
@@ -136,6 +137,9 @@ void rr_game_next_level(rrGame* game){
     int next_level = game->current_level < RR_LEVEL_COUNT ? game->current_level + 1 : 1;
 
     rr_entity_remove_from_grid(&game->player.entity, game->grid);
+    rr_pool_return_vec(game->_yarn_pool, game->_yarns);
+    cutil_vector_clear(game->_yarns);
+
     assert(cutil_vector_empty(game->_enemies));
 
     rr_game_set_active_level(game, next_level);
@@ -301,7 +305,7 @@ int rr_game_set_active_level(rrGame* game, int level_num){
 }
 
 int rr_game_load_debug_level(rrGame* game, const char* path){
-    int file_loaded = rr_grid_load_from_file(game->grid, path);
+    int file_loaded = rr_game_load_level(game, path);
     rr_debug_load_properties(game);
     game->current_level = 0;
     return file_loaded;

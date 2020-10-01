@@ -42,6 +42,11 @@ void rr_yarn_update_waiting(rrYarn* yarn, int time) {
     }
 }
 
+void rr_yarn_explode(rrYarn* yarn) {
+    yarn->entity.status = RR_STATUS_DYING;
+    rr_animation_player_reset(&yarn->explode_animation);
+}
+
 void rr_yarn_update_active(rrYarn* yarn, int time) {
     rrPoint target_pos, current_pos;
     rrEntity* target_entity;
@@ -61,9 +66,12 @@ void rr_yarn_update_active(rrYarn* yarn, int time) {
 
         yarn->move_count += 1;
     }
-    else {
-        yarn->entity.status = RR_STATUS_DYING;
-        rr_animation_player_reset(&yarn->explode_animation);
+    else if (target_entity->type == RR_ENTITY_PLAYER) {
+        rr_player_kill((rrPlayer*)target_entity, NULL);
+        yarn->entity.status = RR_STATUS_KILLED;
+    }
+    else { /* hit other non movable object. */
+        rr_yarn_explode(yarn);
     }
 
     yarn->status_time = 0;

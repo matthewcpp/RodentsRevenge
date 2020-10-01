@@ -177,8 +177,6 @@ void rr_player_move(rrPlayer* player, rrPoint* delta) {
         case RR_ENTITY_UNKNOWN:
             assert(0);
             break;
-
-
     }
 }
 
