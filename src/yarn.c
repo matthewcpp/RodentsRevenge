@@ -56,7 +56,7 @@ void rr_yarn_update_active(rrYarn* yarn, int time) {
         return;
 
     rr_point_add(&target_pos, &yarn->entity.position, &yarn->direction);
-    target_entity = rr_grid_get_entity_at_position(yarn->_grid, & target_pos);
+    target_entity = rr_grid_get_entity_at_position(yarn->_grid, &target_pos);
     if (target_entity == NULL) {
         rr_point_copy(&current_pos, &yarn->entity.position);
         rr_entity_move_to_grid_cell(&yarn->entity, yarn->_grid, &target_pos);
@@ -73,6 +73,11 @@ void rr_yarn_update_active(rrYarn* yarn, int time) {
     else if (target_entity->type == RR_ENTITY_HOLE) {
         yarn->entity.status = RR_STATUS_KILLED;
     }
+    else if (target_entity->type == RR_ENTITY_ENEMY) {
+        rr_point_copy(&yarn->suspended_position, &target_pos);
+        rr_entity_remove_from_grid(&yarn->entity, yarn->_grid);
+        yarn->entity.status = RR_STATUS_SUSPENDED;
+    }
     else { /* hit other non movable object. */
         rr_yarn_explode(yarn);
     }
@@ -81,10 +86,46 @@ void rr_yarn_update_active(rrYarn* yarn, int time) {
 }
 
 void rr_yarn_update_dying(rrYarn* yarn, int time) {
+    /* if the yarn is stuck then check if the space is now available. */
+    if (rr_entity_position_is_invalid(&yarn->entity)) {
+        rrEntity* target_entity = rr_grid_get_entity_at_position(yarn->_grid, &yarn->suspended_position);
+
+        if (target_entity == NULL)
+            rr_entity_place_in_grid_cell(&yarn->entity, yarn->_grid, &yarn->suspended_position);
+    }
+
     rr_animation_player_update(&yarn->explode_animation, time);
 
     if (rr_animation_player_complete(&yarn->explode_animation))
         yarn->entity.status = RR_STATUS_KILLED;
+}
+
+void rr_yarn_update_suspended(rrYarn* yarn, int time) {
+    rrEntity* target_entity = rr_grid_get_entity_at_position(yarn->_grid, &yarn->suspended_position);
+    rrPoint target_pos;
+
+    /* if the grid cell is no longer occupied, we can place the yarn there and resume normal operations */
+    if (target_entity == NULL) {
+        rr_entity_place_in_grid_cell(&yarn->entity, yarn->_grid, &yarn->suspended_position);
+        yarn->entity.status = RR_STATUS_ACTIVE;
+        rr_yarn_update_active(yarn, time);
+        return;
+    }
+
+    yarn->status_time += time;
+
+    if (yarn->status_time < RR_YARN_MOVE_TIME)
+        return;
+
+    /* while we are suspended we can only move to a free cell or one that is occupied by an enemy */
+    rr_point_add(&target_pos, &yarn->suspended_position, &yarn->direction);
+    target_entity = rr_grid_get_entity_at_position(yarn->_grid, &target_pos);
+
+    if (target_entity == NULL || target_entity->type == RR_ENTITY_ENEMY)
+        rr_point_copy(&yarn->suspended_position, &target_pos);
+    else
+        yarn->entity.status = RR_STATUS_DYING;
+
 }
 
 void rr_yarn_update(rrYarn* yarn, int time) {
@@ -101,16 +142,20 @@ void rr_yarn_update(rrYarn* yarn, int time) {
             rr_yarn_update_dying(yarn, time);
             break;
 
+        case RR_STATUS_SUSPENDED:
+            rr_yarn_update_suspended(yarn, time);
+            break;
+
         default:
             break;
     }
 }
 
 void _rr_yarn_reset(rrYarn* yarn) {
-    yarn->_collision = NULL;
     yarn->move_count = 0;
     yarn->status_time = 0;
     rr_point_set(&yarn->direction, 0, 0);
+    rr_point_set(&yarn->suspended_position, 0, 0);
 }
 
 void* _rr_yarn_create_pooled(void* user_data){

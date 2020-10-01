@@ -10,7 +10,7 @@ typedef struct {
     rrGrid* _grid;
 
     rrPoint direction;
-    rrEntity* _collision;
+    rrPoint suspended_position;
     int move_count;
     int status_time;
     rrAnimationPlayer explode_animation;
