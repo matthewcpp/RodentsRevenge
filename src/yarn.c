@@ -70,6 +70,9 @@ void rr_yarn_update_active(rrYarn* yarn, int time) {
         rr_player_kill((rrPlayer*)target_entity, NULL);
         yarn->entity.status = RR_STATUS_KILLED;
     }
+    else if (target_entity->type == RR_ENTITY_HOLE) {
+        yarn->entity.status = RR_STATUS_KILLED;
+    }
     else { /* hit other non movable object. */
         rr_yarn_explode(yarn);
     }
