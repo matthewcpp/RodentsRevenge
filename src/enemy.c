@@ -8,7 +8,6 @@ void rr_enemy_init(rrEnemy* enemy, rrEntity* player, rrGrid* grid) {
     rr_entity_init(&enemy->entity, RR_ENTITY_ENEMY);
     enemy->_grid = grid;
     enemy->_player = player;
-    enemy->_last_move_time = 0;
 }
 
 static rrPoint deltas[8] = {
@@ -59,14 +58,9 @@ int rr_enemy_move(rrEnemy* enemy) {
     }
 }
 
-void rr_enemy_update(rrEnemy* enemy, int time) {
-    if (enemy->entity.status == RR_STATUS_ACTIVE || enemy->entity.status == RR_STATUS_WAITING) {
-        enemy->_last_move_time += time;
-        if (enemy->_last_move_time >= 1000) {
-            rr_enemy_move(enemy);
-            enemy->_last_move_time = 0;
-        }
-    }
+void rr_enemy_update(rrEnemy* enemy) {
+    if (enemy->entity.status == RR_STATUS_ACTIVE || enemy->entity.status == RR_STATUS_WAITING)
+        rr_enemy_move(enemy);
 }
 
 void rr_enemy_suspend(rrEnemy* enemy) {

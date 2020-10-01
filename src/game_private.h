@@ -23,6 +23,9 @@ struct rrGame {
     rrSpawner* _spawner;
     int current_level;
 
+    int enemy_update_frequency;
+    int enemy_update_time;
+
     char* _asset_path;
     size_t _asset_path_len;
 };

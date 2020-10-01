@@ -8,12 +8,11 @@
 typedef struct {
     rrEntity entity;
     rrGrid* _grid;
-    int _last_move_time;
     rrEntity* _player;
 } rrEnemy;
 
 void rr_enemy_init(rrEnemy* enemy, rrEntity* player, rrGrid* grid);
-void rr_enemy_update(rrEnemy* enemy, int time);
+void rr_enemy_update(rrEnemy* enemy);
 int rr_enemy_move(rrEnemy* enemy);
 
 /** Puts enemy in a suspended state so that it will not be reused when spawning additional enemies, but is not active on the board.

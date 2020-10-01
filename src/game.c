@@ -12,6 +12,8 @@ rrPoint starting_pos = {11,11};
 #define RR_LEVEL_COUNT 4
 #define RR_CLOCK_WIND_SPEED_MOD 100
 
+#define RR_GAME_DEFAULT_ENEMY_UPDATE_FREQUENCY 1000
+
 rrGame* rr_game_create(rrInput* input, rrRenderer* renderer, const char* asset_path) {
     rrGame* game = malloc(sizeof(rrGame));
 
@@ -33,6 +35,9 @@ rrGame* rr_game_create(rrInput* input, rrRenderer* renderer, const char* asset_p
     game->_asset_path_len = strlen(asset_path);
     game->_asset_path = malloc(game->_asset_path_len + 1);
     strcpy(game->_asset_path, asset_path);
+
+    game->enemy_update_time = 0;
+    game->enemy_update_frequency = RR_GAME_DEFAULT_ENEMY_UPDATE_FREQUENCY;
 
     rr_game_set_active_level(game, 1);
 
@@ -131,6 +136,7 @@ void rr_game_reset(rrGame* game) {
 
     rr_game_set_active_level(game, game->current_level);
     game->state = RR_GAME_STATE_UNSTARTED;
+    game->enemy_update_time = 0;
 }
 
 void rr_game_next_level(rrGame* game){
@@ -144,6 +150,7 @@ void rr_game_next_level(rrGame* game){
 
     rr_game_set_active_level(game, next_level);
     rr_game_respawn_player(game);
+    game->enemy_update_time = 0;
     rr_spawner_spawn_enemies(game->_spawner, game->_enemies);
 }
 
@@ -162,31 +169,44 @@ void rr_game_update_yarn(rrGame* game, int time) {
     }
 }
 
+int rr_game_update_enemies(rrGame* game, int time) {
+    int i, count, round_clear = 0;
+
+    game->enemy_update_time += time;
+    if (game->enemy_update_time < game->enemy_update_frequency)
+        return round_clear;
+
+    count = (int)cutil_vector_size(game->_enemies);
+    round_clear = 1;
+
+    for (i = 0; i < count; i++){
+        rrEnemy* enemy;
+        cutil_vector_get(game->_enemies, i, &enemy);
+        rr_enemy_update(enemy);
+
+        /* check to see if any previously spawned enemies are still active. */
+        if (enemy->entity.status == RR_STATUS_ACTIVE || enemy->entity.status == RR_STATUS_SUSPENDED)
+            round_clear = 0;
+    }
+
+    game->enemy_update_time -= game->enemy_update_frequency;
+
+    return round_clear;
+}
+
 void rr_game_update_player_active(rrGame* game, int time) {
-    size_t i;
-    unsigned int round_clear = 1;
+    unsigned int round_clear = rr_game_update_enemies(game, time);
+    rr_game_update_yarn(game, time);
 
     if (rr_clock_did_tick_seconds(&game->clock)) {
         if (game->clock.seconds_pos == 14 || game->clock.seconds_pos == 0)
         game->player.score += 1;
     }
 
-    rr_game_update_yarn(game, time);
-
     /* Player has not defeated all enemies in time...more will spawn now! */
     if (rr_clock_did_tick_target(&game->clock) && game->clock.target_pos != 0) {
         rr_clock_advance_target(&game->clock);
         rr_spawner_spawn_enemies(game->_spawner, game->_enemies);
-    }
-
-    /* check to see if any previously spawned enemies are still active. */
-    for (i = 0; i < cutil_vector_size(game->_enemies); i++){
-        rrEnemy* enemy;
-        cutil_vector_get(game->_enemies, i, &enemy);
-
-        rr_enemy_update(enemy, time);
-        if (enemy->entity.status == RR_STATUS_ACTIVE || enemy->entity.status == RR_STATUS_SUSPENDED)
-            round_clear = 0;
     }
 
     if (round_clear) {
