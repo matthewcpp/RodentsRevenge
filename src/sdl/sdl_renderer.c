@@ -291,6 +291,5 @@ int rr_sdl_renderer_load_fonts(rrRenderer* renderer, const char* asset_dir) {
     else
         return 0;
 
-
     return 1;
 }

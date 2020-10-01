@@ -31,6 +31,7 @@ void rr_game_update(rrGame* game, int time);
 void rr_game_reset(rrGame* game);
 int rr_game_restart(rrGame* game);
 int rr_game_set_active_level(rrGame* game, int level_num);
+int rr_game_load_debug_level(rrGame* game, const char* path);
 int rr_game_get_level_count();
 
 #endif

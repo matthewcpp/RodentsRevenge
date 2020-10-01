@@ -5,9 +5,10 @@ include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/util_functions.cmake)
 project (RodentsRevenge C)
 
 set(game_src
+	src/debug.h src/debug.c
 	src/player.h src/player.c
 	src/grid.h src/grid.c
-	src/game.h src/game.c
+	src/game.h src/game_private.h src/game.c
 	src/input.h
 	src/point.h src/point.c
 	src/enemy.h src/enemy.c

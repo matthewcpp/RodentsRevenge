@@ -1,10 +1,7 @@
 #include "game.h"
+#include "game_private.h"
 
-#include "enemy.h"
-#include "pool.h"
-#include "yarn.h"
-#include "spawner.h"
-#include "util.h"
+#include "debug.h"
 
 #include <assert.h>
 #include <string.h>
@@ -14,25 +11,6 @@ rrPoint starting_pos = {11,11};
 
 #define RR_LEVEL_COUNT 4
 #define RR_CLOCK_WIND_SPEED_MOD 100
-
-struct rrGame {
-    rrGrid* grid;
-    rrPlayer player;
-    rrClock clock;
-    rrGameState state;
-
-    cutil_vector* _enemies;
-    cutil_vector* _yarns;
-    rrPool* _enemy_pool;
-    rrPool* _yarn_pool;
-    rrInput* _input;
-    rrRenderer* _renderer;
-    rrSpawner* _spawner;
-    int current_level;
-
-    char* _asset_path;
-    size_t _asset_path_len;
-};
 
 rrGame* rr_game_create(rrInput* input, rrRenderer* renderer, const char* asset_path) {
     rrGame* game = malloc(sizeof(rrGame));
@@ -296,9 +274,17 @@ int rr_game_restart(rrGame* game) {
     game->state = RR_GAME_STATE_PLAYING;
     rr_game_respawn_player(game);
     rr_spawner_spawn_enemies(game->_spawner, game->_enemies);
-    rr_spawner_spawn_yarn(game->_spawner, game->_yarns);
 
     return 1;
+}
+
+int rr_game_load_level(rrGame* game, const char* path) {
+    int file_loaded = rr_grid_load_from_file(game->grid, path);
+
+    rr_spawner_set_properties(game->_spawner, rr_grid_get_properties(game->grid));
+    rr_clock_set_properties(&game->clock, rr_grid_get_properties(game->grid));
+
+    return file_loaded;
 }
 
 int rr_game_set_active_level(rrGame* game, int level_num){
@@ -306,14 +292,18 @@ int rr_game_set_active_level(rrGame* game, int level_num){
 
     char* path_buffer = malloc(game->_asset_path_len + 32);
     sprintf(path_buffer, "%s%slevels%slevel%02d.txt", game->_asset_path, rr_path_sep(), rr_path_sep(), level_num);
-    file_loaded = rr_grid_load_from_file(game->grid, path_buffer);
-
-    rr_spawner_set_properties(game->_spawner, rr_grid_get_properties(game->grid));
-    rr_clock_set_properties(&game->clock, rr_grid_get_properties(game->grid));
+    file_loaded = rr_game_load_level(game, path_buffer);
 
     free (path_buffer);
     game->current_level = level_num;
 
+    return file_loaded;
+}
+
+int rr_game_load_debug_level(rrGame* game, const char* path){
+    int file_loaded = rr_grid_load_from_file(game->grid, path);
+    rr_debug_load_properties(game);
+    game->current_level = 0;
     return file_loaded;
 }
 
