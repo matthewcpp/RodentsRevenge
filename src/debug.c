@@ -2,6 +2,7 @@
 
 #include "game_private.h"
 
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -31,9 +32,22 @@ void rr_debug_set_enemy_freq(rrGame* game, const char* str) {
     game->enemy_update_frequency = enemy_freq;
 }
 
+void rr_game_set_yarn_frequency(rrGame* game, const char* str) {
+    sscanf(str, "%d %d", &game->yarn_spawn_time_min, &game->yarn_spawn_time_max);
+
+    assert(game->yarn_spawn_time_max >= game->yarn_spawn_time_min);
+}
+
+void rr_game_reset_properties(rrGame* game) {
+    game->yarn_spawn_time_min = 0;
+    game->yarn_spawn_time_max = 0;
+}
+
 void rr_debug_load_properties(rrGame* game) {
     cutil_btree* properties = rr_grid_get_properties(game->grid);
     cutil_btree_itr* itr = cutil_btree_itr_create(properties);
+
+    rr_game_reset_properties(game);
 
     while (cutil_btree_itr_next(itr)) {
         char* key;
@@ -42,11 +56,13 @@ void rr_debug_load_properties(rrGame* game) {
         cutil_btree_itr_get_key(itr, &key);
         cutil_btree_itr_get_value(itr, &value);
 
-        if (strstr(key, "yarn") == key)
-            rr_debug_spawn_yarn(game, value);
         if (strstr(key, "enemyfreq") == key)
             rr_debug_set_enemy_freq(game, value);
+        else if (strstr(key, "yarnfreq") == key)
+            rr_game_set_yarn_frequency(game, value);
         else if (strstr(key, "enemy") == key)
             rr_debug_spawn_enemy(game, value);
+        else if (strstr(key, "yarn") == key)
+            rr_debug_spawn_yarn(game, value);
     }
 }

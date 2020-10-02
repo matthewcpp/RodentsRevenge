@@ -152,7 +152,7 @@ void rr_spawner_get_random_yarn_spawn(rrSpawner* spawner, rrPoint* spawn_pos, rr
         return;
     }
 
-    cell_index -= grid_size.x;
+    cell_index -= grid_size.x - 2;
     /* bottom row */
     if (cell_index < grid_size.x - 2) {
         spawn_pos->x = 1 + cell_index;
@@ -162,7 +162,7 @@ void rr_spawner_get_random_yarn_spawn(rrSpawner* spawner, rrPoint* spawn_pos, rr
         return;
     }
 
-    cell_index -= grid_size.x;
+    cell_index -= grid_size.x - 2;
     /* right column */
     if (cell_index < grid_size.y - 2) {
         spawn_pos->x = 0;
@@ -172,7 +172,7 @@ void rr_spawner_get_random_yarn_spawn(rrSpawner* spawner, rrPoint* spawn_pos, rr
         return;
     }
 
-    cell_index -= grid_size.y;
+    cell_index -= grid_size.y - 2;
     /* left column */
     spawn_pos->x = grid_size.x - 1;
     spawn_pos->y = 1 + cell_index;
@@ -190,10 +190,17 @@ void rr_spawner_spawn_yarn(rrSpawner* spawner, cutil_vector* yarn_list) {
         rr_spawner_get_random_yarn_spawn(spawner, &spawn_pos, &direction);
         entity = rr_grid_get_entity_at_position(spawner->grid, &spawn_pos);
         assert(entity != NULL);
+
+        if (entity == NULL)
+            continue;
+
         valid_spawn = entity->type == RR_ENTITY_WALL;
 
         rr_point_add(&test_move, &spawn_pos, &direction);
-        valid_spawn &= rr_grid_get_entity_at_position(spawner->grid, &test_move) == NULL;
+        if (rr_grid_position_is_valid(spawner->grid, &test_move))
+            valid_spawn &= rr_grid_get_entity_at_position(spawner->grid, &test_move) == NULL;
+        else
+            valid_spawn = 0;
 
     } while (!valid_spawn);
 

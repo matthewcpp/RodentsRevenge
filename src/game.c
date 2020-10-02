@@ -2,6 +2,7 @@
 #include "game_private.h"
 
 #include "debug.h"
+#include "util.h"
 
 #include <assert.h>
 #include <string.h>
@@ -39,6 +40,10 @@ rrGame* rr_game_create(rrInput* input, rrRenderer* renderer, const char* asset_p
     game->enemy_update_time = 0;
     game->enemy_update_frequency = RR_GAME_DEFAULT_ENEMY_UPDATE_FREQUENCY;
 
+    game->yarn_spawn_time_min = 0;
+    game->yarn_spawn_time_max = 0;
+    game->yarn_spawn_time = 0;
+
     rr_game_set_active_level(game, 1);
 
     return game;
@@ -69,6 +74,10 @@ rrPlayer* rr_game_get_player(rrGame* game) {
 
 rrGrid* rr_game_get_grid(rrGame* game) {
     return game->grid;
+}
+
+int rr_yarn_enabled(rrGame* game) {
+    return game->yarn_spawn_time_min > 0 && game->yarn_spawn_time_max > 0;
 }
 
 /* TODO: investigate player respawn behavior further.  Perhaps based on distance to enemy? */
@@ -137,6 +146,14 @@ void rr_game_reset(rrGame* game) {
     rr_game_set_active_level(game, game->current_level);
     game->state = RR_GAME_STATE_UNSTARTED;
     game->enemy_update_time = 0;
+    game->yarn_spawn_time = 0;
+}
+
+void rr_game_set_next_yarn_spawn_time(rrGame* game) {
+    if (rr_yarn_enabled(game))
+        game->yarn_spawn_time = rand_between(game->yarn_spawn_time_min, game->yarn_spawn_time_max);
+    else
+        game->yarn_spawn_time = 0;
 }
 
 void rr_game_next_level(rrGame* game){
@@ -152,6 +169,8 @@ void rr_game_next_level(rrGame* game){
     rr_game_respawn_player(game);
     game->enemy_update_time = 0;
     rr_spawner_spawn_enemies(game->_spawner, game->_enemies);
+
+    rr_game_set_next_yarn_spawn_time(game);
 }
 
 void rr_game_update_yarn(rrGame* game, int time) {
@@ -163,9 +182,21 @@ void rr_game_update_yarn(rrGame* game, int time) {
         rr_yarn_update(yarn, time);
 
         if (yarn->entity.status == RR_STATUS_KILLED) {
-            cutil_vector_pop_back(game->_yarns);
+            cutil_vector_remove(game->_yarns, i);
             rr_pool_return(game->_yarn_pool, yarn);
         }
+    }
+}
+
+void rr_game_update_yarn_spawn_timer(rrGame* game, int time) {
+    if (!rr_yarn_enabled(game) || cutil_vector_size(game->_yarns) >= 2)
+        return;
+
+    game->yarn_spawn_time -= time;
+
+    if (game->yarn_spawn_time < 0) {
+        rr_spawner_spawn_yarn(game->_spawner, game->_yarns);
+        rr_game_set_next_yarn_spawn_time(game);
     }
 }
 
@@ -196,6 +227,7 @@ int rr_game_update_enemies(rrGame* game, int time) {
 
 void rr_game_update_player_active(rrGame* game, int time) {
     unsigned int round_clear = rr_game_update_enemies(game, time);
+    rr_game_update_yarn_spawn_timer(game, time);
     rr_game_update_yarn(game, time);
 
     if (rr_clock_did_tick_seconds(&game->clock)) {
@@ -248,11 +280,8 @@ void rr_game_update_state_playing(rrGame* game, int time) {
 
     if (game->player.entity.status == RR_STATUS_KILLED)
         rr_game_update_player_killed(game);
-    else if (game->player.entity.status == RR_STATUS_ACTIVE || game->player.entity.status == RR_STATUS_STUCK) {
+    else if (game->player.entity.status == RR_STATUS_ACTIVE || game->player.entity.status == RR_STATUS_STUCK)
         rr_game_update_player_active(game, time);
-
-
-    }
 }
 
 void rr_game_update_state_unstarted(rrGame* game) {
@@ -298,6 +327,7 @@ int rr_game_restart(rrGame* game) {
     game->state = RR_GAME_STATE_PLAYING;
     rr_game_respawn_player(game);
     rr_spawner_spawn_enemies(game->_spawner, game->_enemies);
+    rr_game_set_next_yarn_spawn_time(game);
 
     return 1;
 }
@@ -307,6 +337,7 @@ int rr_game_load_level(rrGame* game, const char* path) {
 
     rr_spawner_set_properties(game->_spawner, rr_grid_get_properties(game->grid));
     rr_clock_set_properties(&game->clock, rr_grid_get_properties(game->grid));
+    rr_debug_load_properties(game);
 
     return file_loaded;
 }
@@ -326,7 +357,6 @@ int rr_game_set_active_level(rrGame* game, int level_num){
 
 int rr_game_load_debug_level(rrGame* game, const char* path){
     int file_loaded = rr_game_load_level(game, path);
-    rr_debug_load_properties(game);
     game->current_level = 0;
     return file_loaded;
 }

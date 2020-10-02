@@ -7,7 +7,7 @@
 #include <assert.h>
 
 #define RR_YARN_WAIT_TIME_MIN 1000
-#define RR_YARN_WAIT_TIME_MAX 10000
+#define RR_YARN_WAIT_TIME_MAX 5000
 #define RR_YARN_MOVE_TIME 100
 
 void _rr_yarn_reset(rrYarn* yarn);
@@ -38,7 +38,7 @@ void rr_yarn_update_waiting(rrYarn* yarn, int time) {
 
     if (yarn->status_time <= 0) {
         yarn->entity.status = RR_STATUS_ACTIVE;
-        yarn->status_time = 0;
+        yarn->status_time = RR_YARN_MOVE_TIME;
     }
 }
 
@@ -50,9 +50,9 @@ void rr_yarn_explode(rrYarn* yarn) {
 void rr_yarn_update_active(rrYarn* yarn, int time) {
     rrPoint target_pos, current_pos;
     rrEntity* target_entity;
-    yarn->status_time += time;
+    yarn->status_time -= time;
 
-    if (yarn->status_time < RR_YARN_MOVE_TIME)
+    if (yarn->status_time > 0)
         return;
 
     rr_point_add(&target_pos, &yarn->entity.position, &yarn->direction);
@@ -82,18 +82,10 @@ void rr_yarn_update_active(rrYarn* yarn, int time) {
         rr_yarn_explode(yarn);
     }
 
-    yarn->status_time = 0;
+    yarn->status_time = RR_YARN_MOVE_TIME;
 }
 
 void rr_yarn_update_dying(rrYarn* yarn, int time) {
-    /* if the yarn is stuck then check if the space is now available. */
-    if (rr_entity_position_is_invalid(&yarn->entity)) {
-        rrEntity* target_entity = rr_grid_get_entity_at_position(yarn->_grid, &yarn->suspended_position);
-
-        if (target_entity == NULL)
-            rr_entity_place_in_grid_cell(&yarn->entity, yarn->_grid, &yarn->suspended_position);
-    }
-
     rr_animation_player_update(&yarn->explode_animation, time);
 
     if (rr_animation_player_complete(&yarn->explode_animation))

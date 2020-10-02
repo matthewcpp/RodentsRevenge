@@ -26,6 +26,10 @@ struct rrGame {
     int enemy_update_frequency;
     int enemy_update_time;
 
+    int yarn_spawn_time_min;
+    int yarn_spawn_time_max;
+    int yarn_spawn_time;
+
     char* _asset_path;
     size_t _asset_path_len;
 };
