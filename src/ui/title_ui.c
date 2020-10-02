@@ -35,12 +35,19 @@ void rr_title_ui_show(rrTitleUi* ui) {
     ui->level_select_dialog->active = 0;
 }
 
-void rr_title_ui_update(rrTitleUi* ui) {
-    if (ui->level_select_dialog->active) {
-        rr_ui_level_select_update(ui->level_select_dialog);
-        return;
-    }
+void rr_title_update_pointer(rrTitleUi* ui) {
+    rrPoint pos;
 
+    if (!rr_input_pointer_up(ui->_input))
+        return;
+
+    rr_input_pointer_pos(ui->_input, &pos);
+
+    rr_ui_button_try_click(&ui->new_game_button, &pos);
+    rr_ui_button_try_click(&ui->level_select_button, &pos);
+}
+
+void rr_title_ui_update_input(rrTitleUi* ui) {
     if (rr_input_button_down(ui->_input, RR_INPUT_BUTTON_DOWN))
         rr_ui_active_element_group_next(&ui->_element_group);
 
@@ -51,6 +58,16 @@ void rr_title_ui_update(rrTitleUi* ui) {
         rrUiButton* button = (rrUiButton*)rr_ui_active_element_group_get_current(&ui->_element_group);
         rr_ui_button_activate(button);
     }
+}
+
+void rr_title_ui_update(rrTitleUi* ui) {
+    if (ui->level_select_dialog->active) {
+        rr_ui_level_select_update(ui->level_select_dialog);
+        return;
+    }
+
+    rr_title_update_pointer(ui);
+    rr_title_ui_update_input(ui);
 }
 
 void rr_title_ui_layout(rrTitleUi* ui) {
