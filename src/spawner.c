@@ -184,7 +184,7 @@ void rr_spawner_spawn_yarn(rrSpawner* spawner, cutil_vector* yarn_list) {
     rrEntity* entity;
     rrYarn* yarn;
     rrPoint spawn_pos, direction, test_move;
-    int valid_spawn;
+    int valid_spawn = 1;
 
     do {
         rr_spawner_get_random_yarn_spawn(spawner, &spawn_pos, &direction);
