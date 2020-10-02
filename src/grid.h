@@ -23,6 +23,8 @@ void rr_grid_clear_position(rrGrid* grid, rrPoint* position);
 rrEntity* rr_grid_create_basic_entity(rrGrid* grid, rrPoint* position, rrEntityType type);
 void rr_grid_destroy_basic_entity(rrGrid* grid, rrEntity* entity);
 
+void rr_grid_get_size(rrGrid* grid, rrPoint* size);
+
 /** Gets property values specified in level */
 cutil_btree* rr_grid_get_properties(rrGrid* grid);
 

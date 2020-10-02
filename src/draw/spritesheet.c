@@ -5,14 +5,11 @@
 
 rrSpritesheet* rr_spritesheet_create(rrSprite* sprite, size_t size){
     rrSpritesheet* spritesheet = malloc(sizeof(rrSpritesheet));
-    rr_spritesheet_init(spritesheet, sprite, size);
-
-    return spritesheet;
-}
-
-void rr_spritesheet_init(rrSpritesheet* spritesheet, rrSprite* sprite, size_t size) {
     spritesheet->source = sprite;
     spritesheet->sprites = calloc(size, sizeof(rrSprite*));
+    spritesheet->size = size;
+
+    return spritesheet;
 }
 
 void rr_spritesheet_destroy(rrSpritesheet* spritesheet){

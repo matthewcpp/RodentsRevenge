@@ -23,6 +23,7 @@ typedef enum {
     RR_ENTITY_CHEESE,
     RR_ENTITY_HOLE,
     RR_ENTITY_TRAP,
+    RR_ENTITY_YARN,
     RR_ENTITY_UNKNOWN
 } rrEntityType;
 

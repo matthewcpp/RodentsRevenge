@@ -5,22 +5,26 @@ include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/util_functions.cmake)
 project (RodentsRevenge C)
 
 set(game_src
+	src/debug.h src/debug.c
 	src/player.h src/player.c
 	src/grid.h src/grid.c
-	src/game.h src/game.c
+	src/game.h src/game_private.h src/game.c
 	src/input.h
 	src/point.h src/point.c
 	src/enemy.h src/enemy.c
 	src/entity.h src/entity.c
 	src/spawner.h src/spawner.c
-
+	src/yarn.h src/yarn.c
 	src/util.h src/util.c
 	src/clock.h src/clock.c
 	src/vec2.c src/vec2.h
 	src/pool.h src/pool.c)
 
 set(drawing_src
-	src/draw/renderer.h src/draw/renderer.c
+	src/draw/color.h src/draw/color.c
+	src/draw/rect.h src/draw/rect.c
+	src/draw/renderer.h
+	src/draw/sprite.h
 	src/draw/spritesheet.h src/draw/spritesheet.c
 	src/draw/animation.h src/draw/animation.c)
 
@@ -35,7 +39,7 @@ set(ui_src
 	src/ui/button.h src/ui/button.c
 	src/ui/score.h src/ui/score.c
 	src/ui/lives.h src/ui/lives.c
-        src/ui/level_select_dialog.h src/ui/level_select_dialog.c
+	src/ui/level_select_dialog.h src/ui/level_select_dialog.c
 	src/ui/pause_dialog.h src/ui/pause_dialog.c)
 
 set(sdl_src

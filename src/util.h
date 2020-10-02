@@ -4,6 +4,6 @@
 #include "cutil/vector.h"
 
 const char* rr_path_sep();
-void string_split(const char* str, const char* split, cutil_vector* out);
+int rand_between(int min, int max);
 
 #endif

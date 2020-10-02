@@ -1,9 +1,10 @@
 #ifndef RR_SPRITESHEET_INDEXSHEET_H
 #define RR_SPRITESHEET_INDEXSHEET_H
 
-#include "../draw/renderer.h"
+#include "rect.h"
+#include "sprite.h"
 
-#include "cutil/btree.h"
+#include <stddef.h>
 
 typedef struct {
     rrSprite* source;
@@ -12,8 +13,8 @@ typedef struct {
 } rrSpritesheet;
 
 rrSpritesheet* rr_spritesheet_create(rrSprite* sprite, size_t size);
-void rr_spritesheet_init(rrSpritesheet* spritesheet, rrSprite* sprite, size_t size);
-rrSprite* rr_spritesheet_add_sprite(rrSpritesheet* spritesheet, size_t index, rrRect* rect);
 void rr_spritesheet_destroy(rrSpritesheet* spritesheet);
+
+rrSprite* rr_spritesheet_add_sprite(rrSpritesheet* spritesheet, size_t index, rrRect* rect);
 
 #endif

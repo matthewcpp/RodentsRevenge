@@ -6,6 +6,7 @@
 #include "grid.h"
 #include "input.h"
 #include "draw/animation.h"
+#include "draw/renderer.h"
 
 #include <stdint.h>
 
@@ -13,15 +14,17 @@ typedef struct rrPlayer {
     rrEntity entity;
     rrGrid* _grid;
     rrInput* _input;
+    rrRenderer* _renderer;
     int score;
     int lives_remaining;
     int time_stuck;
 
-    rrAnimation* death_animation;
+    rrAnimationPlayer death_animation;
     rrEntity* _killer_entity;
 } rrPlayer;
 
-void rr_player_init(rrPlayer* player, rrGrid* grid, rrInput* input);
+void rr_player_init(rrPlayer* player, rrGrid* grid, rrInput* input, rrRenderer* renderer);
+void rr_player_init_assets(rrPlayer* player);
 void rr_player_update(rrPlayer* player, int time);
 void rr_player_move(rrPlayer* player, rrPoint* delta);
 

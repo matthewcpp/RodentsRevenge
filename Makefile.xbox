@@ -7,6 +7,7 @@ NXDK_SDL = y
 
 SRCS =  lib/cutil/src/allocator.c \
 		lib/cutil/src/btree.c \
+		lib/cutil/src/btree_itr.c \
 		lib/cutil/src/strbuf.c \
 		lib/cutil/src/trait.c \
 		lib/cutil/src/vector.c \

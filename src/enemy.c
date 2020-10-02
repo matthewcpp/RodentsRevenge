@@ -8,7 +8,6 @@ void rr_enemy_init(rrEnemy* enemy, rrEntity* player, rrGrid* grid) {
     rr_entity_init(&enemy->entity, RR_ENTITY_ENEMY);
     enemy->_grid = grid;
     enemy->_player = player;
-    enemy->_last_move_time = 0;
 }
 
 static rrPoint deltas[8] = {
@@ -59,14 +58,9 @@ int rr_enemy_move(rrEnemy* enemy) {
     }
 }
 
-void rr_enemy_update(rrEnemy* enemy, int time) {
-    if (enemy->entity.status == RR_STATUS_ACTIVE || enemy->entity.status == RR_STATUS_WAITING) {
-        enemy->_last_move_time += time;
-        if (enemy->_last_move_time >= 1000) {
-            rr_enemy_move(enemy);
-            enemy->_last_move_time = 0;
-        }
-    }
+void rr_enemy_update(rrEnemy* enemy) {
+    if (enemy->entity.status == RR_STATUS_ACTIVE || enemy->entity.status == RR_STATUS_WAITING)
+        rr_enemy_move(enemy);
 }
 
 void rr_enemy_suspend(rrEnemy* enemy) {
@@ -74,7 +68,7 @@ void rr_enemy_suspend(rrEnemy* enemy) {
     enemy->entity.status = RR_STATUS_SUSPENDED;
 }
 
-void* _rr_enemey_create_pooled(void* user_data) {
+void* _rr_enemy_create_pooled(void* user_data) {
     rrGame* game = (rrGame*)user_data;
 
     rrEnemy* enemy = malloc(sizeof(rrEnemy));
@@ -83,8 +77,10 @@ void* _rr_enemey_create_pooled(void* user_data) {
     return enemy;
 }
 
-/** ensures that the enemy has been removed from the board before it is returned to the reserve.  Failure to do this can leave the board in an inconsistent state. */
-void rr_enemy_reset_pooled(void* item, void* user_data) {
+/** ensures that the enemy has been removed from the board before it is returned to the reserve.
+ * Failure to do this can leave the board in an inconsistent state.
+ * */
+void _rr_enemy_reset_pooled(void* item, void* user_data) {
     rrEnemy* enemy = (rrEnemy*)item;
     rrGame* game = (rrGame*)user_data;
 

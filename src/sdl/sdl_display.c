@@ -2,6 +2,7 @@
 #include "sdl_renderer.h"
 
 #include "../enemy.h"
+#include "../yarn.h"
 #include "../ui/game_ui.h"
 #include "../ui/title_ui.h"
 #include "../util.h"
@@ -20,9 +21,6 @@ typedef enum {
 
 struct rrSDLDisplay{
     rrGame* _game;
-    SDL_Window* _window;
-    SDL_Renderer* sdl_renderer;
-    rrSpritesheet spritesheet;
 
     rrPoint _map_pos;
     rrPoint window_size;
@@ -34,153 +32,46 @@ struct rrSDLDisplay{
     rrInput* input;
 };
 
-rrSDLDisplay* rr_sdl_display_create(SDL_Window* window, rrGame* game, rrInput* input) {
+rrSDLDisplay* rr_sdl_display_create(rrGame* game, rrInput* input, rrRenderer* sdl_renderer) {
     rrSDLDisplay* display = malloc(sizeof(rrSDLDisplay));
 
-    display->_window = window;
+
     display->_game = game;
     display->input = input;
-    display->sdl_renderer = SDL_CreateRenderer(window, -1, 0);
-    display->renderer = rr_sdl_renderer_create(display->sdl_renderer);
+    display->renderer = sdl_renderer;
     display->display_screen = RR_SCREEN_TITLE;
 
     display->game_ui = NULL;
     display->title_ui = NULL;
 
-    TTF_Init();
-
-    SDL_GetRendererOutputSize(display->sdl_renderer, &display->window_size.x, &display->window_size.y);
+    rr_renderer_get_screen_size(display->renderer, &display->window_size);
     display->_map_pos.x = (display->window_size.x / 2)  - ((RR_GRID_WIDTH * RR_RENDERER_TILE_SIZE) / 2);
     display->_map_pos.y = (display->window_size.y / 2)  - ((RR_GRID_HEIGHT * RR_RENDERER_TILE_SIZE) / 2);
-
-    rr_sdl_renderer_set_screen_size(display->renderer, &display->window_size);
 
     return display;
 }
 
 void rr_sdl_display_destroy(rrSDLDisplay* display) {
-    rr_animation_destroy(rr_game_get_player(display->_game)->death_animation);
-
-    rr_sdl_renderer_destroy(display->renderer);
-    SDL_DestroyRenderer(display->sdl_renderer);
-
-
     rr_game_ui_destroy(display->game_ui);
     rr_title_ui_destroy(display->title_ui);
-
-    TTF_Quit();
 
     free(display);
 }
 
-void rr_sdl_display_add_sprite_info(rrSDLDisplay* display, rrSpriteSheetIndex index, int x, int y, int w, int h) {
-    rrRect rect;
-    rect.x = x;
-    rect.y = y;
-    rect.w = w;
-    rect.h = h;
-
-    rr_spritesheet_add_sprite(&display->spritesheet, index, &rect);
-}
-
-void rr_sdl_display_add_tile_sprite_info(rrSDLDisplay* display, rrSpriteSheetIndex index, int x, int y) {
-    rr_sdl_display_add_sprite_info(display, index, x, y, 16, 16);
-}
-
-void rr_sdl_display_init_spritesheet(rrSDLDisplay* display) {
-    rr_spritesheet_init(&display->spritesheet, display->renderer->sprites[RR_SPRITE_SPRITESHEET], RR_SPRITESHEET_INDEX_COUNT);
-
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_BLOCK, 18, 0);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_MOUSE, 54, 34);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_WALL, 36, 0);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_CAT, 85, 52);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_CAT_WAIT, 0, 36);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_CHEESE, 36, 54);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_REMAINING_LIFE, 36, 18);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_HOLE, 0, 0);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_STUCK_PLAYER, 0, 54);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_MOUSETRAP, 18, 54);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_PLAYER_DEATH1, 18, 36);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_PLAYER_DEATH2, 54, 54);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_PLAYER_DEATH3, 36, 36);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_PLAYER_DEATH4, 0, 18);
-    rr_sdl_display_add_tile_sprite_info(display, RR_SPRITESHEET_INDEX_PLAYER_DEATH5, 18, 18);
-    rr_sdl_display_add_sprite_info(display, RR_SPRITESHEET_INDEX_CLOCK, 54, 0, 29, 32);
-}
-
-void rr_sdl_display_init_animation(rrSDLDisplay* display) {
-    rrSprite* animation_frames[5];
-
-    animation_frames[0] = display->spritesheet.sprites[RR_SPRITESHEET_INDEX_PLAYER_DEATH1];
-    animation_frames[1] = display->spritesheet.sprites[RR_SPRITESHEET_INDEX_PLAYER_DEATH2];
-    animation_frames[2] = display->spritesheet.sprites[RR_SPRITESHEET_INDEX_PLAYER_DEATH3];
-    animation_frames[3] = display->spritesheet.sprites[RR_SPRITESHEET_INDEX_PLAYER_DEATH4];
-    animation_frames[4] = display->spritesheet.sprites[RR_SPRITESHEET_INDEX_PLAYER_DEATH5];
-
-    rr_game_get_player(display->_game)->death_animation = rr_animation_create(&display->spritesheet, 5, animation_frames, 100);
-}
-
-int rr_sdl_display_load_sprites(rrSDLDisplay* display, const char* asset_dir) {
-    rrSprite* sprite;
-    char asset_path[256];
-    sprintf(asset_path, "%s%s%s", asset_dir, rr_path_sep(), "spritesheet.png");
-
-    sprite = rr_renderer_load_sprite(display->renderer, asset_path);
-    if (sprite) {
-        display->renderer->sprites[RR_SPRITE_SPRITESHEET] = sprite;
-        rr_sdl_display_init_spritesheet(display);
-        rr_sdl_display_init_animation(display);
-    }
-    else {
-        return 0;
-    }
-
-    sprintf(asset_path, "%s%s%s", asset_dir, rr_path_sep(), "logo.png");
-    sprite = rr_renderer_load_sprite(display->renderer, asset_path);
-
-    if (sprite)
-        display->renderer->sprites[RR_SPRITE_TITLE_LOGO] = sprite;
-    else
-        return 0;
-
-    return 1;
-}
-
-
-int rr_sdl_display_load_fonts(rrSDLDisplay* display, const char* asset_dir) {
-    TTF_Font* font;
-    char asset_path[256];
-    sprintf(asset_path, "%s%s%s", asset_dir, rr_path_sep(), "ms-sans-serif.ttf");
-
-    font = TTF_OpenFont(asset_path, 24);
-    if (font)
-        display->renderer->fonts[RR_FONT_TITLE] = font;
-    else
-        return 0;
-
-    font = TTF_OpenFont(asset_path, 16);
-    if (font)
-        display->renderer->fonts[RR_FONT_BUTTON] = font;
-    else
-        return 0;
-
-
-    return 1;
-}
-
 void rr_sdl_display_draw_board_background(rrSDLDisplay* display) {
-    SDL_Rect board_rect;
+    rrColor background_color = {195, 195, 0, 255};
+    rrRect board_rect;
     board_rect.x = display->_map_pos.x;
     board_rect.y = display->_map_pos.y;
     board_rect.w = RR_GRID_WIDTH * RR_RENDERER_TILE_SIZE;
     board_rect.h = RR_GRID_HEIGHT * RR_RENDERER_TILE_SIZE;
 
-    SDL_SetRenderDrawColor(display->sdl_renderer, 195, 195, 0, 255);
-    SDL_RenderFillRect(display->sdl_renderer, &board_rect);
+    rr_renderer_color(display->renderer, &background_color);
+    rr_renderer_fill_rect(display->renderer, &board_rect);
 }
 
 void rr_sdl_display_draw_enemy(rrSDLDisplay* display, rrEnemy* enemy) {
-    rrSpriteSheetIndex sprite_index;
+    rrSprite* sprite;
     rrPoint draw_pos;
     rr_point_copy(&draw_pos, &display->_map_pos);
     draw_pos.x += enemy->entity.position.x * RR_RENDERER_TILE_SIZE;
@@ -188,18 +79,18 @@ void rr_sdl_display_draw_enemy(rrSDLDisplay* display, rrEnemy* enemy) {
 
     switch (enemy->entity.status) {
         case RR_STATUS_ACTIVE:
-            sprite_index = RR_SPRITESHEET_INDEX_CAT;
+            sprite = display->renderer->spritesheet->sprites[RR_SPRITESHEET_INDEX_CAT];
             break;
 
         case RR_STATUS_WAITING:
-            sprite_index = RR_SPRITESHEET_INDEX_CAT_WAIT;
+            sprite = display->renderer->spritesheet->sprites[RR_SPRITESHEET_INDEX_CAT_WAIT];
             break;
 
         default:
             return;
     }
 
-    rr_renderer_draw_sprite(display->renderer, display->spritesheet.sprites[sprite_index], &draw_pos);
+    rr_renderer_draw_sprite(display->renderer, sprite, &draw_pos);
 }
 
 void rr_sdl_display_draw_player(rrSDLDisplay* display, rrPlayer* player) {
@@ -211,20 +102,35 @@ void rr_sdl_display_draw_player(rrSDLDisplay* display, rrPlayer* player) {
 
     switch (player->entity.status) {
         case RR_STATUS_ACTIVE:
-            sprite = display->spritesheet.sprites[RR_SPRITESHEET_INDEX_MOUSE];
+            sprite = display->renderer->spritesheet->sprites[RR_SPRITESHEET_INDEX_MOUSE];
             break;
 
         case RR_STATUS_STUCK:
-            sprite = display->spritesheet.sprites[RR_SPRITESHEET_INDEX_STUCK_PLAYER];
+            sprite = display->renderer->spritesheet->sprites[RR_SPRITESHEET_INDEX_STUCK_PLAYER];
             break;
 
         case RR_STATUS_DYING:
-            sprite = rr_animation_get_current_sprite(player->death_animation);
+            sprite = rr_animation_player_get_current_sprite(&player->death_animation);
             break;
 
         default:
             return;
     }
+
+    rr_renderer_draw_sprite(display->renderer, sprite, &draw_pos);
+}
+
+void rr_sdl_display_draw_yarn(rrSDLDisplay* display, rrYarn* yarn) {
+    rrSprite* sprite;
+    rrPoint draw_pos;
+    rr_point_copy(&draw_pos, &display->_map_pos);
+    draw_pos.x += yarn->entity.position.x * RR_RENDERER_TILE_SIZE;
+    draw_pos.y += yarn->entity.position.y * RR_RENDERER_TILE_SIZE;
+
+    if (yarn->entity.status == RR_STATUS_DYING)
+        sprite = rr_animation_player_get_current_sprite(&yarn->explode_animation);
+    else
+        sprite = display->renderer->spritesheet->sprites[RR_SPRITESHEET_INDEX_YARN];
 
     rr_renderer_draw_sprite(display->renderer, sprite, &draw_pos);
 }
@@ -235,7 +141,7 @@ void rr_sdl_display_draw_basic_block(rrSDLDisplay* display, rrSpriteSheetIndex s
     draw_pos.x += cell->x * RR_RENDERER_TILE_SIZE;
     draw_pos.y += cell->y * RR_RENDERER_TILE_SIZE;
 
-    rr_renderer_draw_sprite(display->renderer, display->spritesheet.sprites[sprite], &draw_pos);
+    rr_renderer_draw_sprite(display->renderer, display->renderer->spritesheet->sprites[sprite], &draw_pos);
 }
 
 void rr_sdl_display_draw_entities(rrSDLDisplay* display) {
@@ -272,6 +178,10 @@ void rr_sdl_display_draw_entities(rrSDLDisplay* display) {
                     rr_sdl_display_draw_enemy(display, (rrEnemy*)entity);
                     break;
 
+                case RR_ENTITY_YARN:
+                    rr_sdl_display_draw_yarn(display, (rrYarn*)entity);
+                    break;
+
                 case RR_ENTITY_PLAYER:
                     rr_sdl_display_draw_player(display, (rrPlayer*)entity);
                     break;
@@ -298,26 +208,16 @@ void rr_sdl_display_set_screen(rrSDLDisplay* display, rrDisplayScreen screen) {
 }
 
 void rr_sdl_display_draw_game_scren(rrSDLDisplay* display) {
-    SDL_SetRenderDrawColor(display->sdl_renderer, 195, 195, 195, 255);
-    SDL_RenderClear(display->sdl_renderer);
-
     rr_sdl_display_draw_board_background(display);
     rr_sdl_display_draw_entities(display);
 
     rr_game_ui_update(display->game_ui);
     rr_game_ui_draw(display->game_ui);
-
-    SDL_RenderPresent(display->sdl_renderer);
 }
 
 void rr_sdl_display_draw_title_screen(rrSDLDisplay* display){
-    SDL_SetRenderDrawColor(display->sdl_renderer, 195, 195, 195, 255);
-    SDL_RenderClear(display->sdl_renderer);
-
     rr_title_ui_update(display->title_ui);
     rr_title_ui_draw(display->title_ui);
-
-    SDL_RenderPresent(display->sdl_renderer);
 }
 
 void rr_sdl_display_on_new_game(void* user_data) {
@@ -346,7 +246,7 @@ void rr_sdl_display_init_ui(rrSDLDisplay* display) {
     rr_ui_button_set_callback(&display->title_ui->new_game_button, rr_sdl_display_on_new_game, display);
     rr_ui_button_set_callback(&display->title_ui->level_select_dialog->ok_button, rr_sdl_display_on_select_level, display);
 
-    display->game_ui = rr_game_ui_create(display->_game, display->renderer, display->input, &display->spritesheet);
+    display->game_ui = rr_game_ui_create(display->_game, display->renderer, display->input, display->renderer->spritesheet);
     display->_map_pos.y =  display->game_ui->clock._sprite->rect.h + 20;
     rr_ui_button_set_callback(&display->game_ui->pause_dialog->exit_button, rr_sdl_display_on_game_exit, display);
 }

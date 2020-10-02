@@ -2,18 +2,17 @@
 #define RODENTSREVENGE_ENEMY_H
 
 #include "entity.h"
-#include "point.h"
 #include "grid.h"
+#include "point.h"
 
 typedef struct {
     rrEntity entity;
     rrGrid* _grid;
-    int _last_move_time;
     rrEntity* _player;
 } rrEnemy;
 
 void rr_enemy_init(rrEnemy* enemy, rrEntity* player, rrGrid* grid);
-void rr_enemy_update(rrEnemy* enemy, int time);
+void rr_enemy_update(rrEnemy* enemy);
 int rr_enemy_move(rrEnemy* enemy);
 
 /** Puts enemy in a suspended state so that it will not be reused when spawning additional enemies, but is not active on the board.
@@ -21,7 +20,7 @@ int rr_enemy_move(rrEnemy* enemy);
  */
 void rr_enemy_suspend(rrEnemy* enemy);
 
-void* _rr_enemey_create_pooled(void* user_data);
-void rr_enemy_reset_pooled(void* item, void* user_data);
+void* _rr_enemy_create_pooled(void* user_data);
+void _rr_enemy_reset_pooled(void* item, void* user_data);
 
 #endif

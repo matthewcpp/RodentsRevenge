@@ -4,7 +4,7 @@
 
 void rr_game_ui_on_pause_dialog_resume(void* user_data);
 
-        rrGameUi* rr_game_ui_create(rrGame* game, rrRenderer* renderer, rrInput* input, rrSpritesheet* spritesheet) {
+rrGameUi* rr_game_ui_create(rrGame* game, rrRenderer* renderer, rrInput* input, rrSpritesheet* spritesheet) {
     rrGameUi* ui = malloc(sizeof(rrGameUi));
     rrPoint ui_element_offset;
 
@@ -17,7 +17,7 @@ void rr_game_ui_on_pause_dialog_resume(void* user_data);
     rr_ui_score_init(&ui->score, &ui_element_offset, game, renderer);
 
     ui_element_offset.x = 0;
-    rr_ui_clock_init(&ui->clock, renderer, game, spritesheet->sprites[RR_SPRITESHEET_INDEX_CLOCK], &ui_element_offset);
+    rr_ui_clock_init(&ui->clock, renderer, game, rr_renderer_get_sprite(renderer, RR_SPRITE_CLOCK), &ui_element_offset);
 
     ui_element_offset.x = 10;
     rr_ui_lives_init(&ui->lives, spritesheet->sprites[RR_SPRITESHEET_INDEX_REMAINING_LIFE], &ui_element_offset, game, renderer);

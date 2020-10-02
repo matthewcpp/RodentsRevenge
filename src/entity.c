@@ -18,7 +18,7 @@ int rr_entity_position_is_invalid(rrEntity* entity) {
 }
 
 int rr_entity_is_static(rrEntity* entity) {
-    if (entity->type == RR_ENTITY_PLAYER || entity->type == RR_ENTITY_ENEMY)
+    if (entity->type == RR_ENTITY_PLAYER || entity->type == RR_ENTITY_ENEMY || entity->type == RR_ENTITY_YARN)
         return 0;
 
     return 1;
