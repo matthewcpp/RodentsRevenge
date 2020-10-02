@@ -29,7 +29,7 @@ void rr_ui_pause_dialog_show(rrUIPauseDialog* pause_dialog) {
     pause_dialog->active = 1;
 }
 
-void rr_ui_pause_dialog_update(rrUIPauseDialog* pause_dialog) {
+void rr_ui_pause_dialog_update_input(rrUIPauseDialog* pause_dialog) {
     if (rr_input_button_down(pause_dialog->_input, RR_INPUT_BUTTON_RIGHT))
         rr_ui_active_element_group_next(&pause_dialog->_element_group);
     else if (rr_input_button_down(pause_dialog->_input, RR_INPUT_BUTTON_LEFT))
@@ -42,6 +42,23 @@ void rr_ui_pause_dialog_update(rrUIPauseDialog* pause_dialog) {
         rr_ui_button_activate(&pause_dialog->resume_button);
     else if (rr_input_button_down(pause_dialog->_input, RR_INPUT_BUTTON_BACK))
         rr_ui_button_activate(&pause_dialog->exit_button);
+}
+
+void rr_ui_pause_dialog_update_pointer(rrUIPauseDialog* pause_dialog) {
+    rrPoint pos;
+
+    if (!rr_input_pointer_up(pause_dialog->_input))
+        return;
+
+    rr_input_pointer_pos(pause_dialog->_input, &pos);
+
+    rr_ui_button_try_click(&pause_dialog->resume_button, &pos);
+    rr_ui_button_try_click(&pause_dialog->exit_button, &pos);
+}
+
+void rr_ui_pause_dialog_update(rrUIPauseDialog* pause_dialog) {
+    rr_ui_pause_dialog_update_input(pause_dialog);
+    rr_ui_pause_dialog_update_pointer(pause_dialog);
 }
 
 void rr_ui_pause_dialog_center_content(rrUIPauseDialog* pause_dialog, rrRect* content_rect) {

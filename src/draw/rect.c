@@ -26,3 +26,13 @@ void rr_rect_encapsulate(rrRect* target, rrRect* rect) {
     if (rect_bottom > target_bottom)
         target->h += rect_bottom - target_bottom;
 }
+
+int rr_rect_contains_point(rrRect* rect, int x, int y) {
+    if (x < rect->x || x > rect->x + rect->w)
+        return 0;
+
+    if (y < rect->y || y > rect->y + rect->h)
+        return 0;
+
+    return 1;
+}

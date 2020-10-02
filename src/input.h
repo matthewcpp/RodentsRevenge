@@ -1,6 +1,8 @@
 #ifndef RR_INPUT_H
 #define RR_INPUT_H
 
+#include "point.h"
+
 typedef enum{
     RR_INPUT_BUTTON_UP,
     RR_INPUT_BUTTON_DOWN,
@@ -21,6 +23,10 @@ int rr_input_button_down(rrInput* input, rrInputButton button);
  * Note if a button was just pressed this frame, its held time will be zero.
  */
 int rr_input_button_held_time(rrInput* input, rrInputButton button);
+
+int rr_input_pointer_down(rrInput* input);
+int rr_input_pointer_up(rrInput* input);
+void rr_input_pointer_pos(rrInput* input, rrPoint* pos);
 
 
 #endif

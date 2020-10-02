@@ -71,7 +71,7 @@ void rr_ui_level_select_update_active_buttons(rrUILevelSelect* level_select) {
     }
 }
 
-void rr_ui_level_select_update(rrUILevelSelect* level_select) {
+void rr_ui_level_select_update_input(rrUILevelSelect* level_select) {
     if (rr_input_button_down(level_select->_input, RR_INPUT_BUTTON_START))
         rr_ui_button_activate(&level_select->ok_button);
     else if (rr_input_button_down(level_select->_input, RR_INPUT_BUTTON_BACK))
@@ -80,6 +80,23 @@ void rr_ui_level_select_update(rrUILevelSelect* level_select) {
         rr_ui_level_select_update_active_level_text(level_select);
     else
         rr_ui_level_select_update_active_buttons(level_select);
+}
+
+void rr_ui_level_select_update_pointer(rrUILevelSelect* level_select) {
+    rrPoint pos;
+
+    if (!rr_input_pointer_up(level_select->_input))
+        return;
+
+    rr_input_pointer_pos(level_select->_input, &pos);
+
+    rr_ui_button_try_click(&level_select->ok_button, &pos);
+    rr_ui_button_try_click(&level_select->cancel_button, &pos);
+}
+
+void rr_ui_level_select_update(rrUILevelSelect* level_select) {
+    rr_ui_level_select_update_input(level_select);
+    rr_ui_level_select_update_pointer(level_select);
 }
 
 void rr_ui_level_select_center_content(rrUILevelSelect* level_select, rrRect* content_rect) {

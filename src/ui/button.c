@@ -78,3 +78,20 @@ void rr_ui_button_get_rect(rrUiButton* button, rrRect* rect) {
     rect->w = button->sprite->rect.w + RR_UI_BUTTON_PADDING_H * 2;
     rect->h = button->sprite->rect.h + RR_UI_BUTTON_PADDING_V * 2;
 }
+
+int rr_ui_button_hit(rrUiButton* button, rrPoint* point) {
+    rrRect rect;
+    rr_ui_button_get_rect(button, &rect);
+
+    return rr_rect_contains_point(&rect, point->x, point->y);
+}
+
+int rr_ui_button_try_click(rrUiButton* button, rrPoint* point) {
+    if (rr_ui_button_hit(button, point)){
+        rr_ui_button_activate(button);
+
+        return 1;
+    }
+
+    return 0;
+}
