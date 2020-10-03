@@ -271,6 +271,14 @@ int rr_sdl_renderer_load_sprites(rrRenderer* renderer, const char* asset_dir) {
     else
         return 0;
 
+    sprintf(asset_path, "%s%s%s", asset_dir, rr_path_sep(), "trophy.png");
+    sprite = rr_renderer_load_sprite(renderer, asset_path);
+
+    if (sprite)
+        renderer->sprites[RR_SPRITE_TROPHY] = sprite;
+    else
+        return 0;
+
     return 1;
 }
 

@@ -31,6 +31,7 @@ typedef enum {
     RR_SPRITE_TITLE_LOGO,
     RR_SPRITE_SPRITESHEET,
     RR_SPRITE_CLOCK,
+    RR_SPRITE_TROPHY,
     RR_SPRITE_COUNT
 } rrSpriteIndex;
 

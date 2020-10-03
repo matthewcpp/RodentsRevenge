@@ -15,6 +15,8 @@ typedef struct {
 
     rrUiButton back_button;
     rrUiButton clear_button;
+    rrUiBasicSprite title;
+    rrUiBasicSprite trophies[3];
     rrUiActiveElementGroup _element_group;
 } rrHighScoresUi;
 

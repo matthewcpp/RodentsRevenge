@@ -1,5 +1,7 @@
 #include "high_scores_ui.h"
 
+#include "../assets.h"
+
 #include <stdlib.h>
 
 void rr_high_scores_ui_layout(rrHighScoresUi* high_scores_ui);
@@ -25,8 +27,19 @@ void rr_high_scores_ui_destroy(rrHighScoresUi* high_scores_ui){
 }
 
 void rr_high_scores_ui_layout(rrHighScoresUi* high_scores_ui) {
+    rrSprite* trophy_sprite = rr_renderer_get_sprite(high_scores_ui->_renderer, RR_SPRITE_TROPHY);
+    rrSprite* text;
+    rrColor color;
     rrPoint screen_size, element_size, element_pos;
+    int i;
+
     rr_renderer_get_screen_size(high_scores_ui->_renderer, &screen_size);
+
+    text = rr_renderer_create_text(high_scores_ui->_renderer, RR_FONT_TITLE, "Hall Of Fame");
+    rr_color_black(&color);
+    rr_renderer_set_sprite_tint_color(high_scores_ui->_renderer, text, &color);
+    rr_point_set(&element_pos, screen_size.x / 2 - text->rect.w / 2, 5);
+    rr_ui_basic_sprite_init(&high_scores_ui->title, &element_pos, text, high_scores_ui->_renderer);
 
     element_pos.x = screen_size.x - 5;
     element_pos.y = screen_size.y - 5;
@@ -40,6 +53,12 @@ void rr_high_scores_ui_layout(rrHighScoresUi* high_scores_ui) {
     rr_ui_button_get_size(&high_scores_ui->back_button, &element_size);
     element_pos.x -= element_size.x + 10;
     rr_point_copy(&high_scores_ui->back_button.element.position, &element_pos);
+
+    rr_point_set(&element_pos, 10, screen_size.y - trophy_sprite->rect.h - 5);
+    for (i = 0; i < 3; i++) {
+        rr_ui_basic_sprite_init(&high_scores_ui->trophies[i], &element_pos, trophy_sprite, high_scores_ui->_renderer);
+        element_pos.x += trophy_sprite->rect.w + 10;
+    }
 
     rr_ui_active_element_group_add(&high_scores_ui->_element_group, &high_scores_ui->back_button.element);
     rr_ui_active_element_group_add(&high_scores_ui->_element_group, &high_scores_ui->clear_button.element);
@@ -86,6 +105,13 @@ void rr_high_scores_ui_update(rrHighScoresUi* high_scores_ui) {
 }
 
 void rr_high_scores_ui_draw(rrHighScoresUi* high_scores_ui) {
+    int i;
+
+    for (i = 0; i < 3; i++) {
+        rr_ui_basic_sprite_draw(&high_scores_ui->trophies[i]);
+    }
+
+    rr_ui_basic_sprite_draw(&high_scores_ui->title);
     rr_ui_button_draw(&high_scores_ui->clear_button);
     rr_ui_button_draw(&high_scores_ui->back_button);
 }
