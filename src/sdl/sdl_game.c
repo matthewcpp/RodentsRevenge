@@ -57,8 +57,9 @@ int rr_sdl_game_init(rrSDLGame* game, int screen_width, int screen_height) {
     }
 
     game->game = rr_game_create(game->input, game->renderer, game->asset_path);
-    rr_game_load_debug_level(game->game, "C:/development/scratch/debug.txt");
-    game->display = rr_sdl_display_create(game->game, game->input, game->renderer);
+    game->high_scores = rr_high_scores_create();
+    rr_high_scores_load_file(game->high_scores, "C:/development/scratch/high_scores.txt");
+    game->display = rr_sdl_display_create(game->game, game->high_scores, game->input, game->renderer);
 
     rr_sdl_display_init_ui(game->display);
 
@@ -110,6 +111,9 @@ void rr_sdl_game_destroy(rrSDLGame* game) {
     if (game->game) {
         rr_game_destroy(game->game);
     }
+
+    if (game->high_scores)
+        rr_high_scores_destroy(game->high_scores);
 
     if (game->renderer)
         rr_sdl_renderer_destroy(game->renderer);

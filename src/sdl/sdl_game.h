@@ -3,12 +3,14 @@
 
 #include "../input.h"
 #include "../game.h"
+#include "../high_scores.h"
 
 #include "sdl_renderer.h"
 #include "sdl_display.h"
 
 typedef struct {
     rrGame* game;
+    rrHighScores* high_scores;
     rrInput* input;
     rrSDLDisplay* display;
     struct rrRenderer* renderer;

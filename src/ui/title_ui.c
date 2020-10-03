@@ -8,7 +8,6 @@ void rr_title_ui_on_level_select_button(void* user_data);
 void rr_title_ui_on_level_select_cancel(void* user_data);
 
 rrTitleUi* rr_title_ui_create(rrRenderer* renderer, rrGame* game, rrInput* input) {
-
     rrTitleUi* ui = malloc(sizeof(rrTitleUi));
 
     ui->_game = game;
@@ -45,6 +44,7 @@ void rr_title_update_pointer(rrTitleUi* ui) {
 
     rr_ui_button_try_click(&ui->new_game_button, &pos);
     rr_ui_button_try_click(&ui->level_select_button, &pos);
+    rr_ui_button_try_click(&ui->high_scores_button, &pos);
 }
 
 void rr_title_ui_update_input(rrTitleUi* ui) {
@@ -98,11 +98,17 @@ void rr_title_ui_layout(rrTitleUi* ui) {
     ui->new_game_button.element.position.x = screen_size.x / 2 - button_size.x / 2;
 
     render_pos.y += button_size.y + 5;
-    rr_ui_button_init(&ui->level_select_button, ui->_renderer, "Pick Level...", &render_pos);
+    rr_ui_button_init(&ui->level_select_button, ui->_renderer, "Pick Level", &render_pos);
     rr_ui_button_set_callback(&ui->level_select_button, rr_title_ui_on_level_select_button, ui);
     rr_ui_active_element_group_add(&ui->_element_group, &ui->level_select_button.element);
     rr_ui_button_get_size(&ui->level_select_button, &button_size);
     ui->level_select_button.element.position.x = screen_size.x / 2 - button_size.x / 2;
+
+    render_pos.y += button_size.y + 5;
+    rr_ui_button_init(&ui->high_scores_button, ui->_renderer, "High Scores", &render_pos);
+    rr_ui_active_element_group_add(&ui->_element_group, &ui->high_scores_button.element);
+    rr_ui_button_get_size(&ui->high_scores_button, &button_size);
+    ui->high_scores_button.element.position.x = screen_size.x / 2 - button_size.x / 2;
 }
 
 void rr_title_ui_draw(rrTitleUi* ui) {
@@ -111,6 +117,7 @@ void rr_title_ui_draw(rrTitleUi* ui) {
 
     rr_ui_button_draw(&ui->new_game_button);
     rr_ui_button_draw(&ui->level_select_button);
+    rr_ui_button_draw(&ui->high_scores_button);
 
     if (ui->level_select_dialog->active) {
         rr_ui_level_select_draw(ui->level_select_dialog);

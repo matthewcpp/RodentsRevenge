@@ -16,6 +16,7 @@ typedef struct {
     rrUiBasicSprite app_text;
     rrUiButton new_game_button;
     rrUiButton level_select_button;
+    rrUiButton high_scores_button;
     rrUiActiveElementGroup _element_group;
     rrUILevelSelect* level_select_dialog;
 
