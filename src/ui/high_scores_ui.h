@@ -7,6 +7,9 @@
 #include "button.h"
 #include "basic_sprite.h"
 #include "element.h"
+#include "scoreboard.h"
+
+#define SCOREBOARD_SIZE 10
 
 typedef struct {
     rrRenderer* _renderer;
@@ -17,6 +20,7 @@ typedef struct {
     rrUiButton clear_button;
     rrUiBasicSprite title;
     rrUiBasicSprite trophies[3];
+    rrUiScoreboard scoreboard;
     rrUiActiveElementGroup _element_group;
 } rrHighScoresUi;
 

@@ -58,7 +58,7 @@ int rr_sdl_game_init(rrSDLGame* game, int screen_width, int screen_height) {
 
     game->game = rr_game_create(game->input, game->renderer, game->asset_path);
     game->high_scores = rr_high_scores_create();
-    rr_high_scores_load_file(game->high_scores, "C:/development/scratch/high_scores.txt");
+    rr_high_scores_load_file(game->high_scores, "/Users/matthew/development/scratch/high_scores.txt");
     game->display = rr_sdl_display_create(game->game, game->high_scores, game->input, game->renderer);
 
     rr_sdl_display_init_ui(game->display);

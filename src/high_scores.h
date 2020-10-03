@@ -12,6 +12,7 @@ int rr_high_scores_load_file(rrHighScores* high_scores, const char* path);
 int rr_high_scores_write_file(rrHighScores* high_scores, const char* path);
 size_t rr_high_scores_count(rrHighScores* high_scores);
 void rr_high_scores_clear(rrHighScores* high_scores);
+int rr_high_scores_get_score(rrHighScores* high_scores, size_t index, char** name, int* score);
 int rr_high_scores_score_is_high(rrHighScores* high_scores, int score);
 int rr_high_scores_add(rrHighScores* high_scores, int score, const char* name);
 

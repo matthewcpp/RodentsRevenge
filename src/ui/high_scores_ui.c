@@ -15,6 +15,7 @@ rrHighScoresUi* rr_high_scores_ui_create(rrRenderer* renderer, rrHighScores* sco
     high_scores_ui->_input = input;
 
     rr_ui_active_element_group_init(&high_scores_ui->_element_group);
+    rr_ui_scoreboard_init(&high_scores_ui->scoreboard, scores, renderer);
 
     rr_high_scores_ui_layout(high_scores_ui);
 
@@ -40,6 +41,11 @@ void rr_high_scores_ui_layout(rrHighScoresUi* high_scores_ui) {
     rr_renderer_set_sprite_tint_color(high_scores_ui->_renderer, text, &color);
     rr_point_set(&element_pos, screen_size.x / 2 - text->rect.w / 2, 5);
     rr_ui_basic_sprite_init(&high_scores_ui->title, &element_pos, text, high_scores_ui->_renderer);
+
+    element_pos.x = 5;
+    element_pos.y += text->rect.h + 10;
+
+    rr_ui_scoreboard_layout(&high_scores_ui->scoreboard, &element_pos);
 
     element_pos.x = screen_size.x - 5;
     element_pos.y = screen_size.y - 5;
@@ -110,6 +116,8 @@ void rr_high_scores_ui_draw(rrHighScoresUi* high_scores_ui) {
     for (i = 0; i < 3; i++) {
         rr_ui_basic_sprite_draw(&high_scores_ui->trophies[i]);
     }
+
+    rr_ui_scoreboard_draw(&high_scores_ui->scoreboard);
 
     rr_ui_basic_sprite_draw(&high_scores_ui->title);
     rr_ui_button_draw(&high_scores_ui->clear_button);

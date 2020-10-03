@@ -40,6 +40,7 @@ set(ui_src
 	src/ui/title_ui.h src/ui/title_ui.c
 	src/ui/button.h src/ui/button.c
 	src/ui/score.h src/ui/score.c
+	src/ui/scoreboard.h src/ui/scoreboard.c
 	src/ui/lives.h src/ui/lives.c
 	src/ui/level_select_dialog.h src/ui/level_select_dialog.c
 	src/ui/pause_dialog.h src/ui/pause_dialog.c)
