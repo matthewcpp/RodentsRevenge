@@ -43,6 +43,7 @@ set(ui_src
 	src/ui/scoreboard.h src/ui/scoreboard.c
 	src/ui/lives.h src/ui/lives.c
 	src/ui/level_select_dialog.h src/ui/level_select_dialog.c
+	src/ui/text_input.h src/ui/text_input.c
 	src/ui/pause_dialog.h src/ui/pause_dialog.c)
 
 set(sdl_src
