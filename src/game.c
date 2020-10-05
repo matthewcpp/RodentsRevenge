@@ -314,6 +314,7 @@ void rr_game_update(rrGame* game, int time) {
             break;
 
         case RR_GAME_STATE_PAUSED:
+        case RR_GAME_STATE_OVER:
             break;
     }
 }

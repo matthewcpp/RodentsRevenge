@@ -29,13 +29,13 @@ void rr_ui_text_input_buffer_updated(rrUiTextInput* textInput) {
 void rr_ui_text_input_draw(rrUiTextInput* text_input) {
     rrColor color;
     rrRect draw_rect;
+    rrPoint draw_pos;
     rr_ui_text_input_get_rect(text_input, &draw_rect);
 
     rr_color_white(&color);
     rr_renderer_color(text_input->_renderer, &color);
     rr_renderer_fill_rect(text_input->_renderer, &draw_rect);
 
-    rrPoint draw_pos;
     rr_point_copy(&draw_pos, &text_input->element.position);
     draw_pos.x += TEXT_INPUT_PADDING;
     draw_pos.y += TEXT_INPUT_PADDING;

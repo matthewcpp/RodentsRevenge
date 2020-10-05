@@ -299,5 +299,11 @@ int rr_sdl_renderer_load_fonts(rrRenderer* renderer, const char* asset_dir) {
     else
         return 0;
 
+    font = TTF_OpenFont(asset_path, 13);
+    if (font)
+        renderer->fonts[RR_FONT_KEYBOARD] = font;
+    else
+        return 0;
+
     return 1;
 }

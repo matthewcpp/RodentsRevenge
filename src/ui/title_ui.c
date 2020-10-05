@@ -15,6 +15,7 @@ rrTitleUi* rr_title_ui_create(rrRenderer* renderer, rrGame* game, rrInput* input
     ui->_input = input;
 
     rr_ui_active_element_group_init(&ui->_element_group);
+    ui->onscreen_keyboard = rr_ui_onscreen_keyboard_create(renderer);
 
     rr_title_ui_layout(ui);
     ui->level_select_dialog = rr_ui_level_select_create(game, renderer, input);
@@ -122,6 +123,8 @@ void rr_title_ui_draw(rrTitleUi* ui) {
     if (ui->level_select_dialog->active) {
         rr_ui_level_select_draw(ui->level_select_dialog);
     }
+
+    rr_ui_onscreen_keyboard_draw(ui->onscreen_keyboard);
 }
 
 void rr_title_ui_on_level_select_button(void* user_data) {

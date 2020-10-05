@@ -9,6 +9,7 @@
 #include "../game.h"
 #include "../input.h"
 #include "../draw/renderer.h"
+#include "onscreen_keyboard.h"
 
 
 typedef struct {
@@ -19,6 +20,7 @@ typedef struct {
     rrUiButton high_scores_button;
     rrUiActiveElementGroup _element_group;
     rrUILevelSelect* level_select_dialog;
+    rrUiOnscreenKeyboard* onscreen_keyboard;
 
     rrRenderer * _renderer;
     rrGame* _game;
