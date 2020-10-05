@@ -254,12 +254,32 @@ void rr_sdl_display_init_ui(rrSDLDisplay* display) {
     rr_ui_button_set_callback(&display->title_ui->level_select_dialog->ok_button, rr_sdl_display_on_select_level, display);
     rr_ui_button_set_callback(&display->title_ui->high_scores_button, rr_sdl_display_on_high_scores, display);
 
-    display->game_ui = rr_game_ui_create(display->_game, display->renderer, display->input, display->renderer->spritesheet);
+    display->game_ui = rr_game_ui_create(display->_game, display->_high_scores, display->renderer, display->input, display->renderer->spritesheet);
     display->_map_pos.y =  display->game_ui->clock._sprite->rect.h + 20;
     rr_ui_button_set_callback(&display->game_ui->pause_dialog->exit_button, rr_sdl_display_on_game_exit, display);
 
     display->high_scores_ui = rr_high_scores_ui_create(display->renderer, display->_high_scores, display->input);
     rr_ui_button_set_callback(&display->high_scores_ui->back_button, rr_sdl_on_high_scores_back_button, display);
+}
+
+void rr_sdl_display_update(rrSDLDisplay* display) {
+    switch (display->display_screen) {
+        case RR_SCREEN_GAME: {
+            rr_game_ui_update(display->game_ui);
+
+            if (display->game_ui->_previous_state == RR_GAME_STATE_OVER && rr_input_button_down(display->input, RR_INPUT_BUTTON_START))
+                rr_sdl_display_set_screen(display, RR_SCREEN_TITLE);
+
+            break;
+        }
+        case RR_SCREEN_TITLE:
+            rr_title_ui_update(display->title_ui);
+            break;
+
+        case RR_SCREEN_HIGH_SCORES:
+            rr_high_scores_ui_update(display->high_scores_ui);
+            break;
+    }
 }
 
 void rr_sdl_display_draw(rrSDLDisplay* display) {
@@ -272,12 +292,10 @@ void rr_sdl_display_draw(rrSDLDisplay* display) {
             rr_game_ui_draw(display->game_ui);
             break;
         case RR_SCREEN_TITLE:
-            rr_title_ui_update(display->title_ui);
             rr_title_ui_draw(display->title_ui);
             break;
 
         case RR_SCREEN_HIGH_SCORES:
-            rr_high_scores_ui_update(display->high_scores_ui);
             rr_high_scores_ui_draw(display->high_scores_ui);
             break;
     }

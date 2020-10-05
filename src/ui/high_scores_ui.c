@@ -73,7 +73,7 @@ void rr_high_scores_ui_layout(rrHighScoresUi* high_scores_ui) {
 }
 
 void rr_high_scores_ui_update_scoreboard(rrHighScoresUi* high_scores_ui) {
-
+    (void)high_scores_ui;
 }
 
 void rr_high_scores_ui_show(rrHighScoresUi* high_scores_ui) {

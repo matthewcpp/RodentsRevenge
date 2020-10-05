@@ -12,6 +12,7 @@ typedef struct rrSDLDisplay rrSDLDisplay;
 rrSDLDisplay* rr_sdl_display_create(rrGame* game, rrHighScores* high_scores, rrInput* input, rrRenderer* sdl_renderer);
 void rr_sdl_display_init_ui(rrSDLDisplay* display);
 void rr_sdl_display_destroy(rrSDLDisplay* display);
+void rr_sdl_display_update(rrSDLDisplay* display);
 void rr_sdl_display_draw(rrSDLDisplay* display);
 
 #endif

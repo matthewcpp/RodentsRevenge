@@ -35,13 +35,13 @@ void rr_ui_scoreboard_layout(rrUiScoreboard* scoreboard, rrPoint* position) {
 }
 
 void rr_ui_scoreboard_update(rrUiScoreboard* scoreboard) {
-    size_t i;
+    size_t i, count = rr_high_scores_count(scoreboard->_high_scores);
     rrPoint screen_size;
     char score_str[16];
 
     rr_renderer_get_screen_size(scoreboard->_renderer, &screen_size);
 
-    for (i = 0; i < SCOREBOARD_SIZE; i++) {
+    for (i = 0; i < count; i++) {
         rrUiBasicSprite* name_sprite = &scoreboard->names[i];
         rrUiBasicSprite* score_sprite = &scoreboard->scores[i];
         rrPoint pos;
@@ -60,9 +60,9 @@ void rr_ui_scoreboard_update(rrUiScoreboard* scoreboard) {
 }
 
 void rr_ui_scoreboard_draw(rrUiScoreboard* scoreboard) {
-    size_t i;
+    size_t i, count = rr_high_scores_count(scoreboard->_high_scores);
 
-    for (i = 0; i < SCOREBOARD_SIZE; i++) {
+    for (i = 0; i < count; i++) {
         rr_ui_basic_sprite_draw(&scoreboard->names[i]);
         rr_ui_basic_sprite_draw(&scoreboard->scores[i]);
     }

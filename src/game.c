@@ -120,7 +120,10 @@ void rr_game_round_clear(rrGame* game) {
     cutil_vector_clear(game->_enemies);
 }
 
-/* TODO: Preserve last board state while game over state active */
+void rr_game_over(rrGame* game) {
+    game->state = RR_GAME_STATE_OVER;
+}
+
 void rr_game_reset(rrGame* game) {
     size_t i;
 
@@ -257,7 +260,7 @@ void rr_game_update_player_killed(rrGame* game) {
     if (game->player.lives_remaining >= 0)
         rr_game_respawn_player(game);
     else {
-        rr_game_reset(game);
+        rr_game_over(game);
     }
 }
 
@@ -316,7 +319,10 @@ void rr_game_update(rrGame* game, int time) {
 }
 
 int rr_game_restart(rrGame* game) {
-    assert(game->state == RR_GAME_STATE_UNSTARTED);
+    assert(game->state == RR_GAME_STATE_UNSTARTED || game->state == RR_GAME_STATE_OVER);
+
+    if (game->state == RR_GAME_STATE_OVER)
+        rr_game_reset(game);
 
     game->player.score = 0;
     game->player.lives_remaining = 2;

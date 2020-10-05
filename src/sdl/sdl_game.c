@@ -87,6 +87,7 @@ void rr_sdl_game_run(rrSDLGame* game) {
         if (time_delta >= 32) {
             rr_sdl_input_update(game->input, time_delta);
             rr_game_update(game->game, time_delta);
+            rr_sdl_display_update(game->display);
 
             rr_sdl_renderer_begin(game->renderer);
             rr_sdl_display_draw(game->display);

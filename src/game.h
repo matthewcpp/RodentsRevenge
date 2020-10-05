@@ -10,7 +10,8 @@ typedef enum {
     RR_GAME_STATE_UNSTARTED,
     RR_GAME_STATE_PLAYING,
     RR_GAME_STATE_WINDING_CLOCK,
-    RR_GAME_STATE_PAUSED
+    RR_GAME_STATE_PAUSED,
+    RR_GAME_STATE_OVER
 } rrGameState;
 
 typedef struct rrGame rrGame;
