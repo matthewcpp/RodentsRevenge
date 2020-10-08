@@ -14,12 +14,13 @@ typedef enum {
 
 void rr_ui_onscreen_keyboard_init_keys(rrUiOnscreenKeyboard* keyboard);
 void rr_ui_onscreen_keyboard_calculate_content_pos(rrUiOnscreenKeyboard* keyboard);
-void rr_ui_onscreen_keyboard_set_active_key(rrUiOnscreenKeyboard* keyboard, int index);
+int rr_ui_onscreen_keyboard_set_active_key(rrUiOnscreenKeyboard* keyboard, int index);
 
-rrUiOnscreenKeyboard* rr_ui_onscreen_keyboard_create(rrRenderer* renderer){
+rrUiOnscreenKeyboard* rr_ui_onscreen_keyboard_create(rrRenderer* renderer, rrInput* input){
     rrUiOnscreenKeyboard* keyboard = malloc(sizeof(rrUiOnscreenKeyboard));
 
     keyboard->_renderer = renderer;
+    keyboard->_input = input;
     rr_ui_onscreen_keyboard_calculate_content_pos(keyboard);
     rr_ui_onscreen_keyboard_init_keys(keyboard);
     keyboard->_active_sprites = &keyboard->_lower_key_sprites[0];
@@ -35,9 +36,12 @@ void rr_ui_onscreen_keyboard_destroy(rrUiOnscreenKeyboard* keyboard) {
 }
 
 /** Updates the color the active key.  Assumes index is valid. */
-void rr_ui_onscreen_keyboard_set_active_key(rrUiOnscreenKeyboard* keyboard, int index) {
+int rr_ui_onscreen_keyboard_set_active_key(rrUiOnscreenKeyboard* keyboard, int index) {
     rrColor color;
     rr_color_black(&color);
+
+    if (index < 0 || index >= 40)
+        return 0;
 
     rr_renderer_set_sprite_tint_color(keyboard->_renderer, keyboard->_lower_key_sprites[keyboard->_active_index], &color);
     rr_renderer_set_sprite_tint_color(keyboard->_renderer, keyboard->_upper_key_sprites[keyboard->_active_index], &color);
@@ -47,6 +51,8 @@ void rr_ui_onscreen_keyboard_set_active_key(rrUiOnscreenKeyboard* keyboard, int 
 
     rr_renderer_set_sprite_tint_color(keyboard->_renderer, keyboard->_lower_key_sprites[keyboard->_active_index], &color);
     rr_renderer_set_sprite_tint_color(keyboard->_renderer, keyboard->_upper_key_sprites[keyboard->_active_index], &color);
+
+    return 1;
 }
 
 #define KEY_WIDTH 25
@@ -66,14 +72,14 @@ static void calculate_key_sprite_pos(rrRect* key_rect, rrSprite* sprite, rrPoint
 }
 
 void rr_ui_onscreen_keyboard_draw_key(rrUiOnscreenKeyboard* keyboard, int index, rrColor* background_color) {
+    rrSprite* text = keyboard->_active_sprites[index];
     rrPoint sprite_pos;
     rrRect key_rect;
     rrColor black;
     rr_color_black(&black);
     rr_rect_set_size(&key_rect, KEY_WIDTH, KEY_HEIGHT);
-    calculate_key_rect_pos(keyboard, index, &key_rect);
 
-    rrSprite* text = keyboard->_active_sprites[index];
+    calculate_key_rect_pos(keyboard, index, &key_rect);
     calculate_key_sprite_pos(&key_rect, text, &sprite_pos);
 
     rr_renderer_color(keyboard->_renderer, background_color);
@@ -161,4 +167,84 @@ void rr_ui_onscreen_keyboard_calculate_content_pos(rrUiOnscreenKeyboard* keyboar
 
     keyboard->_content_pos.x = screen_size.x / 2 - keyboard_width / 2;
     keyboard->_content_pos.y = screen_size.y - KEY_MARGIN_W - keyboard_height;
+}
+
+void rr_ui_onscreen_keyboard_update_input(rrUiOnscreenKeyboard* keyboard) {
+    if (rr_input_button_down(keyboard->_input, RR_INPUT_BUTTON_RIGHT))
+        rr_ui_onscreen_keyboard_set_active_key(keyboard, keyboard->_active_index + 1);
+
+    if (rr_input_button_down(keyboard->_input, RR_INPUT_BUTTON_LEFT))
+        rr_ui_onscreen_keyboard_set_active_key(keyboard, keyboard->_active_index - 1);
+
+    if (rr_input_button_down(keyboard->_input, RR_INPUT_BUTTON_DOWN))
+        rr_ui_onscreen_keyboard_set_active_key(keyboard, keyboard->_active_index + 10);
+
+    if (rr_input_button_down(keyboard->_input, RR_INPUT_BUTTON_UP))
+        rr_ui_onscreen_keyboard_set_active_key(keyboard, keyboard->_active_index - 10);
+}
+
+void rr_ui_onscreen_keyboard_update_pointer(rrUiOnscreenKeyboard* keyboard) {
+    rrRect keyboard_rect;
+    rrPoint pointer_pos;
+    rrPoint selected_key = {-1, -1};
+    int i;
+
+    if (!rr_input_pointer_up((keyboard->_input)))
+        return;
+
+    rr_ui_onscreen_keyboard_get_rect(keyboard, &keyboard_rect);
+    rr_input_pointer_pos(keyboard->_input, &pointer_pos);
+
+    if (!rr_rect_contains_point(&keyboard_rect, pointer_pos.x, pointer_pos.y))
+        return;
+
+    rr_point_sub(&pointer_pos, &pointer_pos, &keyboard->_content_pos);
+
+    for (i = 0; i < 10; i++) {
+        if (pointer_pos.x < KEY_WIDTH) {
+            selected_key.x = i;
+            break;
+        }
+
+        pointer_pos.x -= KEY_WIDTH;
+
+        if (pointer_pos.x < KEY_MARGIN_W)
+            return;
+
+        pointer_pos.x -= KEY_MARGIN_W;
+    }
+
+    if (selected_key.x == -1)
+        return;
+
+    for (i = 0; i < 4; i++) {
+        if (pointer_pos.y < KEY_HEIGHT) {
+            selected_key.y = i;
+            break;
+        }
+
+        pointer_pos.y -= KEY_HEIGHT;
+
+        if (pointer_pos.y < KEY_MARGIN_H)
+            return;
+
+        pointer_pos.y -= KEY_MARGIN_H;
+    }
+
+    if (selected_key.y == -1)
+        return;
+
+    rr_ui_onscreen_keyboard_set_active_key(keyboard, selected_key.x % 10 + selected_key.y * 10);
+}
+
+void rr_ui_onscreen_keyboard_update(rrUiOnscreenKeyboard* keyboard) {
+    rr_ui_onscreen_keyboard_update_input(keyboard);
+    rr_ui_onscreen_keyboard_update_pointer(keyboard);
+}
+
+void rr_ui_onscreen_keyboard_get_rect(rrUiOnscreenKeyboard* keyboard, rrRect* rect) {
+    rect->x = keyboard->_content_pos.x;
+    rect->y = keyboard->_content_pos.y;
+    rect->w = KEY_WIDTH * 10 + KEY_MARGIN_H * 9;
+    rect->h = KEY_HEIGHT * 4 + KEY_MARGIN_H * 3;
 }
