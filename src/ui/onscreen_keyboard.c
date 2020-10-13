@@ -6,8 +6,8 @@
 #include <stdlib.h>
 
 typedef enum {
-    KEY_VALUE_SPACE,
-    KEY_VALUE_DEL,
+    KEY_VALUE_SPACE = 32,
+    KEY_VALUE_DEL = 8,
     KEY_VAL_UPPER,
     KEY_VAL_DONE
 } rrKeyVal;
@@ -23,9 +23,14 @@ rrUiOnscreenKeyboard* rr_ui_onscreen_keyboard_create(rrRenderer* renderer, rrInp
     keyboard->_input = input;
     rr_ui_onscreen_keyboard_calculate_content_pos(keyboard);
     rr_ui_onscreen_keyboard_init_keys(keyboard);
-    keyboard->_active_sprites = &keyboard->_lower_key_sprites[0];
+    keyboard->_active_sprites = keyboard->_lower_key_sprites;
     keyboard->_active_index = 0;
     rr_ui_onscreen_keyboard_set_active_key(keyboard, keyboard->_active_index);
+
+    keyboard->on_char = NULL;
+    keyboard->on_backspace = NULL;
+    keyboard->on_done = NULL;
+    keyboard ->user_data = NULL;
 
     return keyboard;
 }
@@ -33,6 +38,12 @@ rrUiOnscreenKeyboard* rr_ui_onscreen_keyboard_create(rrRenderer* renderer, rrInp
 void rr_ui_onscreen_keyboard_destroy(rrUiOnscreenKeyboard* keyboard) {
     free(keyboard->_lower_key_sprites);
     free(keyboard);
+}
+
+void rr_ui_onscreen_keyboard_show(rrUiOnscreenKeyboard* keyboard) {
+    keyboard->_active_sprites = &keyboard->_lower_key_sprites[0];
+    keyboard->_active_index = 0;
+    keyboard->active = 1;
 }
 
 /** Updates the color the active key.  Assumes index is valid. */
@@ -147,8 +158,8 @@ void rr_ui_onscreen_keyboard_init_keys(rrUiOnscreenKeyboard* keyboard) {
     }
 
     for (ch = 'A'; ch <= 'Z'; ch ++) {
-        keyboard->_lower_key_values[index] = ch;
-        keyboard->_upper_key_values[index++] = ch + 32;
+        keyboard->_upper_key_values[index] = ch;
+        keyboard->_lower_key_values[index++] = ch + 32;
     }
 
     rr_ui_onscreen_keyboard_create_key_sprites(keyboard->_renderer, keyboard->_lower_key_values, keyboard->_lower_key_sprites, 36);
@@ -169,6 +180,40 @@ void rr_ui_onscreen_keyboard_calculate_content_pos(rrUiOnscreenKeyboard* keyboar
     keyboard->_content_pos.y = screen_size.y - KEY_MARGIN_W - keyboard_height;
 }
 
+void rr_ui_onscreen_keyboard_activate_key(rrUiOnscreenKeyboard* keyboard) {
+    int value = keyboard->_active_sprites == keyboard->_lower_key_sprites ?
+            keyboard->_lower_key_values[keyboard->_active_index] : keyboard->_upper_key_values[keyboard->_active_index];
+
+    switch (value) {
+        case KEY_VALUE_DEL: {
+            if (keyboard->on_backspace)
+                keyboard->on_backspace(keyboard->user_data);
+        }
+        break;
+
+        case KEY_VAL_DONE: {
+            if (keyboard->on_done)
+                keyboard->on_done(keyboard->user_data);
+        }
+        break;
+
+        case KEY_VAL_UPPER: {
+            if (keyboard->_active_sprites == keyboard->_lower_key_sprites)
+                keyboard->_active_sprites = keyboard->_upper_key_sprites;
+            else
+                keyboard->_active_sprites = keyboard->_lower_key_sprites;
+        }
+        break;
+
+        default: {
+            if (keyboard->on_char)
+                keyboard->on_char(value, keyboard->user_data);
+
+            keyboard->_active_sprites = keyboard->_lower_key_sprites;
+        }
+    }
+}
+
 void rr_ui_onscreen_keyboard_update_input(rrUiOnscreenKeyboard* keyboard) {
     if (rr_input_button_down(keyboard->_input, RR_INPUT_BUTTON_RIGHT))
         rr_ui_onscreen_keyboard_set_active_key(keyboard, keyboard->_active_index + 1);
@@ -181,6 +226,9 @@ void rr_ui_onscreen_keyboard_update_input(rrUiOnscreenKeyboard* keyboard) {
 
     if (rr_input_button_down(keyboard->_input, RR_INPUT_BUTTON_UP))
         rr_ui_onscreen_keyboard_set_active_key(keyboard, keyboard->_active_index - 10);
+
+    if (rr_input_button_down(keyboard->_input, RR_INPUT_BUTTON_ACCEPT))
+        rr_ui_onscreen_keyboard_activate_key(keyboard);
 }
 
 void rr_ui_onscreen_keyboard_update_pointer(rrUiOnscreenKeyboard* keyboard) {

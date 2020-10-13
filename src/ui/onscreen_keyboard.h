@@ -4,6 +4,10 @@
 #include "../draw/renderer.h"
 #include "../input.h"
 
+typedef void(*rrUiOnscreenKeyboardCharCallback)(int code, void* user_data);
+typedef void(*rrUiOnscreenKeyboardBackspaceCallback)(void* user_data);
+typedef void(*rrUiOnscreenKeyboardDoneCallback)(void* user_data);
+
 typedef struct {
     rrRenderer* _renderer;
     rrInput* _input;
@@ -18,10 +22,18 @@ typedef struct {
 
     rrPoint _content_pos;
 
+    rrUiOnscreenKeyboardCharCallback on_char;
+    rrUiOnscreenKeyboardBackspaceCallback on_backspace;
+    rrUiOnscreenKeyboardDoneCallback on_done;
+    void* user_data;
+
+    int active;
+
 } rrUiOnscreenKeyboard;
 
 rrUiOnscreenKeyboard* rr_ui_onscreen_keyboard_create(rrRenderer* renderer, rrInput* input);
 void rr_ui_onscreen_keyboard_destroy(rrUiOnscreenKeyboard* keyboard);
+void rr_ui_onscreen_keyboard_show(rrUiOnscreenKeyboard* keyboard);
 void rr_ui_onscreen_keyboard_update(rrUiOnscreenKeyboard* keyboard);
 
 void rr_ui_onscreen_keyboard_draw(rrUiOnscreenKeyboard* keyboard);

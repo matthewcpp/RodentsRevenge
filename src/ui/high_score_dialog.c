@@ -19,7 +19,7 @@ rrUiHighScoreDialog* rr_ui_high_score_dialog_create(rrRenderer* renderer, rrInpu
     return high_score_dialog;
 }
 
-void rr_ui_high_score_dialog_delete(rrUiHighScoreDialog* high_score_dialog){
+void rr_ui_high_score_dialog_delete(rrUiHighScoreDialog* high_score_dialog) {
     rr_ui_active_element_group_uninit(&high_score_dialog->_element_group);
 
     free(high_score_dialog);
@@ -73,7 +73,7 @@ void rr_ui_high_score_dialog_layout(rrUiHighScoreDialog* high_score_dialog) {
     rr_rect_encapsulate(&content_rect, &element_rect);
     position.y += element_rect.h + 5;
 
-    rr_ui_text_input_init(&high_score_dialog->text_input, high_score_dialog->_input, high_score_dialog->_renderer, &position, "Name");
+    rr_ui_text_input_init(&high_score_dialog->text_input, high_score_dialog->_input, high_score_dialog->_renderer, &position);
     rr_ui_text_input_get_rect(&high_score_dialog->text_input, &element_rect);
     rr_rect_encapsulate(&content_rect, &element_rect);
     position.y += element_rect.h + 10;
@@ -82,14 +82,20 @@ void rr_ui_high_score_dialog_layout(rrUiHighScoreDialog* high_score_dialog) {
     rr_ui_button_get_rect(&high_score_dialog->ok_button, &element_rect);
     rr_rect_encapsulate(&content_rect, &element_rect);
 
+    rr_ui_active_element_group_add(&high_score_dialog->_element_group, &high_score_dialog->text_input.element);
+    rr_ui_active_element_group_add(&high_score_dialog->_element_group, &high_score_dialog->ok_button.element);
+
     rr_ui_high_score_dialog_center_content(high_score_dialog, &content_rect);
 }
 
-void rr_ui_high_score_dialog_show(rrUiHighScoreDialog* high_score_dialog){
+void rr_ui_high_score_dialog_show(rrUiHighScoreDialog* high_score_dialog) {
     high_score_dialog->active = 1;
 }
 
-void rr_ui_high_score_dialog_update(rrUiHighScoreDialog* high_score_dialog){
+void rr_ui_high_score_dialog_update(rrUiHighScoreDialog* high_score_dialog) {
+    if (high_score_dialog->text_input.onscreen_keyboard->active) {
+        rr_ui_text_input_update(&high_score_dialog->text_input);
+    }
     if (rr_input_pointer_up(high_score_dialog->_input)) {
         rrPoint pos;
         rr_input_pointer_pos(high_score_dialog->_input, &pos);
@@ -100,7 +106,7 @@ void rr_ui_high_score_dialog_update(rrUiHighScoreDialog* high_score_dialog){
         rr_ui_button_activate(&high_score_dialog->ok_button);
 }
 
-void rr_ui_high_score_dialog_draw(rrUiHighScoreDialog* high_score_dialog){
+void rr_ui_high_score_dialog_draw(rrUiHighScoreDialog* high_score_dialog) {
     rrColor color;
     rr_color_black(&color);
 
