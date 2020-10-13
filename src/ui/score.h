@@ -9,7 +9,7 @@ typedef struct {
     rrPoint offset;
     rrSprite * sprite;
     int prev_score;
-    rrGame* _game;
+    rrPlayer* _player;
     rrRenderer* _renderer;
 }rrUiScore;
 

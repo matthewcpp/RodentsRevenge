@@ -287,8 +287,6 @@ void rr_sdl_display_draw(rrSDLDisplay* display) {
         case RR_SCREEN_GAME:
             rr_sdl_display_draw_board_background(display);
             rr_sdl_display_draw_entities(display);
-
-            rr_game_ui_update(display->game_ui);
             rr_game_ui_draw(display->game_ui);
             break;
         case RR_SCREEN_TITLE:
