@@ -93,16 +93,23 @@ void rr_ui_high_score_dialog_show(rrUiHighScoreDialog* high_score_dialog) {
 }
 
 void rr_ui_high_score_dialog_update(rrUiHighScoreDialog* high_score_dialog) {
-    if (high_score_dialog->text_input.onscreen_keyboard->active) {
-        rr_ui_text_input_update(&high_score_dialog->text_input);
-    }
+    rr_ui_text_input_update(&high_score_dialog->text_input);
+
+    if (high_score_dialog->text_input.onscreen_keyboard->active)
+        return;
+
+    if (rr_input_button_down(high_score_dialog->_input, RR_INPUT_BUTTON_DOWN))
+        rr_ui_active_element_group_next(&high_score_dialog->_element_group);
+    else if (rr_input_button_down(high_score_dialog->_input, RR_INPUT_BUTTON_UP))
+        rr_ui_active_element_group_previous(&high_score_dialog->_element_group);
+
     if (rr_input_pointer_up(high_score_dialog->_input)) {
         rrPoint pos;
         rr_input_pointer_pos(high_score_dialog->_input, &pos);
         rr_ui_button_try_click(&high_score_dialog->ok_button, &pos);
     }
 
-    if (rr_input_button_down(high_score_dialog->_input, RR_INPUT_BUTTON_START))
+    if ((rr_input_button_down(high_score_dialog->_input, RR_INPUT_BUTTON_ACCEPT) || rr_input_button_down(high_score_dialog->_input, RR_INPUT_BUTTON_START)) && high_score_dialog->ok_button.element.active)
         rr_ui_button_activate(&high_score_dialog->ok_button);
 }
 
@@ -116,6 +123,6 @@ void rr_ui_high_score_dialog_draw(rrUiHighScoreDialog* high_score_dialog) {
     rr_ui_basic_rect_draw(&high_score_dialog->bar);
     rr_ui_basic_sprite_draw(&high_score_dialog->prompt_line_1);
     rr_ui_basic_sprite_draw(&high_score_dialog->prompt_line_2);
-    rr_ui_text_input_draw(&high_score_dialog->text_input);
     rr_ui_button_draw(&high_score_dialog->ok_button);
+    rr_ui_text_input_draw(&high_score_dialog->text_input);
 }

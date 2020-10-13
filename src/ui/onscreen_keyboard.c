@@ -42,7 +42,7 @@ void rr_ui_onscreen_keyboard_destroy(rrUiOnscreenKeyboard* keyboard) {
 
 void rr_ui_onscreen_keyboard_show(rrUiOnscreenKeyboard* keyboard) {
     keyboard->_active_sprites = &keyboard->_lower_key_sprites[0];
-    keyboard->_active_index = 0;
+    rr_ui_onscreen_keyboard_set_active_key(keyboard, 0);
     keyboard->active = 1;
 }
 
@@ -283,6 +283,7 @@ void rr_ui_onscreen_keyboard_update_pointer(rrUiOnscreenKeyboard* keyboard) {
         return;
 
     rr_ui_onscreen_keyboard_set_active_key(keyboard, selected_key.x % 10 + selected_key.y * 10);
+    rr_ui_onscreen_keyboard_activate_key(keyboard);
 }
 
 void rr_ui_onscreen_keyboard_update(rrUiOnscreenKeyboard* keyboard) {
