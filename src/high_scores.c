@@ -1,5 +1,7 @@
 #include "high_scores.h"
 
+#include "util.h"
+
 #include "cutil/strbuf.h"
 #include "cutil/vector.h"
 
@@ -35,16 +37,27 @@ void rr_high_score_set_name(rrHighScore* high_score, const char* name) {
 
 struct rrHighScores {
     cutil_vector* scores;
+    char* data_file_path;
     rrHighScoresChangedCallbackFunc update_callback;
     void* callback_user_data;
 };
 
-rrHighScores* rr_high_scores_create() {
+#define HIGH_SCORE_DATA_FILE "high_scores.txt"
+
+void set_data_file_str(rrHighScores* high_scores, const char* data_dir) {
+    size_t len = strlen(data_dir);
+    high_scores->data_file_path = malloc(len + (strlen(HIGH_SCORE_DATA_FILE) + 2));
+    sprintf(high_scores->data_file_path, "%s%s%s", data_dir, rr_path_sep(), HIGH_SCORE_DATA_FILE);
+}
+
+rrHighScores* rr_high_scores_create(const char* data_dir) {
     rrHighScores* high_scores = malloc(sizeof(rrHighScores));
 
     high_scores->scores = cutil_vector_create(cutil_trait_ptr());
     high_scores->update_callback = NULL;
     high_scores->callback_user_data = NULL;
+
+    set_data_file_str(high_scores, data_dir);
 
     return high_scores;
 }
@@ -59,6 +72,7 @@ void rr_high_scores_destroy(rrHighScores* high_scores) {
     }
 
     cutil_vector_destroy(high_scores->scores);
+    free(high_scores->data_file_path);
     free(high_scores);
 }
 
@@ -72,12 +86,13 @@ void rr_highscore_readline(FILE* file, cutil_strbuf* strbuf) {
     }
 }
 
-int rr_high_scores_load_file(rrHighScores* high_scores, const char* path) {
+int rr_high_scores_load(rrHighScores* high_scores) {
     int i, count;
     cutil_strbuf* strbuf;
-    FILE* file = fopen(path, "r");
+    FILE* file = fopen(high_scores->data_file_path, "r");
 
     if (!file) return 0;
+
     strbuf = cutil_strbuf_create();
     rr_highscore_readline(file, strbuf);
     sscanf(cutil_strbuf_cstring(strbuf), "%d", &count);

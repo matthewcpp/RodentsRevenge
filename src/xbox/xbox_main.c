@@ -25,7 +25,7 @@ int main() {
     XVideoSetMode(RR_XBOX_SCREEN_WIDTH, RR_XBOX_SCREEN_HEIGHT, 32, REFRESH_DEFAULT);
 
     /* Note that D:/ is mounted as cwd when game is launched. */
-    game = rr_sdl_game_create("D:\\assets");
+    game = rr_sdl_game_create("D:\\assets", "D:\\data");
 
     if (!rr_sdl_game_init(game, RR_XBOX_SCREEN_WIDTH, RR_XBOX_SCREEN_HEIGHT))
         xbox_fatal_error(rr_sdl_game_get_error_str(game));

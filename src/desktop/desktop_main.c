@@ -8,7 +8,7 @@
 int main(int argc, char** argv) {
     rrSDLGame* sdl_game;
 
-    sdl_game = rr_sdl_game_create(ASSET_DIRECTORY);
+    sdl_game = rr_sdl_game_create(ASSET_DIRECTORY, DATA_DIRECTORY);
     if (!rr_sdl_game_init(sdl_game, RR_SCREEN_WIDTH, RR_SCREEN_HEIGHT)) {
         printf("Error Initializing game: %s\n", rr_sdl_game_get_error_str(sdl_game));
         return 1;

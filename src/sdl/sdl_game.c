@@ -8,12 +8,16 @@
 #include <string.h>
 #include <time.h>
 
-rrSDLGame* rr_sdl_game_create(const char* asset_path) {
+rrSDLGame* rr_sdl_game_create(const char* asset_path, const char* data_path) {
     rrSDLGame* game = calloc(sizeof(rrSDLGame), 1);
 
     game->error_str = NULL;
+
     game->asset_path = malloc(strlen(asset_path) + 1);
     strcpy(game->asset_path, asset_path);
+
+    game->data_path = malloc(strlen(data_path) + 1);
+    strcpy(game->data_path, data_path);
 
     return game;
 }
@@ -57,8 +61,8 @@ int rr_sdl_game_init(rrSDLGame* game, int screen_width, int screen_height) {
     }
 
     game->game = rr_game_create(game->input, game->renderer, game->asset_path);
-    game->high_scores = rr_high_scores_create();
-    rr_high_scores_load_file(game->high_scores, "/Users/matthew/development/scratch/high_scores.txt");
+    game->high_scores = rr_high_scores_create(game->data_path);
+    rr_high_scores_load(game->high_scores);
     game->display = rr_sdl_display_create(game->game, game->high_scores, game->input, game->renderer);
 
     rr_sdl_display_init_ui(game->display);
@@ -109,9 +113,11 @@ void rr_sdl_game_destroy(rrSDLGame* game) {
     if (game->asset_path)
         free(game->asset_path);
 
-    if (game->game) {
+    if (game->data_path)
+        free(game->data_path);
+
+    if (game->game)
         rr_game_destroy(game->game);
-    }
 
     if (game->high_scores)
         rr_high_scores_destroy(game->high_scores);
@@ -119,9 +125,8 @@ void rr_sdl_game_destroy(rrSDLGame* game) {
     if (game->renderer)
         rr_sdl_renderer_destroy(game->renderer);
 
-    if (game->window) {
+    if (game->window)
         SDL_DestroyWindow(game->window);
-    }
 
     SDL_VideoQuit();
 }

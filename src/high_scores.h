@@ -7,10 +7,15 @@ typedef struct rrHighScores rrHighScores;
 
 typedef void (*rrHighScoresChangedCallbackFunc)(void* data);
 
-rrHighScores* rr_high_scores_create();
+rrHighScores* rr_high_scores_create(const char* data_dir);
 void rr_high_scores_destroy(rrHighScores* high_scores);
 
-int rr_high_scores_load_file(rrHighScores* high_scores, const char* path);
+/**
+ * Loads serialized high score data into memory.
+ * @param high_scores
+ * @return nonzero value if score data was successfully loaded, otherwise zero.
+ */
+int rr_high_scores_load(rrHighScores* high_scores);
 int rr_high_scores_write_file(rrHighScores* high_scores, const char* path);
 size_t rr_high_scores_count(rrHighScores* high_scores);
 void rr_high_scores_clear(rrHighScores* high_scores);

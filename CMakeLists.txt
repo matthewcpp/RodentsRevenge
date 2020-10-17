@@ -58,7 +58,18 @@ set(platform_src
 	src/desktop/desktop_main.c)
 
 add_executable(RodentsRevenge ${game_src} ${ui_src} ${drawing_src} ${sdl_src} ${platform_src})
-set_source_files_properties(src/desktop/desktop_main.c PROPERTIES COMPILE_DEFINITIONS ASSET_DIRECTORY="${CMAKE_CURRENT_SOURCE_DIR}/assets")
+
+set(data_dir ${CMAKE_CURRENT_BINARY_DIR}/data)
+if (NOT IS_DIRECTORY ${data_dir})
+	file(MAKE_DIRECTORY ${data_dir})
+endif()
+
+set_property(
+	SOURCE src/desktop/desktop_main.c
+	APPEND
+	PROPERTY COMPILE_DEFINITIONS
+	ASSET_DIRECTORY="${CMAKE_CURRENT_SOURCE_DIR}/assets" COMPILE_DEFINITIONS DATA_DIRECTORY="${data_dir}")
+
 set_compiler_options(RodentsRevenge)
 target_compile_definitions(RodentsRevenge PUBLIC RR_PLATFORM_DESKTOP)
 
