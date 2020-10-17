@@ -36,6 +36,7 @@ set(ui_src
 	src/ui/basic_sprite.h src/ui/basic_sprite.c
 	src/ui/clock.h src/ui/clock.c
 	src/ui/game_ui.h src/ui/game_ui.c
+	src/ui/game_over.h src/ui/game_over.c
 	src/ui/high_scores_ui.h src/ui/high_scores_ui.c
 	src/ui/title_ui.h src/ui/title_ui.c
 	src/ui/button.h src/ui/button.c
