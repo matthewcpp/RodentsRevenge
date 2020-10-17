@@ -267,7 +267,7 @@ void rr_sdl_display_update(rrSDLDisplay* display) {
         case RR_SCREEN_GAME: {
             rr_game_ui_update(display->game_ui);
 
-            if (display->game_ui->_previous_state == RR_GAME_STATE_OVER && rr_input_button_down(display->input, RR_INPUT_BUTTON_START))
+            if (display->game_ui->_previous_state == RR_GAME_STATE_OVER && (rr_input_button_down(display->input, RR_INPUT_BUTTON_START) || rr_input_button_down(display->input, RR_INPUT_BUTTON_ACCEPT)))
                 rr_sdl_display_set_screen(display, RR_SCREEN_TITLE);
 
             break;

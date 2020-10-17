@@ -10,6 +10,7 @@
 #include "lives.h"
 #include "pause_dialog.h"
 #include "high_score_dialog.h"
+#include "game_over.h"
 
 typedef struct {
     rrGame* game;
@@ -23,6 +24,7 @@ typedef struct {
     rrGameState  _previous_state;
     rrUIPauseDialog* pause_dialog;
     rrUiHighScoreDialog* high_score_dialog;
+    rrUiGameOver game_over;
 } rrGameUi;
 
 rrGameUi* rr_game_ui_create(rrGame* game, rrHighScores* high_scores, rrRenderer* renderer, rrInput* input, rrSpritesheet* spritesheet);

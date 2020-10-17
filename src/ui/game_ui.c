@@ -45,6 +45,8 @@ void rr_game_ui_layout(rrGameUi* ui, rrSpritesheet* spritesheet) {
 
     ui->high_score_dialog = rr_ui_high_score_dialog_create(ui->renderer, ui->input);
     rr_ui_button_set_callback(&ui->high_score_dialog->ok_button, rr_game_ui_on_high_score_accepted, ui);
+
+    rr_ui_game_over_init(&ui->game_over, ui->renderer);
 }
 
 void rr_game_ui_show(rrGameUi* game_ui) {
@@ -56,6 +58,10 @@ void rr_game_ui_draw(rrGameUi* ui) {
     rr_ui_score_draw(&ui->score);
     rr_ui_clock_draw(&ui->clock);
     rr_ui_lives_draw(&ui->lives);
+
+    if (rr_game_get_state(ui->game) == RR_GAME_STATE_OVER) {
+        rr_ui_game_over_draw(&ui->game_over);
+    }
 
     if (ui->pause_dialog->active)
         rr_ui_pause_dialog_draw(ui->pause_dialog);
