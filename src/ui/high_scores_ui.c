@@ -106,6 +106,8 @@ void rr_high_scores_ui_update_input(rrHighScoresUi* high_scores_ui) {
 }
 
 void rr_high_scores_ui_update(rrHighScoresUi* high_scores_ui) {
+    rr_ui_scoreboard_update(&high_scores_ui->scoreboard);
+
     rr_high_scores_ui_update_pointer(high_scores_ui);
     rr_high_scores_ui_update_input(high_scores_ui);
 }

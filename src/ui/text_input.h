@@ -27,6 +27,7 @@ void rr_ui_text_input_uninit(rrUiTextInput* text_input);
 void rr_ui_text_input_update(rrUiTextInput* text_input);
 void rr_ui_text_input_draw(rrUiTextInput* text_input);
 void rr_ui_text_input_get_rect(rrUiTextInput* text_input, rrRect* rect);
+const char* rr_ui_text_get_str(rrUiTextInput* text_input);
 
 
 #endif

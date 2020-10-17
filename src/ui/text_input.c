@@ -23,7 +23,7 @@ void rr_ui_text_input_init(rrUiTextInput* text_input, rrInput* input,  rrRendere
     text_input->onscreen_keyboard->on_done = on_keyboard_done;
     text_input->onscreen_keyboard->user_data = text_input;
 
-    // 'W' used for layout measurement purposes.
+    /* 'W' used for layout height measurement purposes only. */
     rr_ui_text_input_init_keyboard_sprite(text_input);
     cutil_strbuf_pop_back(text_input->strbuf);
 }
@@ -102,4 +102,8 @@ void on_keyboard_bakspace(void* user_data) {
 void on_keyboard_done(void* user_data) {
     rrUiTextInput* text_input = (rrUiTextInput*)user_data;
     text_input->onscreen_keyboard->active = 0;
+}
+
+const char* rr_ui_text_get_str(rrUiTextInput* text_input) {
+    return cutil_strbuf_cstring(text_input->strbuf);
 }

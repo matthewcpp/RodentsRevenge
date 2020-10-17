@@ -9,6 +9,7 @@
 typedef struct {
     rrHighScores* _high_scores;
     rrRenderer* _renderer;
+    int _needs_refresh;
 
     rrUiBasicSprite names[SCOREBOARD_SIZE];
     rrUiBasicSprite scores[SCOREBOARD_SIZE];

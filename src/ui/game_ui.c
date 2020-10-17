@@ -90,7 +90,11 @@ void rr_game_ui_update(rrGameUi* ui) {
     }
 
     if (game_state == RR_GAME_STATE_OVER && game_state != ui->_previous_state) {
-        rr_ui_high_score_dialog_show(ui->high_score_dialog);
+        rrPlayer* player = rr_game_get_player(ui->game);
+
+        if (rr_high_scores_score_is_high(ui->high_scores, player->score)) {
+            rr_ui_high_score_dialog_show(ui->high_score_dialog);
+        }
     }
 
     ui->_previous_state = game_state;
@@ -98,5 +102,9 @@ void rr_game_ui_update(rrGameUi* ui) {
 
 void rr_game_ui_on_high_score_accepted(void* user_data) {
     rrGameUi* ui = (rrGameUi*)user_data;
+    rrPlayer* player = rr_game_get_player(ui->game);
+    const char* player_name = rr_ui_text_get_str(&ui->high_score_dialog->text_input);
     ui->high_score_dialog->active = 0;
+
+    rr_high_scores_add(ui->high_scores, player->score, player_name);
 }
