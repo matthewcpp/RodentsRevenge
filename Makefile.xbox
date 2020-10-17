@@ -25,4 +25,5 @@ include $(NXDK_DIR)/Makefile
 
 cp_assets:
 	@mkdir -p $(OUTPUT_DIR)
+	@mkdir -p $(OUTPUT_DIR)/data
 	cp -r assets $(OUTPUT_DIR)

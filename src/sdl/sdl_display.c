@@ -5,6 +5,7 @@
 #include "../yarn.h"
 #include "../ui/game_ui.h"
 #include "../ui/title_ui.h"
+#include "../ui/high_scores_ui.h"
 #include "../util.h"
 
 #include <SDL_image.h>
@@ -16,11 +17,13 @@
 
 typedef enum {
     RR_SCREEN_TITLE,
-    RR_SCREEN_GAME
+    RR_SCREEN_GAME,
+    RR_SCREEN_HIGH_SCORES
 }rrDisplayScreen;
 
 struct rrSDLDisplay{
     rrGame* _game;
+    rrHighScores* _high_scores;
 
     rrPoint _map_pos;
     rrPoint window_size;
@@ -29,14 +32,16 @@ struct rrSDLDisplay{
     rrRenderer* renderer;
     rrGameUi* game_ui;
     rrTitleUi* title_ui;
+    rrHighScoresUi* high_scores_ui;
     rrInput* input;
 };
 
-rrSDLDisplay* rr_sdl_display_create(rrGame* game, rrInput* input, rrRenderer* sdl_renderer) {
+rrSDLDisplay* rr_sdl_display_create(rrGame* game, rrHighScores* high_scores, rrInput* input, rrRenderer* sdl_renderer) {
     rrSDLDisplay* display = malloc(sizeof(rrSDLDisplay));
 
-
     display->_game = game;
+    display->_high_scores = high_scores;
+
     display->input = input;
     display->renderer = sdl_renderer;
     display->display_screen = RR_SCREEN_TITLE;
@@ -54,6 +59,7 @@ rrSDLDisplay* rr_sdl_display_create(rrGame* game, rrInput* input, rrRenderer* sd
 void rr_sdl_display_destroy(rrSDLDisplay* display) {
     rr_game_ui_destroy(display->game_ui);
     rr_title_ui_destroy(display->title_ui);
+    rr_high_scores_ui_destroy(display->high_scores_ui);
 
     free(display);
 }
@@ -204,20 +210,11 @@ void rr_sdl_display_set_screen(rrSDLDisplay* display, rrDisplayScreen screen) {
         case RR_SCREEN_GAME:
             rr_game_ui_show(display->game_ui);
             break;
+
+        case RR_SCREEN_HIGH_SCORES:
+            rr_high_scores_ui_show(display->high_scores_ui);
+            break;
     }
-}
-
-void rr_sdl_display_draw_game_scren(rrSDLDisplay* display) {
-    rr_sdl_display_draw_board_background(display);
-    rr_sdl_display_draw_entities(display);
-
-    rr_game_ui_update(display->game_ui);
-    rr_game_ui_draw(display->game_ui);
-}
-
-void rr_sdl_display_draw_title_screen(rrSDLDisplay* display){
-    rr_title_ui_update(display->title_ui);
-    rr_title_ui_draw(display->title_ui);
 }
 
 void rr_sdl_display_on_new_game(void* user_data) {
@@ -234,6 +231,11 @@ void rr_sdl_display_on_select_level(void* user_data) {
     rr_game_restart(display->_game);
 }
 
+void rr_sdl_display_on_high_scores(void* user_data) {
+    rrSDLDisplay* display = (rrSDLDisplay*)user_data;
+    rr_sdl_display_set_screen(display, RR_SCREEN_HIGH_SCORES);
+}
+
 void rr_sdl_display_on_game_exit(void* user_data) {
     rrSDLDisplay* display = (rrSDLDisplay*)user_data;
     rr_game_reset(display->_game);
@@ -241,23 +243,58 @@ void rr_sdl_display_on_game_exit(void* user_data) {
     rr_sdl_display_set_screen(display, RR_SCREEN_TITLE);
 }
 
+void rr_sdl_on_high_scores_back_button(void* user_data) {
+    rrSDLDisplay* display = (rrSDLDisplay*)user_data;
+    rr_sdl_display_set_screen(display, RR_SCREEN_TITLE);
+}
+
 void rr_sdl_display_init_ui(rrSDLDisplay* display) {
     display->title_ui = rr_title_ui_create(display->renderer, display->_game, display->input);
     rr_ui_button_set_callback(&display->title_ui->new_game_button, rr_sdl_display_on_new_game, display);
     rr_ui_button_set_callback(&display->title_ui->level_select_dialog->ok_button, rr_sdl_display_on_select_level, display);
+    rr_ui_button_set_callback(&display->title_ui->high_scores_button, rr_sdl_display_on_high_scores, display);
 
-    display->game_ui = rr_game_ui_create(display->_game, display->renderer, display->input, display->renderer->spritesheet);
+    display->game_ui = rr_game_ui_create(display->_game, display->_high_scores, display->renderer, display->input, display->renderer->spritesheet);
     display->_map_pos.y =  display->game_ui->clock._sprite->rect.h + 20;
     rr_ui_button_set_callback(&display->game_ui->pause_dialog->exit_button, rr_sdl_display_on_game_exit, display);
+
+    display->high_scores_ui = rr_high_scores_ui_create(display->renderer, display->_high_scores, display->input);
+    rr_ui_button_set_callback(&display->high_scores_ui->back_button, rr_sdl_on_high_scores_back_button, display);
+}
+
+void rr_sdl_display_update(rrSDLDisplay* display) {
+    switch (display->display_screen) {
+        case RR_SCREEN_GAME: {
+            rr_game_ui_update(display->game_ui);
+
+            if (display->game_ui->_previous_state == RR_GAME_STATE_OVER && rr_input_button_down(display->input, RR_INPUT_BUTTON_START))
+                rr_sdl_display_set_screen(display, RR_SCREEN_TITLE);
+
+            break;
+        }
+        case RR_SCREEN_TITLE:
+            rr_title_ui_update(display->title_ui);
+            break;
+
+        case RR_SCREEN_HIGH_SCORES:
+            rr_high_scores_ui_update(display->high_scores_ui);
+            break;
+    }
 }
 
 void rr_sdl_display_draw(rrSDLDisplay* display) {
     switch (display->display_screen) {
         case RR_SCREEN_GAME:
-            rr_sdl_display_draw_game_scren(display);
+            rr_sdl_display_draw_board_background(display);
+            rr_sdl_display_draw_entities(display);
+            rr_game_ui_draw(display->game_ui);
             break;
         case RR_SCREEN_TITLE:
-            rr_sdl_display_draw_title_screen(display);
+            rr_title_ui_draw(display->title_ui);
+            break;
+
+        case RR_SCREEN_HIGH_SCORES:
+            rr_high_scores_ui_draw(display->high_scores_ui);
             break;
     }
 }

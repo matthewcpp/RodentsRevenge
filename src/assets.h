@@ -31,6 +31,7 @@ typedef enum {
     RR_SPRITE_TITLE_LOGO,
     RR_SPRITE_SPRITESHEET,
     RR_SPRITE_CLOCK,
+    RR_SPRITE_TROPHY,
     RR_SPRITE_COUNT
 } rrSpriteIndex;
 
@@ -38,8 +39,9 @@ typedef enum {
     RR_FONT_TITLE = 0,
     RR_FONT_BUTTON = 1,
     RR_FONT_SCORE = 1,
+    RR_FONT_KEYBOARD = 2,
 
-    RR_FONT_COUNT = 2
+    RR_FONT_COUNT = 3
 } rrFontIndex;
 
 typedef enum {

@@ -9,20 +9,23 @@
 #include "clock.h"
 #include "lives.h"
 #include "pause_dialog.h"
+#include "high_score_dialog.h"
 
 typedef struct {
     rrGame* game;
+    rrHighScores* high_scores;
     rrRenderer* renderer;
     rrInput* input;
 
     rrUiScore score;
     rrUiClock clock;
     rrUILives lives;
-
+    rrGameState  _previous_state;
     rrUIPauseDialog* pause_dialog;
+    rrUiHighScoreDialog* high_score_dialog;
 } rrGameUi;
 
-rrGameUi* rr_game_ui_create(rrGame* game, rrRenderer* renderer, rrInput* input, rrSpritesheet* spritesheet);
+rrGameUi* rr_game_ui_create(rrGame* game, rrHighScores* high_scores, rrRenderer* renderer, rrInput* input, rrSpritesheet* spritesheet);
 void rr_game_ui_destroy(rrGameUi* game_ui);
 void rr_game_ui_show(rrGameUi* game_ui);
 void rr_game_ui_update(rrGameUi* ui);

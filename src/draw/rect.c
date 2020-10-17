@@ -36,3 +36,15 @@ int rr_rect_contains_point(rrRect* rect, int x, int y) {
 
     return 1;
 }
+
+void rr_rect_set(rrRect* rect, int x, int y, int w, int h) {
+    rect->x = x;
+    rect->y = y;
+    rect->w = w;
+    rect->h = h;
+}
+
+void rr_rect_set_size(rrRect* rect, int w, int h) {
+    rect->w = w;
+    rect->h = h;
+}

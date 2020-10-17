@@ -271,6 +271,14 @@ int rr_sdl_renderer_load_sprites(rrRenderer* renderer, const char* asset_dir) {
     else
         return 0;
 
+    sprintf(asset_path, "%s%s%s", asset_dir, rr_path_sep(), "trophy.png");
+    sprite = rr_renderer_load_sprite(renderer, asset_path);
+
+    if (sprite)
+        renderer->sprites[RR_SPRITE_TROPHY] = sprite;
+    else
+        return 0;
+
     return 1;
 }
 
@@ -288,6 +296,12 @@ int rr_sdl_renderer_load_fonts(rrRenderer* renderer, const char* asset_dir) {
     font = TTF_OpenFont(asset_path, 16);
     if (font)
         renderer->fonts[RR_FONT_BUTTON] = font;
+    else
+        return 0;
+
+    font = TTF_OpenFont(asset_path, 8);
+    if (font)
+        renderer->fonts[RR_FONT_KEYBOARD] = font;
     else
         return 0;
 

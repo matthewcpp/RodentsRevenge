@@ -9,6 +9,7 @@ set(game_src
 	src/player.h src/player.c
 	src/grid.h src/grid.c
 	src/game.h src/game_private.h src/game.c
+	src/high_scores.h src/high_scores.c
 	src/input.h
 	src/point.h src/point.c
 	src/enemy.h src/enemy.c
@@ -35,12 +36,17 @@ set(ui_src
 	src/ui/basic_sprite.h src/ui/basic_sprite.c
 	src/ui/clock.h src/ui/clock.c
 	src/ui/game_ui.h src/ui/game_ui.c
+	src/ui/high_scores_ui.h src/ui/high_scores_ui.c
 	src/ui/title_ui.h src/ui/title_ui.c
 	src/ui/button.h src/ui/button.c
 	src/ui/score.h src/ui/score.c
+	src/ui/scoreboard.h src/ui/scoreboard.c
 	src/ui/lives.h src/ui/lives.c
 	src/ui/level_select_dialog.h src/ui/level_select_dialog.c
-	src/ui/pause_dialog.h src/ui/pause_dialog.c)
+	src/ui/text_input.h src/ui/text_input.c
+	src/ui/onscreen_keyboard.h src/ui/onscreen_keyboard.c
+	src/ui/pause_dialog.h src/ui/pause_dialog.c
+	src/ui/high_score_dialog.h src/ui/high_score_dialog.c)
 
 set(sdl_src
 	src/sdl/sdl_input.h src/sdl/sdl_input.c
@@ -52,7 +58,18 @@ set(platform_src
 	src/desktop/desktop_main.c)
 
 add_executable(RodentsRevenge ${game_src} ${ui_src} ${drawing_src} ${sdl_src} ${platform_src})
-set_source_files_properties(src/desktop/desktop_main.c PROPERTIES COMPILE_DEFINITIONS ASSET_DIRECTORY="${CMAKE_CURRENT_SOURCE_DIR}/assets")
+
+set(data_dir ${CMAKE_CURRENT_BINARY_DIR}/data)
+if (NOT IS_DIRECTORY ${data_dir})
+	file(MAKE_DIRECTORY ${data_dir})
+endif()
+
+set_property(
+	SOURCE src/desktop/desktop_main.c
+	APPEND
+	PROPERTY COMPILE_DEFINITIONS
+	ASSET_DIRECTORY="${CMAKE_CURRENT_SOURCE_DIR}/assets" COMPILE_DEFINITIONS DATA_DIRECTORY="${data_dir}")
+
 set_compiler_options(RodentsRevenge)
 target_compile_definitions(RodentsRevenge PUBLIC RR_PLATFORM_DESKTOP)
 
