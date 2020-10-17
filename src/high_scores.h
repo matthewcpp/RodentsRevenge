@@ -16,8 +16,22 @@ void rr_high_scores_destroy(rrHighScores* high_scores);
  * @return nonzero value if score data was successfully loaded, otherwise zero.
  */
 int rr_high_scores_load(rrHighScores* high_scores);
-int rr_high_scores_write_file(rrHighScores* high_scores, const char* path);
+
+/**
+ * Serializes high score data to storage
+ * @return nonzero value if data was successfully serialized, otherwise zero
+ */
+int rr_high_scores_write(rrHighScores* high_scores);
+
+/**
+ * Gets the number of high scores currently loaded.
+ */
 size_t rr_high_scores_count(rrHighScores* high_scores);
+
+/**
+ * Clears all high scores from memory.
+ * @see rr_high_scores_write to persist changes.
+ */
 void rr_high_scores_clear(rrHighScores* high_scores);
 
 /**

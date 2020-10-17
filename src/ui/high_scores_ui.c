@@ -130,5 +130,6 @@ void rr_high_scores_ui_on_clear_scores(void* user_data) {
     rrHighScoresUi* high_scores_ui = (rrHighScoresUi*)user_data;
 
     rr_high_scores_clear(high_scores_ui->_scores);
+    rr_high_scores_write(high_scores_ui->_scores);
     rr_high_scores_ui_update_scoreboard(high_scores_ui);
 }

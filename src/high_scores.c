@@ -116,7 +116,26 @@ int rr_high_scores_load(rrHighScores* high_scores) {
     return 1;
 }
 
-int rr_high_scores_write_file(rrHighScores* high_scores, const char* path);
+int rr_high_scores_write(rrHighScores* high_scores) {
+    int i, count = (int)cutil_vector_size(high_scores->scores);
+
+    FILE* file = fopen(high_scores->data_file_path, "w");
+
+    if (!file) return 0;
+
+    fprintf(file, "%d\n", count);
+
+    for (i = 0; i < count; i++) {
+        rrHighScore* high_score;
+        cutil_vector_get(high_scores->scores, i, &high_score);
+        fprintf(file, "%s\n%d\n", high_score->name, high_score->score);
+    }
+
+    fflush(file);
+    fclose(file);
+
+    return 1;
+}
 
 size_t rr_high_scores_count(rrHighScores* high_scores) {
     return cutil_vector_size(high_scores->scores);
@@ -180,6 +199,8 @@ int rr_high_scores_add(rrHighScores* high_scores, int score, const char* name) {
         if (score > high_score->score)
             break;
     }
+
+    target->score = score;
 
     if (i == count)
         cutil_vector_push_back(high_scores->scores, &target);

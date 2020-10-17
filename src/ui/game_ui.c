@@ -107,4 +107,5 @@ void rr_game_ui_on_high_score_accepted(void* user_data) {
     ui->high_score_dialog->active = 0;
 
     rr_high_scores_add(ui->high_scores, player->score, player_name);
+    rr_high_scores_write(ui->high_scores);
 }
