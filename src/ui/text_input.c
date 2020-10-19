@@ -51,6 +51,12 @@ void rr_ui_text_input_draw(rrUiTextInput* text_input) {
     rr_renderer_color(text_input->_renderer, &color);
     rr_renderer_fill_rect(text_input->_renderer, &draw_rect);
 
+    if (text_input->element.active) {
+        rr_color_black(&color);
+        rr_renderer_color(text_input->_renderer, &color);
+        rr_renderer_draw_rect(text_input->_renderer, &draw_rect);
+    }
+
     rr_point_copy(&draw_pos, &text_input->element.position);
     draw_pos.x += TEXT_INPUT_PADDING;
     draw_pos.y += TEXT_INPUT_PADDING;
