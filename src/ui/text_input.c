@@ -15,6 +15,9 @@ void rr_ui_text_input_init(rrUiTextInput* text_input, rrInput* input,  rrRendere
     text_input->strbuf = cutil_strbuf_create_with_cstring("W");
     text_input->width_override = 0;
 
+    text_input->text_entered_callback = NULL;
+    text_input->callback_data = NULL;
+
     rr_point_copy(&text_input->element.position, pos);
     text_input->element.active = 0;
     text_input->onscreen_keyboard = rr_ui_onscreen_keyboard_create(renderer, input);
@@ -31,6 +34,11 @@ void rr_ui_text_input_init(rrUiTextInput* text_input, rrInput* input,  rrRendere
 void rr_ui_text_input_uninit(rrUiTextInput* text_input) {
     cutil_strbuf_destroy(text_input->strbuf);
     rr_ui_onscreen_keyboard_destroy(text_input->onscreen_keyboard);
+}
+
+void rr_ui_text_input_show(rrUiTextInput* text_input) {
+    cutil_strbuf_clear(text_input->strbuf);
+    rr_ui_onscreen_keyboard_show(text_input->onscreen_keyboard);
 }
 
 void rr_ui_text_input_draw(rrUiTextInput* text_input) {
@@ -102,6 +110,9 @@ void on_keyboard_bakspace(void* user_data) {
 void on_keyboard_done(void* user_data) {
     rrUiTextInput* text_input = (rrUiTextInput*)user_data;
     text_input->onscreen_keyboard->active = 0;
+
+    if (text_input->text_entered_callback)
+        text_input->text_entered_callback(text_input->callback_data);
 }
 
 const char* rr_ui_text_get_str(rrUiTextInput* text_input) {

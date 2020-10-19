@@ -31,6 +31,7 @@ rrUiOnscreenKeyboard* rr_ui_onscreen_keyboard_create(rrRenderer* renderer, rrInp
     keyboard->on_backspace = NULL;
     keyboard->on_done = NULL;
     keyboard ->user_data = NULL;
+    keyboard->active = 0;
 
     return keyboard;
 }
