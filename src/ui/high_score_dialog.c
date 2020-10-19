@@ -98,10 +98,13 @@ void rr_ui_high_score_dialog_show(rrUiHighScoreDialog* high_score_dialog) {
 }
 
 void rr_ui_high_score_dialog_update(rrUiHighScoreDialog* high_score_dialog) {
-    rr_ui_text_input_update(&high_score_dialog->text_input);
-
-    if (high_score_dialog->text_input.onscreen_keyboard->active)
+    /* not totally ideal but if the keyboard closes due to button press, wait to wait to next update to resume general dialog update. */
+    if (high_score_dialog->text_input.onscreen_keyboard->active) {
+        rr_ui_text_input_update(&high_score_dialog->text_input);
         return;
+    }
+
+    rr_ui_text_input_update(&high_score_dialog->text_input);
 
     if (rr_input_button_down(high_score_dialog->_input, RR_INPUT_BUTTON_DOWN))
         rr_ui_active_element_group_next(&high_score_dialog->_element_group);
