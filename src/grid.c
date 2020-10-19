@@ -102,8 +102,9 @@ void rr_grid_parse_property(rrGrid* grid, FILE* file) {
     /* read prop value */
     ch = fgetc(file);
     while (ch != '\n') {
-        if (ch == '\r') continue;
-        cutil_strbuf_append_char(property_value, (char)ch);
+        if (ch != '\r')
+            cutil_strbuf_append_char(property_value, (char)ch);
+
         ch = fgetc(file);
     }
 

@@ -80,8 +80,9 @@ void rr_highscore_readline(FILE* file, cutil_strbuf* strbuf) {
     int ch = fgetc(file);
 
     while (ch != '\n' && ch != EOF) {
-        if (ch == '\r') continue;
-        cutil_strbuf_append_char(strbuf, (char)ch);
+        if (ch != '\r')
+            cutil_strbuf_append_char(strbuf, (char)ch);
+
         ch = fgetc(file);
     }
 }
