@@ -37,7 +37,6 @@ rrUiOnscreenKeyboard* rr_ui_onscreen_keyboard_create(rrRenderer* renderer, rrInp
 }
 
 void rr_ui_onscreen_keyboard_destroy(rrUiOnscreenKeyboard* keyboard) {
-    free(keyboard->_lower_key_sprites);
     free(keyboard);
 }
 
